@@ -211,12 +211,6 @@ parameters:
 			path: src/Domain/BuildPlan/Steps/Navigation/Navigation_Detail_Builder.php
 
 		-
-			message: '#^Parameter \#2 \$item_id_set of method AIOPageBuilder\\Domain\\BuildPlan\\Steps\\NewPageCreation\\New_Page_Creation_Bulk_Action_Service\:\:bulk_set_selected_eligible_status\(\) expects array\<string, bool\>, array\<string, \(int\|string\)\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Domain/BuildPlan/Steps/NewPageCreation/New_Page_Creation_Bulk_Action_Service.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -617,18 +611,6 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/Domain/Industry/Export/Industry_Pack_Bundle_Service.php
-
-		-
-			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 2
-			path: src/Domain/Industry/Import/Industry_Bundle_Apply_Service.php
-
-		-
-			message: '#^Constant AIOPageBuilder\\Domain\\Industry\\Import\\Industry_Bundle_Apply_Service\:\:STATUS_FAILED is unused\.$#'
-			identifier: classConstant.unused
-			count: 1
-			path: src/Domain/Industry/Import/Industry_Bundle_Apply_Service.php
 
 		-
 			message: '#^Parameter \#1 \$array \(list\<\(int\|string\)\>\) of array_values is already a list, call has no effect\.$#'

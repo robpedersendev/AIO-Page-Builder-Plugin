@@ -546,7 +546,6 @@ final class Onboarding_Planning_Request_Orchestrator {
 
 			if ( $validation_report->allows_build_plan_handoff() ) {
 				$normalized  = $validation_report->get_normalized_output();
-				$crawl_empty = empty( $artifact_options['crawl'] ?? array() );
 				$bundle_refs = array();
 				if ( isset( $artifact_options['industry_context'] ) && is_array( $artifact_options['industry_context'] ) ) {
 					$ic = $artifact_options['industry_context'];
@@ -558,7 +557,8 @@ final class Onboarding_Planning_Request_Orchestrator {
 					? $registry['template_recommendation_context']
 					: array();
 				$enrich_ctx = array(
-					'crawl_empty'                     => $crawl_empty,
+					// * Crawl-backed artifact options are not populated in this onboarding path yet; thin enrichment treats crawl as empty.
+					'crawl_empty'                     => true,
 					'subtype_bundle_refs'             => $bundle_refs,
 					'template_recommendation_context' => $rec_ctx,
 				);
@@ -574,7 +574,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 					if ( $pages_after > $pages_before ) {
 						Named_Debug_Log::event(
 							Named_Debug_Log_Event::ORCHESTRATOR_THIN_OUTPUT_ENRICHED,
-							'before=' . (string) $pages_before . ' after=' . (string) $pages_after . ' crawl_empty=' . ( $crawl_empty ? '1' : '0' )
+							'before=' . (string) $pages_before . ' after=' . (string) $pages_after . ' crawl_empty=1'
 						);
 					}
 				}
@@ -610,7 +610,7 @@ final class Onboarding_Planning_Request_Orchestrator {
 					if ( $pages_after > $pages_before ) {
 						Named_Debug_Log::event(
 							Named_Debug_Log_Event::ORCHESTRATOR_THIN_OUTPUT_ENRICHED,
-							'before=' . (string) $pages_before . ' after=' . (string) $pages_after . ' phase=post_expand crawl_empty=' . ( $crawl_empty ? '1' : '0' )
+							'before=' . (string) $pages_before . ' after=' . (string) $pages_after . ' phase=post_expand crawl_empty=1'
 						);
 					}
 				}

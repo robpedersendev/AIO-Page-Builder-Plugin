@@ -37,11 +37,11 @@ final class Onboarding_Step_Readiness_Review_Advisories_Test extends TestCase {
 	private function base_profile( string $geo ): array {
 		return array(
 			Profile_Schema::ROOT_BUSINESS => array(
-				'business_name'             => 'Acme Corporation',
-				'business_type'             => 'B2B SaaS',
-				'target_audience_summary'   => 'Mid-market ops teams needing workflow automation and audit trails.',
-				'primary_offers_summary'    => 'Annual subscriptions, onboarding packages, and priority support tiers.',
-				'core_geographic_market'    => $geo,
+				'business_name'           => 'Acme Corporation',
+				'business_type'           => 'B2B SaaS',
+				'target_audience_summary' => 'Mid-market ops teams needing workflow automation and audit trails.',
+				'primary_offers_summary'  => 'Annual subscriptions, onboarding packages, and priority support tiers.',
+				'core_geographic_market'  => $geo,
 			),
 			Profile_Schema::ROOT_BRAND    => array(
 				'brand_positioning_summary' => 'Trusted operator-first platform with clear ROI narratives.',
@@ -77,7 +77,7 @@ final class Onboarding_Step_Readiness_Review_Advisories_Test extends TestCase {
 		$prefill = $this->make_prefill();
 		$p       = $this->base_profile( 'United Kingdom' );
 		$p[ Profile_Schema::ROOT_BUSINESS ]['business_name'] = 'N/A';
-		$adv = Onboarding_Step_Readiness::get_review_advisories( $p, $prefill );
+		$adv    = Onboarding_Step_Readiness::get_review_advisories( $p, $prefill );
 		$joined = implode( ' ', $adv );
 		$this->assertStringContainsString( 'business name', strtolower( $joined ) );
 	}

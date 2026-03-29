@@ -36,11 +36,11 @@ final class AI_Provider_Route_Result {
 		?string $fallback_provider_id = null,
 		?string $fallback_model_override = null
 	) {
-		$this->primary_provider_id      = $primary_provider_id;
-		$this->primary_model_override   = $primary_model_override;
-		$this->valid                    = $valid;
-		$this->fallback_provider_id     = $fallback_provider_id;
-		$this->fallback_model_override  = $fallback_model_override;
+		$this->primary_provider_id     = $primary_provider_id;
+		$this->primary_model_override  = $primary_model_override;
+		$this->valid                   = $valid;
+		$this->fallback_provider_id    = $fallback_provider_id;
+		$this->fallback_model_override = $fallback_model_override;
 	}
 
 	public static function invalid(): self {

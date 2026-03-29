@@ -169,7 +169,7 @@ final class ExportRestore_Provider implements Service_Provider_Interface {
 				$template_library_validator = $container->has( 'template_library_export_validator' ) ? $container->get( 'template_library_export_validator' ) : null;
 				$acf_mirror_service         = $container->has( 'acf_local_json_mirror_service' ) ? $container->get( 'acf_local_json_mirror_service' ) : null;
 				$snapshot_repo              = $container->has( 'profile_snapshot_repository' ) ? $container->get( 'profile_snapshot_repository' ) : null;
-				$chat_repo = $container->has( 'ai_chat_session_repository' ) ? $container->get( 'ai_chat_session_repository' ) : null;
+				$chat_repo                  = $container->has( 'ai_chat_session_repository' ) ? $container->get( 'ai_chat_session_repository' ) : null;
 				return new Export_Generator(
 					$container->get( 'plugin_path_manager' ),
 					$container->get( 'settings' ),

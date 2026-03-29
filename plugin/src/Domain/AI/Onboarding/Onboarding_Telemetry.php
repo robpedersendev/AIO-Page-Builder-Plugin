@@ -158,7 +158,11 @@ final class Onboarding_Telemetry {
 				if ( $e === '' || $t <= 0 ) {
 					continue;
 				}
-				$out['recent'][] = array( 'e' => $e, 's' => $s, 't' => $t );
+				$out['recent'][] = array(
+					'e' => $e,
+					's' => $s,
+					't' => $t,
+				);
 			}
 			if ( \count( $out['recent'] ) > self::RECENT_MAX ) {
 				$out['recent'] = \array_slice( $out['recent'], -self::RECENT_MAX );

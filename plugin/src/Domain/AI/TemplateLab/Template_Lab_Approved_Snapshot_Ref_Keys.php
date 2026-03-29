@@ -27,11 +27,11 @@ final class Template_Lab_Approved_Snapshot_Ref_Keys {
 	/** pending | approved */
 	public const APPROVAL_STATE = 'approval_state';
 
-	public const APPROVAL_PENDING  = 'pending';
-	public const APPROVAL_APPROVED = 'approved';
-	public const TARGET_COMPOSITION  = 'composition';
-	public const TARGET_PAGE         = 'page_template';
-	public const TARGET_SECTION      = 'section_template';
+	public const APPROVAL_PENDING   = 'pending';
+	public const APPROVAL_APPROVED  = 'approved';
+	public const TARGET_COMPOSITION = 'composition';
+	public const TARGET_PAGE        = 'page_template';
+	public const TARGET_SECTION     = 'section_template';
 
 	/**
 	 * @return array<int, string>

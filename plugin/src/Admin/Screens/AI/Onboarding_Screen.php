@@ -17,12 +17,14 @@ use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Build_Plan_Bootstrap_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Draft_Service;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
+use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\BuildPlan\Generation\AI_Run_To_Build_Plan_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Statuses;
 use AIOPageBuilder\Domain\Industry\Onboarding\Industry_Question_Pack_Registry;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Repository;
 use AIOPageBuilder\Domain\Industry\Profile\Industry_Profile_Schema;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Crawl_Context_Phase;
+use AIOPageBuilder\Domain\Crawler\Snapshots\Crawl_Snapshot_Service;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Telemetry;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_User_Facing_Status;
 use AIOPageBuilder\Domain\AI\Onboarding\Onboarding_Step_Readiness;
@@ -310,6 +312,21 @@ final class Onboarding_Screen {
 							$draft_fresh['linked_build_plan_post_id'] = $bp_result->get_plan_post_id();
 							$draft_fresh['linked_build_plan_key']     = $plan_key !== '' ? $plan_key : ( $draft_fresh['linked_build_plan_key'] ?? null );
 							$draft_service->save_draft( $draft_fresh );
+							if ( $run_post_id > 0 && $plan_key !== '' && $this->container->has( 'ai_run_service' ) ) {
+								$run_svc = $this->container->get( 'ai_run_service' );
+								if ( $run_svc instanceof AI_Run_Service ) {
+									$run_row = $run_svc->get_run_by_post_id( $run_post_id );
+									if ( $run_row !== null ) {
+										$run_st = (string) ( $run_row['status'] ?? 'completed' );
+										$run_svc->update_run(
+											$run_post_id,
+											$run_st,
+											array( 'build_plan_ref' => $plan_key ),
+											array()
+										);
+									}
+								}
+							}
 							if ( $this->container->has( 'onboarding_build_plan_bootstrap_service' ) ) {
 								$prefill  = $this->container->get( 'onboarding_prefill_service' )->get_prefill_data( $draft_fresh );
 								$industry = $this->get_industry_profile_snapshot_for_plan();
@@ -508,11 +525,92 @@ final class Onboarding_Screen {
 	 */
 	private function persist_all_wizard_fields_from_post( array &$draft ): void {
 		$this->merge_build_plan_lineage_from_post_into_draft( $draft );
+		$this->merge_crawl_run_id_ref_from_post_into_draft( $draft );
 		$this->persist_brand_profile_from_post( $draft );
 		$this->persist_business_profile_from_post( $draft );
 		$this->persist_template_preferences_from_post( $draft );
 		$this->persist_industry_profile_from_post();
 		$this->merge_goal_intent_from_post_into_draft( $draft );
+	}
+
+	/**
+	 * Persists the crawl session pin from the review (or submission) step into the draft.
+	 *
+	 * @param array<string, mixed> $draft Draft (mutated).
+	 */
+	private function merge_crawl_run_id_ref_from_post_into_draft( array &$draft ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_post() before this runs.
+		if ( ! isset( $_POST['aio_onboarding_crawl_run_id_ref'] ) ) {
+			return;
+		}
+		$raw = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_onboarding_crawl_run_id_ref'] ) );
+		if ( $raw === '' || $raw === '__auto__' ) {
+			$draft['crawl_run_id_ref'] = null;
+			return;
+		}
+		$allowed = $this->list_allowed_crawl_run_ids_for_draft( $draft );
+		if ( \in_array( $raw, $allowed, true ) ) {
+			$draft['crawl_run_id_ref'] = $raw;
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+	}
+
+	/**
+	 * Crawl run ids that may be stored on the draft (snapshot list plus any existing pinned id so stale refs round-trip).
+	 *
+	 * @param array<string, mixed> $draft Current draft.
+	 * @return list<string>
+	 */
+	private function list_allowed_crawl_run_ids_for_draft( array $draft ): array {
+		$allowed = array();
+		if ( $this->container->has( 'crawl_snapshot_service' ) ) {
+			$snap = $this->container->get( 'crawl_snapshot_service' );
+			if ( $snap instanceof Crawl_Snapshot_Service ) {
+				foreach ( $snap->list_sessions( 50 ) as $session ) {
+					if ( ! \is_array( $session ) ) {
+						continue;
+					}
+					$rid = isset( $session['crawl_run_id'] ) && \is_string( $session['crawl_run_id'] ) ? $session['crawl_run_id'] : null;
+					if ( $rid !== null && $rid !== '' ) {
+						$allowed[] = $rid;
+					}
+				}
+			}
+		}
+		$pinned = isset( $draft['crawl_run_id_ref'] ) && \is_string( $draft['crawl_run_id_ref'] ) ? \trim( $draft['crawl_run_id_ref'] ) : '';
+		if ( $pinned !== '' && ! \in_array( $pinned, $allowed, true ) ) {
+			$allowed[] = $pinned;
+		}
+		return $allowed;
+	}
+
+	/**
+	 * Human-readable label for a crawl run id (timestamp when available).
+	 */
+	private function format_crawl_run_select_label( string $run_id ): string {
+		if ( ! $this->container->has( 'crawl_snapshot_service' ) ) {
+			return $run_id;
+		}
+		$snap = $this->container->get( 'crawl_snapshot_service' );
+		if ( ! $snap instanceof Crawl_Snapshot_Service ) {
+			return $run_id;
+		}
+		$sess = $snap->get_session( $run_id );
+		if ( ! \is_array( $sess ) ) {
+			return $run_id;
+		}
+		$ended   = isset( $sess['ended_at'] ) && \is_string( $sess['ended_at'] ) ? \trim( $sess['ended_at'] ) : '';
+		$started = isset( $sess['started_at'] ) && \is_string( $sess['started_at'] ) ? \trim( $sess['started_at'] ) : '';
+		$ts_raw  = $ended !== '' ? $ended : ( $started !== '' ? $started : '' );
+		if ( $ts_raw === '' ) {
+			return $run_id;
+		}
+		$ts = \strtotime( $ts_raw );
+		if ( $ts === false ) {
+			return $run_id . ' — ' . $ts_raw;
+		}
+		$when = \wp_date( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), $ts );
+		return $run_id . ' — ' . $when;
 	}
 
 	/**
@@ -1888,6 +1986,9 @@ final class Onboarding_Screen {
 		$positioning       = isset( $brand['brand_positioning_summary'] ) && $brand['brand_positioning_summary'] !== '' ? (string) $brand['brand_positioning_summary'] : '';
 		$voice             = isset( $brand['brand_voice_summary'] ) && $brand['brand_voice_summary'] !== '' ? (string) $brand['brand_voice_summary'] : '';
 		$site_url          = isset( $prefill['current_site_url'] ) && is_string( $prefill['current_site_url'] ) ? trim( $prefill['current_site_url'] ) : '';
+		$crawl_run_ids     = isset( $prefill['crawl_run_ids'] ) && is_array( $prefill['crawl_run_ids'] ) ? $prefill['crawl_run_ids'] : array();
+		$draft_review      = isset( $state['draft'] ) && is_array( $state['draft'] ) ? $state['draft'] : array();
+		$pinned_crawl      = isset( $draft_review['crawl_run_id_ref'] ) && is_string( $draft_review['crawl_run_id_ref'] ) ? trim( $draft_review['crawl_run_id_ref'] ) : '';
 		$crawl_id          = isset( $prefill['latest_crawl_run_id'] ) && is_string( $prefill['latest_crawl_run_id'] ) ? trim( $prefill['latest_crawl_run_id'] ) : '';
 		$crawl_ts          = isset( $prefill['latest_crawl_session_timestamp'] ) && is_string( $prefill['latest_crawl_session_timestamp'] ) ? trim( $prefill['latest_crawl_session_timestamp'] ) : '';
 		$advisories        = isset( $state['review_advisories'] ) && is_array( $state['review_advisories'] ) ? $state['review_advisories'] : array();

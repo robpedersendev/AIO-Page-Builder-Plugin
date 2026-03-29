@@ -671,7 +671,7 @@ final class Admin_Menu_Hub_Renderer {
 			$args[ Admin_Screen_Hub::QUERY_SUBTAB ] = $subtab;
 		}
 		$url         = \add_query_arg( $args, \admin_url( 'admin.php' ) );
-		$passthrough = array( 'run_id', 'date_from', 'date_to', 'template_family', 'page_class' );
+		$passthrough = array( 'run_id', 'date_from', 'date_to', 'template_family', 'page_class', 'plan_id', 'id', 'step' );
 		foreach ( $passthrough as $key ) {
 			if ( ! isset( $_GET[ $key ] ) ) {
 				continue;
@@ -828,7 +828,7 @@ final class Admin_Menu_Hub_Renderer {
 	}
 
 	/**
-	 * AI workspace hub (providers, runs, experiments).
+	 * AI workspace hub (providers, runs, compare setups tab).
 	 *
 	 * @return void
 	 */
@@ -972,6 +972,14 @@ final class Admin_Menu_Hub_Renderer {
 		$tab     = Admin_Screen_Hub::current_tab( $default, array_keys( $tabs ) );
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
+		}
+		// * Deep links (?plan_id= / ?id=) must show the Build Plans screen, not another hub tab left selected (e.g. analytics).
+		$deep = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
+		if ( $deep === '' && isset( $_GET['id'] ) ) {
+			$deep = \sanitize_text_field( \wp_unslash( (string) $_GET['id'] ) );
+		}
+		if ( $deep !== '' && Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
+			$tab = 'build_plans';
 		}
 		?>
 		<div class="wrap aio-hub-wrap">

@@ -63,8 +63,8 @@ final class Planning_Expand_Pass_Runner {
 			array_filter(
 				array_unique(
 					array_map(
-						static function ( $k ) {
-							return is_string( $k ) ? trim( $k ) : '';
+						static function ( string $k ): string {
+							return trim( $k );
 						},
 						$allowed_template_keys
 					)

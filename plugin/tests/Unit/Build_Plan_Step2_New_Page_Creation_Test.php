@@ -507,9 +507,9 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 	public function test_bulk_deny_selected_skips_non_pending_in_selection(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 7921;
 		try {
-			$repo    = new Build_Plan_Repository();
-			$def     = $this->step2_plan_definition( 3 );
-			$post_id = $repo->save(
+			$repo                = new Build_Plan_Repository();
+			$def                 = $this->step2_plan_definition( 3 );
+			$post_id             = $repo->save(
 				array(
 					'plan_definition' => $def,
 					'internal_key'    => 'test-plan-bulk-deny-mixed',
@@ -517,9 +517,9 @@ final class Build_Plan_Step2_New_Page_Creation_Test extends TestCase {
 					'status'          => 'publish',
 				)
 			);
-			$def0                                   = $repo->get_plan_definition( $post_id );
-			$items0                                 = $def0[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ];
-			$items0[0]['status']                    = Build_Plan_Item_Statuses::REJECTED;
+			$def0                = $repo->get_plan_definition( $post_id );
+			$items0              = $def0[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ];
+			$items0[0]['status'] = Build_Plan_Item_Statuses::REJECTED;
 			$def0[ Build_Plan_Schema::KEY_STEPS ][2][ Build_Plan_Item_Schema::KEY_ITEMS ] = $items0;
 			$repo->save_plan_definition( $post_id, $def0 );
 			$bulk  = new New_Page_Creation_Bulk_Action_Service( $repo );

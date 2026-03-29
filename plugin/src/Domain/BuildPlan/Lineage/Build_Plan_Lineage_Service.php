@@ -36,11 +36,13 @@ final class Build_Plan_Lineage_Service implements Lineage_Previous_Version_Resol
 			array(
 				'post_type'              => Object_Type_Keys::BUILD_PLAN,
 				'post_status'            => 'any',
+				// phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Onboarding selector; bounded UI list.
 				'posts_per_page'         => 200,
 				'orderby'                => 'date',
 				'order'                  => 'DESC',
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Filter plans that have lineage meta.
 				'meta_query'             => array(
 					array(
 						'key'     => Build_Plan_Repository::META_PLAN_LINEAGE_ID,
@@ -96,11 +98,13 @@ final class Build_Plan_Lineage_Service implements Lineage_Previous_Version_Resol
 			array(
 				'post_type'              => Object_Type_Keys::BUILD_PLAN,
 				'post_status'            => 'any',
+				// phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Version list for one lineage; bounded.
 				'posts_per_page'         => 200,
 				'orderby'                => 'date',
 				'order'                  => 'ASC',
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Exact lineage_id match.
 				'meta_query'             => array(
 					array(
 						'key'   => Build_Plan_Repository::META_PLAN_LINEAGE_ID,
@@ -159,10 +163,12 @@ final class Build_Plan_Lineage_Service implements Lineage_Previous_Version_Resol
 			array(
 				'post_type'              => Object_Type_Keys::BUILD_PLAN,
 				'post_status'            => 'any',
+				// phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Need all versions in lineage to compute next seq.
 				'posts_per_page'         => 500,
 				'fields'                 => 'ids',
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Exact lineage_id match; ids only.
 				'meta_query'             => array(
 					array(
 						'key'   => Build_Plan_Repository::META_PLAN_LINEAGE_ID,

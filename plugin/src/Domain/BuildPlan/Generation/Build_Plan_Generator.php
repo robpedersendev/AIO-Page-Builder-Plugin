@@ -64,7 +64,7 @@ final class Build_Plan_Generator {
 	 * @param array<string, mixed> $normalized_output Validated normalized output (run_summary, site_purpose, existing_page_changes, etc.).
 	 * @param string               $ai_run_ref        Source AI run id.
 	 * @param string               $normalized_output_ref Reference to stored normalized output (e.g. run_id:normalized_output).
-	 * @param array<string, mixed> $context           Optional: profile_context_ref, crawl_snapshot_ref, registry_snapshot_ref, target_post_id (int, replace plan post), onboarding_shell (bool, skip industry scoring for placeholders).
+	 * @param array<string, mixed> $context           Optional: profile_context_ref, crawl_snapshot_ref, registry_snapshot_ref, target_post_id (int, replace plan post), reuse_existing_plan_id (string, keep stable plan_id/internal_key when overwriting a post), onboarding_shell (bool, skip industry scoring for placeholders).
 	 * @return Plan_Generation_Result
 	 */
 	public function generate( array $normalized_output, string $ai_run_ref, string $normalized_output_ref, array $context = array() ): Plan_Generation_Result {
@@ -78,6 +78,12 @@ final class Build_Plan_Generator {
 		}
 
 		$plan_id = 'aio-plan-' . ( function_exists( 'wp_generate_uuid4' ) ? \wp_generate_uuid4() : uniqid( 'plan-', true ) );
+		$reuse   = isset( $context['reuse_existing_plan_id'] ) && is_string( $context['reuse_existing_plan_id'] )
+			? trim( \sanitize_text_field( $context['reuse_existing_plan_id'] ) )
+			: '';
+		if ( $reuse !== '' && strlen( $reuse ) <= 255 ) {
+			$plan_id = $reuse;
+		}
 
 		$run_summary    = $normalized_output[ Build_Plan_Draft_Schema::KEY_RUN_SUMMARY ] ?? array();
 		$site_purpose   = $normalized_output[ Build_Plan_Draft_Schema::KEY_SITE_PURPOSE ] ?? array();

@@ -33,7 +33,7 @@ final class Template_Lab_Session_Admin_Helper {
 			return $lines;
 		}
 		$lines[] = __( 'A provider route is configured for template-lab chat.', 'aio-page-builder' );
-		$fb = $route->get_fallback_provider_id();
+		$fb      = $route->get_fallback_provider_id();
 		if ( is_string( $fb ) && $fb !== '' && $fb !== $route->get_primary_provider_id() ) {
 			$lines[] = __( 'Fallback route metadata is present if the primary route is unavailable.', 'aio-page-builder' );
 		}

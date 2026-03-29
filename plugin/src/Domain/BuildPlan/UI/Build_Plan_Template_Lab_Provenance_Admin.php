@@ -26,7 +26,7 @@ final class Build_Plan_Template_Lab_Provenance_Admin {
 		}
 		$lines   = array();
 		$lines[] = __( 'Template-lab context (informational; this build plan remains the canonical workflow).', 'aio-page-builder' );
-		$tk = isset( $ctx['target_kind'] ) ? (string) $ctx['target_kind'] : '';
+		$tk      = isset( $ctx['target_kind'] ) ? (string) $ctx['target_kind'] : '';
 		if ( $tk !== '' ) {
 			/* translators: %s: target kind slug */
 			$lines[] = sprintf( __( 'Linked draft target kind: %s', 'aio-page-builder' ), $tk );

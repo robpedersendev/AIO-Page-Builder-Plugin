@@ -297,7 +297,7 @@ final class Onboarding_Step_Readiness {
 		if ( $norm === '' ) {
 			return false;
 		}
-		$tokens = array(
+		$tokens            = array(
 			'uk',
 			'gb',
 			'us',

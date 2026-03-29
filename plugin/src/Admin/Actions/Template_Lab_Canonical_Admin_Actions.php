@@ -23,19 +23,19 @@ final class Template_Lab_Canonical_Admin_Actions {
 
 	public const ACTION_APPROVE = 'aio_template_lab_approve_snapshot';
 
-	public const ACTION_APPLY   = 'aio_template_lab_apply_canonical';
+	public const ACTION_APPLY = 'aio_template_lab_apply_canonical';
 
 	public const NONCE_APPROVE = 'aio_template_lab_approve_snapshot';
 
-	public const NONCE_APPLY   = 'aio_template_lab_apply_canonical';
+	public const NONCE_APPLY = 'aio_template_lab_apply_canonical';
 
 	public const FIELD_SESSION = 'aio_tl_session_id';
 
-	public const FIELD_TARGET  = 'aio_tl_target_kind';
+	public const FIELD_TARGET = 'aio_tl_target_kind';
 
 	public const QUERY_APPROVE = 'aio_tl_approve';
 
-	public const QUERY_APPLY   = 'aio_tl_apply';
+	public const QUERY_APPLY = 'aio_tl_apply';
 
 	public static function handle_approve( Service_Container $container ): void {
 		$url = self::redirect_base();
@@ -70,7 +70,7 @@ final class Template_Lab_Canonical_Admin_Actions {
 		if ( ! Capabilities::current_user_can_for_route( Template_Lab_Access::capability_for_approved_target_kind( $tk ) ) ) {
 			self::redirect( self::url_with_session( $session_id ), self::QUERY_APPROVE, 'unauthorized' );
 		}
-		$out = $svc->approve_pending_snapshot( $uid, $session_id );
+		$out  = $svc->approve_pending_snapshot( $uid, $session_id );
 		$code = ( $out['ok'] ?? false ) ? 'ok' : (string) ( $out['code'] ?? 'error' );
 		self::redirect( self::url_with_session( $session_id ), self::QUERY_APPROVE, $code );
 	}
@@ -80,6 +80,7 @@ final class Template_Lab_Canonical_Admin_Actions {
 		if ( ! self::verify_nonce( self::NONCE_APPLY ) ) {
 			self::redirect( $url, self::QUERY_APPLY, 'bad_nonce' );
 		}
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified above.
 		$session_id = self::read_session_id();
 		$target     = isset( $_POST[ self::FIELD_TARGET ] ) && is_string( $_POST[ self::FIELD_TARGET ] )
 			? \sanitize_key( \wp_unslash( $_POST[ self::FIELD_TARGET ] ) )
@@ -103,6 +104,7 @@ final class Template_Lab_Canonical_Admin_Actions {
 			? ( $res->is_already_applied() ? 'already_applied' : 'ok' )
 			: $res->get_code();
 		self::redirect( self::url_with_session( $session_id ), self::QUERY_APPLY, $code );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	private static function apply_service( Service_Container $container ): ?Template_Lab_Canonical_Apply_Service {
@@ -122,9 +124,11 @@ final class Template_Lab_Canonical_Admin_Actions {
 	}
 
 	private static function read_session_id(): string {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Admin-post handlers verify nonce before calling.
 		if ( ! isset( $_POST[ self::FIELD_SESSION ] ) || ! is_string( $_POST[ self::FIELD_SESSION ] ) ) {
 			return '';
 		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Admin-post handlers verify nonce before calling.
 		return \sanitize_text_field( \wp_unslash( $_POST[ self::FIELD_SESSION ] ) );
 	}
 

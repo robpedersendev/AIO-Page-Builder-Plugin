@@ -25,7 +25,7 @@ final class AI_Runs_Screen {
 
 	public const SLUG = 'aio-page-builder-ai-runs';
 
-	/** Admin hub page slug (tabs: AI Providers, AI Runs, Prompt Experiments). */
+	/** Admin hub page slug (tabs: AI Providers, AI Runs, Compare AI setups). */
 	public const HUB_PAGE_SLUG = 'aio-page-builder-ai-workspace';
 
 	/** Query arg: set to {@see ONBOARDING_PLAN_SUCCESS_VALUE} when redirecting from onboarding after a successful planning run. */
@@ -111,6 +111,7 @@ final class AI_Runs_Screen {
 	}
 
 	private function render_list( bool $embed_in_hub = false ): void {
+		$this->render_onboarding_plan_success_notice_if_needed();
 		$runs            = array();
 		$spend_summaries = array();
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only list filter (GET).
@@ -239,7 +240,7 @@ final class AI_Runs_Screen {
 							<?php
 							if ( $is_experiment ) :
 								?>
-								<span class="aio-run-badge" aria-label="<?php esc_attr_e( 'Experiment run', 'aio-page-builder' ); ?>"><?php echo \esc_html( $experiment_label ? $experiment_label : __( 'Experiment', 'aio-page-builder' ) ); ?></span><?php endif; ?></td>
+								<span class="aio-run-badge" aria-label="<?php esc_attr_e( 'Comparison run', 'aio-page-builder' ); ?>"><?php echo \esc_html( $experiment_label ? $experiment_label : __( 'Comparison', 'aio-page-builder' ) ); ?></span><?php endif; ?></td>
 								<td><?php echo $surface !== '' ? \esc_html( $surface ) : \esc_html( \__( '—', 'aio-page-builder' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $run['status'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['provider_id'] ?? '' ) ); ?></td>

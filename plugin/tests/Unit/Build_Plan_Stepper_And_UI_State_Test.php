@@ -10,6 +10,7 @@ namespace AIOPageBuilder\Tests\Unit;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
+use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Empty_Definition_Repair_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_UI_State_Builder;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
@@ -21,6 +22,7 @@ $plugin_root = dirname( __DIR__, 2 );
 require_once $plugin_root . '/src/Domain/BuildPlan/Schema/Build_Plan_Schema.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Schema/Build_Plan_Item_Schema.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/Statuses/Build_Plan_Item_Statuses.php';
+require_once $plugin_root . '/src/Domain/BuildPlan/Generation/Build_Plan_Empty_Definition_Repair_Service.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/UI/Build_Plan_Stepper_Builder.php';
 require_once $plugin_root . '/src/Domain/BuildPlan/UI/Build_Plan_UI_State_Builder.php';
 require_once $plugin_root . '/src/Domain/Storage/Repositories/Repository_Interface.php';
@@ -119,6 +121,12 @@ final class Build_Plan_Stepper_And_UI_State_Test extends TestCase {
 		$stepper = new Build_Plan_Stepper_Builder();
 		$builder = new Build_Plan_UI_State_Builder( $repo, $stepper );
 		$this->assertNull( $builder->build( 'nonexistent-plan-id-' . \uniqid( 'plan-', true ) ) );
+	}
+
+	public function test_empty_definition_repair_detects_missing_steps(): void {
+		$this->assertTrue( Build_Plan_Empty_Definition_Repair_Service::definition_lacks_steps( array() ) );
+		$this->assertTrue( Build_Plan_Empty_Definition_Repair_Service::definition_lacks_steps( array( Build_Plan_Schema::KEY_STEPS => array() ) ) );
+		$this->assertFalse( Build_Plan_Empty_Definition_Repair_Service::definition_lacks_steps( $this->minimal_plan_definition_with_steps() ) );
 	}
 
 	/**

@@ -2001,6 +2001,12 @@ final class Build_Plan_Workspace_Screen {
 
 	private function render_step_workspace( array $state, ?array $current_step, int $active_step_index, array $definition, string $base_url ): void {
 		if ( $current_step === null ) {
+			$stepper = $state['stepper_steps'] ?? array();
+			if ( $stepper === array() ) {
+				echo '<div class="notice notice-error inline aio-build-plan-definition-missing" role="alert"><p>' . \esc_html__( 'This build plan has no saved steps. The plan definition in the database is missing or empty—often after an interrupted save or a background job that never finished. Check the Action Scheduler / cron notice if shown, open the source AI run to rebuild the plan, or submit onboarding planning again.', 'aio-page-builder' ) . '</p></div>';
+				echo '<p class="aio-empty-state">' . \esc_html__( 'Nothing to review yet.', 'aio-page-builder' ) . '</p>';
+				return;
+			}
 			echo '<p class="aio-empty-state">' . \esc_html__( 'No step selected.', 'aio-page-builder' ) . '</p>';
 			return;
 		}

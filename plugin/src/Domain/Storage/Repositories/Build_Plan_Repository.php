@@ -103,7 +103,16 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 			);
 		}
 		$json = \wp_json_encode( $definition );
-		$ok   = $json !== false && \update_post_meta( $post_id, self::META_PLAN_DEFINITION, $json ) !== false;
+		if ( $json === false ) {
+			return false;
+		}
+		// * update_post_meta returns false when the value is unchanged; treat identical JSON as success.
+		$updated = \update_post_meta( $post_id, self::META_PLAN_DEFINITION, $json );
+		$ok      = $updated !== false;
+		if ( ! $ok ) {
+			$existing = \get_post_meta( $post_id, self::META_PLAN_DEFINITION, true );
+			$ok       = \is_string( $existing ) && $existing === $json;
+		}
 		if ( $ok ) {
 			$this->sync_lineage_meta_from_definition( $post_id, $definition );
 		}

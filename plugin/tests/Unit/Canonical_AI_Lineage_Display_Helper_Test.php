@@ -20,7 +20,7 @@ require_once dirname( __DIR__, 2 ) . '/src/Domain/Registries/Snapshots/Version_S
 final class Canonical_AI_Lineage_Display_Helper_Test extends TestCase {
 
 	public function test_manual_definition_hides_notice_when_no_snapshots(): void {
-		$def = array(
+		$def   = array(
 			Composition_Schema::FIELD_COMPOSITION_ID => 'comp_x',
 			Composition_Schema::FIELD_NAME           => 'X',
 		);
@@ -37,7 +37,7 @@ final class Canonical_AI_Lineage_Display_Helper_Test extends TestCase {
 
 	public function test_shows_for_ai_traced_composition_without_snapshot_repo(): void {
 		$def = array(
-			Composition_Schema::FIELD_COMPOSITION_ID        => 'comp_z',
+			Composition_Schema::FIELD_COMPOSITION_ID => 'comp_z',
 			Composition_Schema::FIELD_REGISTRY_SNAPSHOT_REF => array( 'ai_run_post_id' => 42 ),
 		);
 		$this->assertTrue( Registry_AI_Provenance_Helper::composition_has_ai_trace( $def ) );

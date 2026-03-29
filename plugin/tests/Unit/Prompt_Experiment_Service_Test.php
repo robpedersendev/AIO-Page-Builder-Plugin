@@ -63,7 +63,7 @@ final class Prompt_Experiment_Service_Test extends TestCase {
 				),
 			),
 		);
-		$this->assertSame( 'Experiment name is required.', $service->validate_definition( $def ) );
+		$this->assertSame( 'Please enter a name for this comparison.', $service->validate_definition( $def ) );
 	}
 
 	public function test_validate_definition_requires_variants(): void {

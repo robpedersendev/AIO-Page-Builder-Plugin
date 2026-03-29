@@ -77,10 +77,10 @@ final class Default_AI_Provider_Router_Test extends TestCase {
 		$settings->set(
 			Option_Names::PROVIDER_CONFIG_REF,
 			array(
-				'task_routing'          => array(
+				'task_routing'         => array(
 					AI_Routing_Task::TEMPLATE_LAB_REPAIR => array(
-						'provider_id'        => 'unknown_vendor',
-						'fallback_disabled'  => true,
+						'provider_id'       => 'unknown_vendor',
+						'fallback_disabled' => true,
 					),
 				),
 				'fallback_provider_id' => 'anthropic',
@@ -96,9 +96,9 @@ final class Default_AI_Provider_Router_Test extends TestCase {
 		$settings->set(
 			Option_Names::PROVIDER_CONFIG_REF,
 			array(
-				'primary_provider_id'   => 'openai',
-				'fallback_provider_id'  => 'anthropic',
-				'task_routing'          => array(
+				'primary_provider_id'  => 'openai',
+				'fallback_provider_id' => 'anthropic',
+				'task_routing'         => array(
 					AI_Routing_Task::TEMPLATE_LAB_CHAT => array(
 						'provider_id'          => 'anthropic',
 						'fallback_provider_id' => 'openai',

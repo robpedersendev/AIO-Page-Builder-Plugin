@@ -16,6 +16,8 @@ use AIOPageBuilder\Domain\AI\Budget\Provider_Spend_Cap_Settings;
 use AIOPageBuilder\Domain\AI\Budget\Provider_Monthly_Spend_Service;
 use AIOPageBuilder\Domain\AI\Providers\AI_Provider_Interface;
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Bootstrap\Constants;
+use AIOPageBuilder\Domain\AI\Routing\AI_Provider_Routing_Model_Catalog;
 use AIOPageBuilder\Domain\AI\Routing\AI_Provider_Routing_Settings_Sanitizer;
 use AIOPageBuilder\Domain\AI\Routing\AI_Provider_Routing_Task_Labels;
 use AIOPageBuilder\Domain\AI\Routing\AI_Routing_Task;
@@ -37,7 +39,16 @@ final class AI_Providers_Screen {
 	public const SLUG = 'aio-page-builder-ai-providers';
 
 	/** Hub tab key for {@see AI_Runs_Screen::HUB_PAGE_SLUG} (forms must POST here; legacy {@see self::SLUG} is removed from $submenu). */
-	private const HUB_TAB = 'providers';
+	public const AI_WORKSPACE_TAB = 'providers';
+
+	/** Sub-tab under AI → Providers: credentials / routing / diagnostics / spend_caps. */
+	private const SUBTAB_CREDENTIALS = 'credentials';
+
+	private const SUBTAB_ROUTING = 'routing';
+
+	private const SUBTAB_DIAGNOSTICS = 'diagnostics';
+
+	private const SUBTAB_SPEND_CAPS = 'spend_caps';
 
 	/** @var Service_Container|null */
 	private $container;
@@ -88,14 +99,29 @@ final class AI_Providers_Screen {
 		$this->render_routing_save_notice();
 		$this->render_connection_test_notice();
 		$state = $this->get_state();
-		$this->render_disclosure( $state['disclosure_blocks'] );
-		if ( ! $embed_in_hub ) {
-			echo '<p class="description" style="margin:0.75em 0 0;">' . \esc_html__( 'Connection tests and planning runs use your provider account; token usage may incur cost. Exact pricing is set by the provider.', 'aio-page-builder' ) . '</p>';
+		if ( $embed_in_hub ) {
+			$sub = $this->resolve_providers_hub_subtab();
+			$this->render_providers_hub_subtab_nav( $sub );
+			if ( $sub === self::SUBTAB_CREDENTIALS ) {
+				$this->render_disclosure( $state['disclosure_blocks'] );
+				$this->render_provider_list( $state['provider_rows'], $state['ai_runs_url'], true );
+			} elseif ( $sub === self::SUBTAB_ROUTING ) {
+				$this->enqueue_ai_routing_script();
+				$this->render_task_routing_section( $state['provider_rows'], true );
+			} elseif ( $sub === self::SUBTAB_DIAGNOSTICS ) {
+				$this->render_routing_diagnostics_section( true );
+			} else {
+				$this->render_spend_cap_section( $state['provider_rows'], true );
+			}
+			return;
 		}
-		$this->render_provider_list( $state['provider_rows'], $state['ai_runs_url'], $embed_in_hub );
-		$this->render_task_routing_section( $state['provider_rows'], $embed_in_hub );
-		$this->render_routing_diagnostics_section( $embed_in_hub );
-		$this->render_spend_cap_section( $state['provider_rows'], $embed_in_hub );
+		$this->render_disclosure( $state['disclosure_blocks'] );
+		echo '<p class="description" style="margin:0.75em 0 0;">' . \esc_html__( 'Connection tests and planning runs use your provider account; token usage may incur cost. Exact pricing is set by the provider.', 'aio-page-builder' ) . '</p>';
+		$this->enqueue_ai_routing_script();
+		$this->render_provider_list( $state['provider_rows'], $state['ai_runs_url'], false );
+		$this->render_task_routing_section( $state['provider_rows'], false );
+		$this->render_routing_diagnostics_section( false );
+		$this->render_spend_cap_section( $state['provider_rows'], false );
 	}
 
 	private function render_routing_save_notice(): void {
@@ -213,11 +239,143 @@ final class AI_Providers_Screen {
 	private function build_routing_redirect_url( string $status, string $message ): string {
 		return \add_query_arg(
 			array(
-				'aio_route_message' => $message,
-				'aio_route_status'  => $status,
+				'aio_route_message'            => $message,
+				'aio_route_status'             => $status,
+				Admin_Screen_Hub::QUERY_SUBTAB => self::SUBTAB_ROUTING,
 			),
 			$this->get_hub_providers_base_url()
 		);
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	private function providers_hub_subtab_keys_allowed(): array {
+		$map     = array(
+			self::SUBTAB_CREDENTIALS => Capabilities::MANAGE_AI_PROVIDERS,
+			self::SUBTAB_ROUTING     => Capabilities::MANAGE_AI_PROVIDERS,
+			self::SUBTAB_DIAGNOSTICS => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
+			self::SUBTAB_SPEND_CAPS  => Capabilities::MANAGE_AI_PROVIDERS,
+		);
+		$allowed = array();
+		foreach ( $map as $key => $cap ) {
+			if ( Capabilities::current_user_can_for_route( $cap ) ) {
+				$allowed[] = $key;
+			}
+		}
+		return $allowed;
+	}
+
+	private function resolve_providers_hub_subtab(): string {
+		$allowed = $this->providers_hub_subtab_keys_allowed();
+		if ( $allowed === array() ) {
+			return self::SUBTAB_CREDENTIALS;
+		}
+		$default = $allowed[0];
+		$cur     = Admin_Screen_Hub::current_subtab( $default, $allowed );
+		return in_array( $cur, $allowed, true ) ? $cur : $default;
+	}
+
+	private function render_providers_hub_subtab_nav( string $current ): void {
+		$tabs = array(
+			self::SUBTAB_CREDENTIALS => array(
+				'label' => __( 'Providers & credentials', 'aio-page-builder' ),
+				'cap'   => Capabilities::MANAGE_AI_PROVIDERS,
+			),
+			self::SUBTAB_ROUTING     => array(
+				'label' => __( 'Task routing & models', 'aio-page-builder' ),
+				'cap'   => Capabilities::MANAGE_AI_PROVIDERS,
+			),
+			self::SUBTAB_DIAGNOSTICS => array(
+				'label' => __( 'Routing diagnostics', 'aio-page-builder' ),
+				'cap'   => Capabilities::VIEW_SENSITIVE_DIAGNOSTICS,
+			),
+			self::SUBTAB_SPEND_CAPS  => array(
+				'label' => __( 'Monthly spend caps', 'aio-page-builder' ),
+				'cap'   => Capabilities::MANAGE_AI_PROVIDERS,
+			),
+		);
+		Admin_Screen_Hub::render_subnav_tabs(
+			AI_Runs_Screen::HUB_PAGE_SLUG,
+			self::AI_WORKSPACE_TAB,
+			$tabs,
+			$current
+		);
+	}
+
+	private function enqueue_ai_routing_script(): void {
+		$handle = 'aio-ai-providers-routing';
+		$url    = \trailingslashit( Constants::plugin_url() ) . 'assets/js/aio-ai-providers-routing.js';
+		\wp_enqueue_script( $handle, $url, array(), Constants::plugin_version(), true );
+		$catalog = AI_Provider_Routing_Model_Catalog::build( $this->get_allowed_provider_ids(), $this->collect_drivers_for_routing_catalog() );
+		\wp_localize_script(
+			$handle,
+			'aioAiRouting',
+			array(
+				'catalog' => $catalog,
+				'i18n'    => array(
+					'inheritOption'       => __( '— Inherit / not set —', 'aio-page-builder' ),
+					'savedModel'          => __( 'Saved value', 'aio-page-builder' ),
+					'goodFor'             => __( 'Good for', 'aio-page-builder' ),
+					'notIdeal'            => __( 'Not ideal when', 'aio-page-builder' ),
+					'chooseProviderFirst' => __( 'Choose a provider above to load model guidance.', 'aio-page-builder' ),
+					'customModelHint'     => __( 'This value is not in the curated list; confirm it in your provider dashboard before production use.', 'aio-page-builder' ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * @return array<string, AI_Provider_Interface|null>
+	 */
+	private function collect_drivers_for_routing_catalog(): array {
+		$out = array();
+		foreach ( $this->get_allowed_provider_ids() as $pid ) {
+			$out[ $pid ] = $this->get_driver_for_provider_id( $pid );
+		}
+		return $out;
+	}
+
+	/**
+	 * @param array<int, array{id: string, good_for: string, not_ideal_for: string}> $models
+	 * @param list<string>                                                           $known_ids
+	 * @return void
+	 */
+	private function render_routing_model_select(
+		string $name,
+		string $value,
+		string $aria_label,
+		bool $disabled,
+		string $css_class,
+		array $models,
+		array $known_ids,
+		string $html_id = ''
+	): void {
+		?>
+		<select
+			name="<?php echo \esc_attr( $name ); ?>"
+			<?php echo $html_id !== '' ? 'id="' . \esc_attr( $html_id ) . '" ' : ''; ?>
+			class="aio-routing-model-select <?php echo \esc_attr( $css_class ); ?>"
+			autocomplete="off"
+			aria-label="<?php echo \esc_attr( $aria_label ); ?>"
+			<?php echo $disabled ? ' disabled="disabled"' : ''; ?>
+		>
+			<option value=""><?php \esc_html_e( '— Inherit / not set —', 'aio-page-builder' ); ?></option>
+			<?php foreach ( $models as $row ) : ?>
+				<?php
+				$mid = isset( $row['id'] ) ? (string) $row['id'] : '';
+				if ( $mid === '' ) {
+					continue;
+				}
+				?>
+				<option value="<?php echo \esc_attr( $mid ); ?>" <?php \selected( $value, $mid ); ?>><?php echo \esc_html( $mid ); ?></option>
+			<?php endforeach; ?>
+			<?php if ( $value !== '' && ! in_array( $value, $known_ids, true ) ) : ?>
+				<option value="<?php echo \esc_attr( $value ); ?>" selected="selected"><?php echo \esc_html( __( 'Saved:', 'aio-page-builder' ) . ' ' . $value ); ?></option>
+			<?php endif; ?>
+		</select>
+		<div class="aio-routing-model-panel"></div>
+		<?php
 	}
 
 	/**
@@ -235,6 +393,7 @@ final class AI_Providers_Screen {
 		$fb_model = isset( $cfg['fallback_model'] ) && is_string( $cfg['fallback_model'] ) ? $cfg['fallback_model'] : '';
 		$tasks    = isset( $cfg['task_routing'] ) && is_array( $cfg['task_routing'] ) ? $cfg['task_routing'] : array();
 		$opts     = $this->get_allowed_provider_ids();
+		$catalog  = AI_Provider_Routing_Model_Catalog::build( $opts, $this->collect_drivers_for_routing_catalog() );
 		$wrap     = $embed_in_hub ? 'aio-ai-provider-routing-section' : 'wrap aio-ai-provider-routing-section';
 		?>
 		<div class="<?php echo \esc_attr( $wrap ); ?>">
@@ -271,7 +430,25 @@ final class AI_Providers_Screen {
 					<tr>
 						<th scope="row"><label for="aio_route_fallback_model"><?php \esc_html_e( 'Default fallback model (optional)', 'aio-page-builder' ); ?></label></th>
 						<td>
-							<input name="aio_pb_ai_routing[fallback_model]" id="aio_route_fallback_model" type="text" class="regular-text" value="<?php echo \esc_attr( $fb_model ); ?>" autocomplete="off" />
+							<?php
+							$gf_models = $fb_id !== '' ? ( $catalog[ $fb_id ] ?? array() ) : array();
+							$gf_known  = array();
+							foreach ( $gf_models as $gm ) {
+								if ( isset( $gm['id'] ) && is_string( $gm['id'] ) ) {
+									$gf_known[] = $gm['id'];
+								}
+							}
+							$this->render_routing_model_select(
+								'aio_pb_ai_routing[fallback_model]',
+								$fb_model,
+								__( 'Default fallback model', 'aio-page-builder' ),
+								false,
+								'aio-routing-fallback-model',
+								$gf_models,
+								$gf_known,
+								'aio_route_fallback_model'
+							);
+							?>
 						</td>
 					</tr>
 				</table>
@@ -299,13 +476,13 @@ final class AI_Providers_Screen {
 						$fdis  = ! empty( $slice['fallback_disabled'] );
 						$fname = 'aio_pb_ai_routing[task][' . $task_id . ']';
 						?>
-						<tr>
+						<tr class="aio-routing-task-row">
 							<th scope="row">
 								<?php echo \esc_html( AI_Provider_Routing_Task_Labels::label_for( $task_id ) ); ?>
 								<p class="description"><?php \esc_html_e( 'Routing only; does not change secrets.', 'aio-page-builder' ); ?></p>
 							</th>
 							<td>
-								<select name="<?php echo \esc_attr( $fname . '[provider_id]' ); ?>" aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'primary provider', 'aio-page-builder' ) ); ?>">
+								<select class="aio-routing-primary-provider" name="<?php echo \esc_attr( $fname . '[provider_id]' ); ?>" aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'primary provider', 'aio-page-builder' ) ); ?>">
 									<option value=""><?php \esc_html_e( 'Inherit default', 'aio-page-builder' ); ?></option>
 									<?php foreach ( $opts as $pid ) : ?>
 										<option value="<?php echo \esc_attr( $pid ); ?>" <?php \selected( $tp, $pid ); ?>><?php echo \esc_html( $pid ); ?></option>
@@ -313,10 +490,28 @@ final class AI_Providers_Screen {
 								</select>
 							</td>
 							<td>
-								<input type="text" class="regular-text" name="<?php echo \esc_attr( $fname . '[model]' ); ?>" value="<?php echo \esc_attr( $tm ); ?>" autocomplete="off" aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'primary model', 'aio-page-builder' ) ); ?>" />
+								<?php
+								$res_pri   = $tp !== '' ? $tp : $primary;
+								$pri_mods  = $catalog[ $res_pri ] ?? array();
+								$pri_known = array();
+								foreach ( $pri_mods as $pm ) {
+									if ( isset( $pm['id'] ) && is_string( $pm['id'] ) ) {
+										$pri_known[] = $pm['id'];
+									}
+								}
+								$this->render_routing_model_select(
+									$fname . '[model]',
+									$tm,
+									AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'primary model', 'aio-page-builder' ),
+									false,
+									'aio-routing-primary-model',
+									$pri_mods,
+									$pri_known
+								);
+								?>
 							</td>
 							<td>
-								<select name="<?php echo \esc_attr( $fname . '[fallback_provider_id]' ); ?>" <?php \disabled( $fdis ); ?> aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'fallback provider', 'aio-page-builder' ) ); ?>">
+								<select class="aio-routing-fallback-provider" name="<?php echo \esc_attr( $fname . '[fallback_provider_id]' ); ?>" <?php \disabled( $fdis ); ?> aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'fallback provider', 'aio-page-builder' ) ); ?>">
 									<option value=""><?php \esc_html_e( 'Inherit default', 'aio-page-builder' ); ?></option>
 									<?php foreach ( $opts as $pid ) : ?>
 										<option value="<?php echo \esc_attr( $pid ); ?>" <?php \selected( $tff, $pid ); ?>><?php echo \esc_html( $pid ); ?></option>
@@ -324,7 +519,25 @@ final class AI_Providers_Screen {
 								</select>
 							</td>
 							<td>
-								<input type="text" class="regular-text" name="<?php echo \esc_attr( $fname . '[fallback_model]' ); ?>" value="<?php echo \esc_attr( $tfm ); ?>" autocomplete="off" <?php \disabled( $fdis ); ?> aria-label="<?php echo \esc_attr( AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'fallback model', 'aio-page-builder' ) ); ?>" />
+								<?php
+								$res_fb   = $tff !== '' ? $tff : $fb_id;
+								$fb_mods  = $res_fb !== '' ? ( $catalog[ $res_fb ] ?? array() ) : array();
+								$fb_known = array();
+								foreach ( $fb_mods as $fm ) {
+									if ( isset( $fm['id'] ) && is_string( $fm['id'] ) ) {
+										$fb_known[] = $fm['id'];
+									}
+								}
+								$this->render_routing_model_select(
+									$fname . '[fallback_model]',
+									$tfm,
+									AI_Provider_Routing_Task_Labels::label_for( $task_id ) . ' — ' . __( 'fallback model', 'aio-page-builder' ),
+									$fdis,
+									'aio-routing-fallback-model',
+									$fb_mods,
+									$fb_known
+								);
+								?>
 							</td>
 							<td>
 								<label>
@@ -516,11 +729,12 @@ final class AI_Providers_Screen {
 	/**
 	 * @return string Full admin URL with flash query args for the providers tab.
 	 */
-	private function build_redirect_url( string $status, string $message ): string {
+	private function build_redirect_url( string $status, string $message, string $subtab = self::SUBTAB_CREDENTIALS ): string {
 		return \add_query_arg(
 			array(
-				'aio_provider_message' => $message,
-				'aio_provider_status'  => $status,
+				'aio_provider_message'         => $message,
+				'aio_provider_status'          => $status,
+				Admin_Screen_Hub::QUERY_SUBTAB => $subtab,
 			),
 			$this->get_hub_providers_base_url()
 		);
@@ -535,7 +749,7 @@ final class AI_Providers_Screen {
 		return \add_query_arg(
 			array(
 				'page'                      => AI_Runs_Screen::HUB_PAGE_SLUG,
-				Admin_Screen_Hub::QUERY_TAB => self::HUB_TAB,
+				Admin_Screen_Hub::QUERY_TAB => self::AI_WORKSPACE_TAB,
 			),
 			\admin_url( 'admin.php' )
 		);
@@ -706,7 +920,7 @@ final class AI_Providers_Screen {
 			return null;
 		}
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::MANAGE_AI_PROVIDERS ) ) {
-			return $this->build_redirect_url( 'error', __( 'You do not have permission to change spend cap settings.', 'aio-page-builder' ) );
+			return $this->build_redirect_url( 'error', __( 'You do not have permission to change spend cap settings.', 'aio-page-builder' ), self::SUBTAB_SPEND_CAPS );
 		}
 		\check_admin_referer( 'aio_pb_save_spend_cap_' . $provider_id );
 		Named_Debug_Log::event( Named_Debug_Log_Event::ADMIN_AI_PROVIDER_SPEND_CAP_SAVE_POST, 'provider=' . $provider_id );
@@ -719,7 +933,7 @@ final class AI_Providers_Screen {
 		/** @var Provider_Spend_Cap_Settings $cap_settings */
 		$cap_settings = $this->container->get( 'provider_spend_cap_settings' );
 		$cap_settings->save_settings( $provider_id, $cap_usd, $override );
-		return $this->build_redirect_url( 'success', __( 'Spend cap settings saved.', 'aio-page-builder' ) );
+		return $this->build_redirect_url( 'success', __( 'Spend cap settings saved.', 'aio-page-builder' ), self::SUBTAB_SPEND_CAPS );
 	}
 
 	/**

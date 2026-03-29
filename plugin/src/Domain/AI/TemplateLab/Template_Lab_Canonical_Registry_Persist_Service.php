@@ -35,10 +35,10 @@ final class Template_Lab_Canonical_Registry_Persist_Service implements Template_
 		Page_Template_Repository $page_templates,
 		Section_Template_Repository $section_templates
 	) {
-		$this->compositions      = $compositions;
-		$this->page_templates    = $page_templates;
-		$this->section_templates = $section_templates;
-		$this->page_sections_validator   = new Page_Template_Ordered_Sections_Registry_Validator( $section_templates );
+		$this->compositions               = $compositions;
+		$this->page_templates             = $page_templates;
+		$this->section_templates          = $section_templates;
+		$this->page_sections_validator    = new Page_Template_Ordered_Sections_Registry_Validator( $section_templates );
 		$this->section_semantic_validator = new Section_Template_Canonical_Semantic_Validator();
 	}
 
@@ -47,23 +47,38 @@ final class Template_Lab_Canonical_Registry_Persist_Service implements Template_
 		if ( $target_kind === Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_COMPOSITION ) {
 			$key = (string) ( $definition[ Composition_Schema::FIELD_COMPOSITION_ID ] ?? '' );
 			$id  = $this->compositions->save_definition( $definition );
-			return array( 'internal_key' => $key, 'post_id' => $id );
+			return array(
+				'internal_key' => $key,
+				'post_id'      => $id,
+			);
 		}
 		if ( $target_kind === Template_Lab_Approved_Snapshot_Ref_Keys::TARGET_PAGE ) {
 			$page_errs = $this->page_sections_validator->validate( $definition );
 			if ( $page_errs !== array() ) {
-				return array( 'internal_key' => '', 'post_id' => 0 );
+				return array(
+					'internal_key' => '',
+					'post_id'      => 0,
+				);
 			}
 			$key = (string) ( $definition[ Page_Template_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 			$id  = $this->page_templates->save_definition( $definition );
-			return array( 'internal_key' => $key, 'post_id' => $id );
+			return array(
+				'internal_key' => $key,
+				'post_id'      => $id,
+			);
 		}
 		$sec_errs = $this->section_semantic_validator->validate( $definition );
 		if ( $sec_errs !== array() ) {
-			return array( 'internal_key' => '', 'post_id' => 0 );
+			return array(
+				'internal_key' => '',
+				'post_id'      => 0,
+			);
 		}
 		$key = (string) ( $definition[ Section_Schema::FIELD_INTERNAL_KEY ] ?? '' );
 		$id  = $this->section_templates->save_definition( $definition );
-		return array( 'internal_key' => $key, 'post_id' => $id );
+		return array(
+			'internal_key' => $key,
+			'post_id'      => $id,
+		);
 	}
 }

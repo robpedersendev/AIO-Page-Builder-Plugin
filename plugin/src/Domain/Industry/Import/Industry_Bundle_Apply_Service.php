@@ -87,7 +87,6 @@ final class Industry_Bundle_Apply_Service {
 		update_option( $this->conflicts_option_key( $bundle_id ), array( 'conflicts' => $conflicts ) );
 
 		$registry = $this->settings->get( Option_Names::PB_INDUSTRY_BUNDLE_REGISTRY );
-		$registry = is_array( $registry ) ? $registry : array();
 
 		$record     = array(
 			'bundle_id'      => $bundle_id,
@@ -103,7 +102,6 @@ final class Industry_Bundle_Apply_Service {
 		$this->settings->set( Option_Names::PB_INDUSTRY_BUNDLE_REGISTRY, $registry );
 
 		$merge_state                  = $this->settings->get( Option_Names::PB_INDUSTRY_BUNDLE_MERGE_STATE );
-		$merge_state                  = is_array( $merge_state ) ? $merge_state : array();
 		$merge_state['apply_order']   = isset( $merge_state['apply_order'] ) && is_array( $merge_state['apply_order'] ) ? $merge_state['apply_order'] : array();
 		$merge_state['apply_order'][] = $bundle_id;
 		$merge_state['apply_order']   = array_values( array_unique( array_map( 'strval', $merge_state['apply_order'] ) ) );

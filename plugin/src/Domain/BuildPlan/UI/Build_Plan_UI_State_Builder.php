@@ -21,6 +21,7 @@ use AIOPageBuilder\Domain\BuildPlan\Steps\Navigation\Navigation_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Empty_Definition_Repair_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 
 /**
@@ -63,6 +64,9 @@ final class Build_Plan_UI_State_Builder {
 	/** @var History_Rollback_Step_UI_Service|null */
 	private $history_rollback_step_ui_service;
 
+	/** @var Build_Plan_Empty_Definition_Repair_Service|null */
+	private $empty_definition_repair;
+
 	public function __construct(
 		Build_Plan_Repository $repository,
 		Build_Plan_Stepper_Builder $stepper_builder,
@@ -73,7 +77,8 @@ final class Build_Plan_UI_State_Builder {
 		?Tokens_Step_UI_Service $tokens_step_ui_service = null,
 		?SEO_Media_Step_UI_Service $seo_media_step_ui_service = null,
 		?Finalization_Step_UI_Service $finalization_step_ui_service = null,
-		?History_Rollback_Step_UI_Service $history_rollback_step_ui_service = null
+		?History_Rollback_Step_UI_Service $history_rollback_step_ui_service = null,
+		?Build_Plan_Empty_Definition_Repair_Service $empty_definition_repair = null
 	) {
 		$this->repository                       = $repository;
 		$this->stepper_builder                  = $stepper_builder;
@@ -85,6 +90,7 @@ final class Build_Plan_UI_State_Builder {
 		$this->seo_media_step_ui_service        = $seo_media_step_ui_service;
 		$this->finalization_step_ui_service     = $finalization_step_ui_service;
 		$this->history_rollback_step_ui_service = $history_rollback_step_ui_service;
+		$this->empty_definition_repair          = $empty_definition_repair;
 	}
 
 	/**
@@ -105,10 +111,25 @@ final class Build_Plan_UI_State_Builder {
 		if ( $record === null ) {
 			return null;
 		}
-		$definition       = isset( $record['plan_definition'] ) && is_array( $record['plan_definition'] ) ? $record['plan_definition'] : $record;
+		$post_id = (int) ( $record['id'] ?? 0 );
+		// * Prefer meta-backed definition: flattened merge in post_to_record is skipped when stored JSON is empty, which would otherwise treat post row fields as the "definition" and yield an empty stepper.
+		$from_meta = $post_id > 0 ? $this->repository->get_plan_definition( $post_id ) : array();
+		if ( $this->empty_definition_repair !== null && Build_Plan_Empty_Definition_Repair_Service::definition_lacks_steps( $from_meta ) ) {
+			$lookup = (string) ( $record['internal_key'] ?? $plan_id );
+			$this->empty_definition_repair->repair_if_needed( $post_id, $lookup );
+			$from_meta = $post_id > 0 ? $this->repository->get_plan_definition( $post_id ) : array();
+		}
+		if ( $from_meta !== array() ) {
+			$definition = $from_meta;
+		} else {
+			$definition = isset( $record['plan_definition'] ) && is_array( $record['plan_definition'] ) ? $record['plan_definition'] : $record;
+		}
 		$plan_id_from_def = (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? $record['internal_key'] ?? $plan_id );
 		$stepper_steps    = $this->stepper_builder->build( $definition );
 		$context_rail     = $this->build_context_rail( $definition, $stepper_steps );
+		if ( (string) ( $context_rail['plan_id'] ?? '' ) === '' && $plan_id_from_def !== '' ) {
+			$context_rail['plan_id'] = $plan_id_from_def;
+		}
 
 		return array(
 			'plan_id'         => $plan_id_from_def,

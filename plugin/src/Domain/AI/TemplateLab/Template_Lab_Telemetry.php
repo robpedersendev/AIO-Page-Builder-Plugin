@@ -37,10 +37,7 @@ final class Template_Lab_Telemetry {
 		if ( $key === '' || strlen( $key ) > 64 ) {
 			return;
 		}
-		$raw = $this->settings->get( Option_Names::TEMPLATE_LAB_TELEMETRY_AGGREGATE );
-		if ( ! is_array( $raw ) ) {
-			$raw = array();
-		}
+		$raw      = $this->settings->get( Option_Names::TEMPLATE_LAB_TELEMETRY_AGGREGATE );
 		$counters = isset( $raw['c'] ) && is_array( $raw['c'] ) ? $raw['c'] : array();
 		if ( count( $counters ) > 80 ) {
 			$counters = array_slice( $counters, -60, null, true );
@@ -56,7 +53,6 @@ final class Template_Lab_Telemetry {
 	 * @return array<string, mixed>
 	 */
 	public function get_aggregate_for_diagnostics(): array {
-		$raw = $this->settings->get( Option_Names::TEMPLATE_LAB_TELEMETRY_AGGREGATE );
-		return is_array( $raw ) ? $raw : array();
+		return $this->settings->get( Option_Names::TEMPLATE_LAB_TELEMETRY_AGGREGATE );
 	}
 }

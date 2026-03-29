@@ -146,13 +146,13 @@ final class Dashboard_State_Builder {
 
 	/**
 	 * @param array{is_first_run: bool, is_resume: bool, onboarding_url: string} $welcome
-	 * @param array{environment: array, dependency: array, provider: array}       $readiness
+	 * @param array{environment: array, dependency: array, provider: array}      $readiness
 	 * @return array{visible: bool, variant: string, headline: string, body: string, cta_label: string, url: string, dependency_lines: list<string>, reporting_note: string, settings_reporting_url: string, diagnostics_url: string}
 	 */
 	private function build_onboarding_callout( array $welcome, array $readiness ): array {
-		$url = (string) ( $welcome['onboarding_url'] ?? '' );
-		$base = \admin_url( 'admin.php' );
-		$diag = \add_query_arg( array( 'page' => 'aio-page-builder-diagnostics' ), $base );
+		$url              = (string) ( $welcome['onboarding_url'] ?? '' );
+		$base             = \admin_url( 'admin.php' );
+		$diag             = \add_query_arg( array( 'page' => 'aio-page-builder-diagnostics' ), $base );
 		$settings_privacy = \add_query_arg(
 			array(
 				'page'    => 'aio-page-builder-settings',
@@ -162,16 +162,16 @@ final class Dashboard_State_Builder {
 		);
 		if ( ! Capabilities::current_user_can_for_route( Capabilities::RUN_ONBOARDING ) ) {
 			return array(
-				'visible'           => false,
-				'variant'           => 'none',
-				'headline'          => '',
-				'body'              => '',
-				'cta_label'         => '',
-				'url'               => $url,
-				'dependency_lines'  => array(),
-				'reporting_note'    => '',
+				'visible'                => false,
+				'variant'                => 'none',
+				'headline'               => '',
+				'body'                   => '',
+				'cta_label'              => '',
+				'url'                    => $url,
+				'dependency_lines'       => array(),
+				'reporting_note'         => '',
 				'settings_reporting_url' => $settings_privacy,
-				'diagnostics_url'   => $diag,
+				'diagnostics_url'        => $diag,
 			);
 		}
 		$dep_lines = array(
@@ -183,43 +183,43 @@ final class Dashboard_State_Builder {
 		$reporting = __( 'Private distribution: mandatory operational reporting includes install/heartbeat and health signals as described under Privacy & reporting. Payloads exclude API keys, credentials, and your page content.', 'aio-page-builder' );
 		if ( ! empty( $welcome['is_first_run'] ) ) {
 			return array(
-				'visible'              => true,
-				'variant'              => 'hero',
-				'headline'             => __( 'Welcome — orient and start onboarding', 'aio-page-builder' ),
-				'body'                 => __( 'This plugin plans structured pages and sections with optional AI-assisted runs. Next: capture your business profile, optionally connect a crawl, then configure an AI provider before you request a planning run.', 'aio-page-builder' ),
-				'cta_label'            => __( 'Begin onboarding', 'aio-page-builder' ),
-				'url'                  => $url,
-				'dependency_lines'     => $dep_lines,
-				'reporting_note'       => $reporting,
+				'visible'                => true,
+				'variant'                => 'hero',
+				'headline'               => __( 'Welcome — orient and start onboarding', 'aio-page-builder' ),
+				'body'                   => __( 'This plugin plans structured pages and sections with optional AI-assisted runs. Next: capture your business profile, optionally connect a crawl, then configure an AI provider before you request a planning run.', 'aio-page-builder' ),
+				'cta_label'              => __( 'Begin onboarding', 'aio-page-builder' ),
+				'url'                    => $url,
+				'dependency_lines'       => $dep_lines,
+				'reporting_note'         => $reporting,
 				'settings_reporting_url' => $settings_privacy,
-				'diagnostics_url'      => $diag,
+				'diagnostics_url'        => $diag,
 			);
 		}
 		if ( ! empty( $welcome['is_resume'] ) ) {
 			return array(
-				'visible'              => true,
-				'variant'              => 'resume',
-				'headline'             => __( 'Finish onboarding', 'aio-page-builder' ),
-				'body'                 => __( 'You have a saved session. Resume to continue profile, provider, and planning steps.', 'aio-page-builder' ),
-				'cta_label'            => __( 'Resume onboarding', 'aio-page-builder' ),
-				'url'                  => $url,
-				'dependency_lines'     => $dep_lines,
-				'reporting_note'       => __( 'Mandatory operational reporting applies; see Privacy & reporting for what is included and excluded.', 'aio-page-builder' ),
+				'visible'                => true,
+				'variant'                => 'resume',
+				'headline'               => __( 'Finish onboarding', 'aio-page-builder' ),
+				'body'                   => __( 'You have a saved session. Resume to continue profile, provider, and planning steps.', 'aio-page-builder' ),
+				'cta_label'              => __( 'Resume onboarding', 'aio-page-builder' ),
+				'url'                    => $url,
+				'dependency_lines'       => $dep_lines,
+				'reporting_note'         => __( 'Mandatory operational reporting applies; see Privacy & reporting for what is included and excluded.', 'aio-page-builder' ),
 				'settings_reporting_url' => $settings_privacy,
-				'diagnostics_url'      => $diag,
+				'diagnostics_url'        => $diag,
 			);
 		}
 		return array(
-			'visible'              => false,
-			'variant'              => 'none',
-			'headline'             => '',
-			'body'                 => '',
-			'cta_label'            => '',
-			'url'                  => $url,
-			'dependency_lines'     => array(),
-			'reporting_note'       => '',
+			'visible'                => false,
+			'variant'                => 'none',
+			'headline'               => '',
+			'body'                   => '',
+			'cta_label'              => '',
+			'url'                    => $url,
+			'dependency_lines'       => array(),
+			'reporting_note'         => '',
 			'settings_reporting_url' => $settings_privacy,
-			'diagnostics_url'      => $diag,
+			'diagnostics_url'        => $diag,
 		);
 	}
 
@@ -296,7 +296,7 @@ final class Dashboard_State_Builder {
 			),
 			array(
 				'title'       => __( 'AI workspace', 'aio-page-builder' ),
-				'description' => __( 'Runs, providers, experiments, and spend detail.', 'aio-page-builder' ),
+				'description' => __( 'Runs, providers, setup comparisons, and spend detail.', 'aio-page-builder' ),
 				'url'         => \add_query_arg(
 					array(
 						'page'    => 'aio-page-builder-ai-workspace',

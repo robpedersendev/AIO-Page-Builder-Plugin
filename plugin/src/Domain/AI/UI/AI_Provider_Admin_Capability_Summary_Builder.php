@@ -45,21 +45,21 @@ final class AI_Provider_Admin_Capability_Summary_Builder {
 			if ( ! $driver instanceof AI_Provider_Interface ) {
 				continue;
 			}
-			$pid  = $driver->get_provider_id();
-			$caps = $driver->get_capabilities();
-			$models = isset( $caps['models'] ) && is_array( $caps['models'] ) ? $caps['models'] : array();
-			$mc     = count( $models );
+			$pid      = $driver->get_provider_id();
+			$caps     = $driver->get_capabilities();
+			$models   = isset( $caps['models'] ) && is_array( $caps['models'] ) ? $caps['models'] : array();
+			$mc       = count( $models );
 			$has_cred = $this->secret_store->has_credential( $pid );
 			$struct   = ! empty( $caps['structured_output_supported'] );
 			$files    = ! empty( $caps['file_attachment_supported'] );
-			$max_tok = null;
+			$max_tok  = null;
 			if ( array_key_exists( 'max_context_tokens', $caps ) && is_int( $caps['max_context_tokens'] ) ) {
 				$max_tok = $caps['max_context_tokens'];
 			}
 			$readiness = ! $has_cred
 				? 'needs_credential'
 				: ( $struct ? 'ready_structured' : 'credential_only' );
-			$rows[]  = array(
+			$rows[]    = array(
 				'provider_id'                 => $pid,
 				'driver_available'            => true,
 				'credential_configured'       => $has_cred,

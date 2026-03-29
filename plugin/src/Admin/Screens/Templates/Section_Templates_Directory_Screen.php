@@ -70,8 +70,8 @@ final class Section_Templates_Directory_Screen {
 			'all'                  => isset( $_GET['all'] ) && \sanitize_key( \wp_unslash( $_GET['all'] ) ) === '1',
 			'status'               => isset( $_GET['status'] ) ? \sanitize_key( \wp_unslash( $_GET['status'] ) ) : '',
 			'search'               => isset( $_GET['search'] ) ? \sanitize_text_field( \wp_unslash( $_GET['search'] ) ) : '',
-			'paged'                => $raw_paged !== null ? max( 1, (int) $raw_paged ) : 1,
-			'per_page'             => $raw_per_page !== null ? max( 1, min( \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::MAX_PER_PAGE, (int) $raw_per_page ) ) : \AIOPageBuilder\Domain\Registries\Shared\Large_Library_Query_Service::DEFAULT_PER_PAGE,
+			'paged'                => $paged,
+			'per_page'             => $per_page,
 			'industry_view'        => isset( $_GET['industry_view'] ) ? \sanitize_key( \wp_unslash( $_GET['industry_view'] ) ) : Industry_Section_Library_Read_Model_Builder::VIEW_FULL_LIBRARY,
 		);
 		$state                                      = $state_builder->build_state( $request );

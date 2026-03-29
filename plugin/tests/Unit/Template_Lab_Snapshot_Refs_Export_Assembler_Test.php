@@ -22,7 +22,10 @@ final class Template_Lab_Snapshot_Refs_Export_Assembler_Test extends TestCase {
 				array(
 					'session_id'            => 'acs_test',
 					'task_type'             => 'template_lab',
-					'approved_snapshot_ref' => array( 'run_post_id' => 1, 'artifact_fingerprint' => 'ab' ),
+					'approved_snapshot_ref' => array(
+						'run_post_id'          => 1,
+						'artifact_fingerprint' => 'ab',
+					),
 					'post_modified_gmt'     => '2026-03-01 12:00:00',
 				),
 			)

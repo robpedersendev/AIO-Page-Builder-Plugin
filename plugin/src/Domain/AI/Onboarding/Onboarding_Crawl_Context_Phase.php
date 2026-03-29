@@ -20,13 +20,13 @@ use AIOPageBuilder\Infrastructure\Settings\Settings_Service;
  */
 final class Onboarding_Crawl_Context_Phase {
 
-	public const PHASE_NONE       = 'none';
-	public const PHASE_RUNNING    = 'running';
-	public const PHASE_COMPLETED  = 'completed';
-	public const PHASE_PARTIAL    = 'partial';
-	public const PHASE_FAILED     = 'failed';
-	public const PHASE_UNKNOWN    = 'unknown';
-	public const PHASE_STALE      = 'stale';
+	public const PHASE_NONE      = 'none';
+	public const PHASE_RUNNING   = 'running';
+	public const PHASE_COMPLETED = 'completed';
+	public const PHASE_PARTIAL   = 'partial';
+	public const PHASE_FAILED    = 'failed';
+	public const PHASE_UNKNOWN   = 'unknown';
+	public const PHASE_STALE     = 'stale';
 
 	/**
 	 * @param array<string, mixed> $prefill Onboarding prefill from {@see Onboarding_Prefill_Service::get_prefill_data()}.
@@ -67,7 +67,7 @@ final class Onboarding_Crawl_Context_Phase {
 			}
 		}
 
-		$end_ts = $ended !== '' ? \strtotime( $ended ) : false;
+		$end_ts   = $ended !== '' ? \strtotime( $ended ) : false;
 		$is_stale = false;
 		if ( $end_ts !== false ) {
 			$age_seconds = \time() - $end_ts;

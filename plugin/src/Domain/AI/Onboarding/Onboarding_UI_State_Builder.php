@@ -125,7 +125,7 @@ final class Onboarding_UI_State_Builder {
 			$resume_message = __( 'You have saved draft progress. You can continue below.', 'aio-page-builder' );
 		} elseif ( $current_step_key !== Onboarding_Step_Keys::WELCOME
 			&& in_array( $overall_status, array( Onboarding_Statuses::IN_PROGRESS, Onboarding_Statuses::BLOCKED, Onboarding_Statuses::READY_FOR_SUBMISSION ), true ) ) {
-			$step_lbl = self::step_labels()[ $current_step_key ] ?? $current_step_key;
+			$step_lbl       = self::step_labels()[ $current_step_key ] ?? $current_step_key;
 			$resume_message = sprintf(
 				/* translators: %s: current step label */
 				__( 'Resume: you are on “%s”. Use Save draft anytime; nothing is submitted until you request a plan.', 'aio-page-builder' ),

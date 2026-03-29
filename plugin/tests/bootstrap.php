@@ -624,6 +624,26 @@ if ( ! function_exists( 'update_post_meta' ) ) {
 		return true;
 	}
 }
+if ( ! function_exists( 'delete_post_meta' ) ) {
+	/**
+	 * @param int         $post_id
+	 * @param string      $meta_key
+	 * @param string|bool $meta_value Unused; stub removes the key entirely.
+	 * @return bool
+	 */
+	function delete_post_meta( $post_id, $meta_key, $meta_value = '' ) {
+		unset( $meta_value );
+		$id = (string) $post_id;
+		if ( ! isset( $GLOBALS['_aio_post_meta'][ $id ] ) ) {
+			return false;
+		}
+		if ( ! array_key_exists( $meta_key, $GLOBALS['_aio_post_meta'][ $id ] ) ) {
+			return false;
+		}
+		unset( $GLOBALS['_aio_post_meta'][ $id ][ $meta_key ] );
+		return true;
+	}
+}
 if ( ! function_exists( 'wp_insert_post' ) ) {
 	function wp_insert_post( $postarr, $wp_error = false ) {
 		$id = isset( $GLOBALS['_aio_wp_insert_post_return'] ) ? $GLOBALS['_aio_wp_insert_post_return'] : 0;

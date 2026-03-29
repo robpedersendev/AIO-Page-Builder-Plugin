@@ -87,8 +87,8 @@ final class Onboarding_Prefill_Service {
 		if ( $this->crawl_snapshot_service !== null && is_string( $latest_crawl_run_id ) && $latest_crawl_run_id !== '' ) {
 			$sess = $this->crawl_snapshot_service->get_session( $latest_crawl_run_id );
 			if ( is_array( $sess ) ) {
-				$ended   = isset( $sess['ended_at'] ) && is_string( $sess['ended_at'] ) ? \trim( $sess['ended_at'] ) : '';
-				$started = isset( $sess['started_at'] ) && is_string( $sess['started_at'] ) ? \trim( $sess['started_at'] ) : '';
+				$ended                          = isset( $sess['ended_at'] ) && is_string( $sess['ended_at'] ) ? \trim( $sess['ended_at'] ) : '';
+				$started                        = isset( $sess['started_at'] ) && is_string( $sess['started_at'] ) ? \trim( $sess['started_at'] ) : '';
 				$latest_crawl_session_timestamp = $ended !== '' ? $ended : ( $started !== '' ? $started : null );
 				$latest_crawl_started_at        = $started !== '' ? $started : null;
 				$latest_crawl_ended_at          = $ended !== '' ? $ended : null;

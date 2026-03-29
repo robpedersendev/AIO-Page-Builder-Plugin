@@ -293,6 +293,18 @@ final class Build_Plan_Generator_Test extends TestCase {
 		unset( $GLOBALS['_aio_wp_insert_post_return'] );
 	}
 
+	public function test_generate_respects_reuse_existing_plan_id_context(): void {
+		$GLOBALS['_aio_wp_insert_post_return'] = 1;
+		$output                                = $this->valid_normalized_output();
+		$gen                                   = new Build_Plan_Generator( new Build_Plan_Repository(), new Build_Plan_Item_Generator() );
+		$stable                                = 'aio-plan-fixed-id-for-tests';
+		$result                                = $gen->generate( $output, 'run-1', 'run-1:out', array( 'reuse_existing_plan_id' => $stable ) );
+		$this->assertTrue( $result->is_success() );
+		$this->assertSame( $stable, $result->get_plan_id() );
+		$this->assertSame( $stable, $result->get_plan_payload()[ Build_Plan_Schema::KEY_PLAN_ID ] );
+		unset( $GLOBALS['_aio_wp_insert_post_return'] );
+	}
+
 	public function test_recommended_top_level_pages_still_emit_hierarchy_note(): void {
 		$GLOBALS['_aio_wp_insert_post_return'] = 1;
 		$output                                = $this->valid_normalized_output();

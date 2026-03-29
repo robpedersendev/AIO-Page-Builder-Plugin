@@ -153,6 +153,7 @@ final class AI_Run_Detail_Screen {
 			if ( isset( $_GET[ Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT ] ) ) {
 				$bp_flag = \sanitize_key( (string) \wp_unslash( (string) $_GET[ Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT ] ) );
 				$bp_msgs = array(
+					Create_Build_Plan_From_AI_Run_Action::RESULT_CREATED           => __( 'Build Plan was created from this run.', 'aio-page-builder' ),
 					Create_Build_Plan_From_AI_Run_Action::RESULT_UNAUTHORIZED    => __( 'You do not have permission to create Build Plans.', 'aio-page-builder' ),
 					Create_Build_Plan_From_AI_Run_Action::RESULT_BAD_REQUEST    => __( 'The request could not be completed. Try again.', 'aio-page-builder' ),
 					Create_Build_Plan_From_AI_Run_Action::RESULT_GENERATION_FAILED => __( 'The Build Plan could not be generated from this run. Check validation and normalized output.', 'aio-page-builder' ),
@@ -211,7 +212,7 @@ final class AI_Run_Detail_Screen {
 					$this->render_subtab_validation( $validation_report, $dropped_report );
 					break;
 				case self::SUBTAB_FULL_PROMPT:
-					$this->render_subtab_full_prompt( $artifact_svc, (int) $run['id'], $can_view_raw );
+					$this->render_subtab_full_prompt( $artifact_svc, (int) $run['id'], $can_view_raw, $run );
 					break;
 				case self::SUBTAB_OVERVIEW:
 				default:
@@ -352,7 +353,7 @@ final class AI_Run_Detail_Screen {
 						</tr>
 						<?php endif; ?>
 						<?php if ( ! empty( $meta_safe['is_experiment'] ) ) : ?>
-						<tr><th scope="row"><?php \esc_html_e( 'Experiment', 'aio-page-builder' ); ?></th><td><span class="aio-run-badge"><?php \esc_html_e( 'Experiment run', 'aio-page-builder' ); ?></span> <?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['experiment_id'] ?? '' ) ); ?> — <?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['experiment_variant_label'] ?? $meta_safe['experiment_variant_id'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Comparison', 'aio-page-builder' ); ?></th><td><span class="aio-run-badge"><?php \esc_html_e( 'Comparison run', 'aio-page-builder' ); ?></span> <?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['experiment_id'] ?? '' ) ); ?> — <?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['experiment_variant_label'] ?? $meta_safe['experiment_variant_id'] ?? '' ) ); ?></td></tr>
 						<?php endif; ?>
 						<?php foreach ( $meta_safe as $mk => $mv ) : ?>
 							<?php
@@ -537,21 +538,54 @@ final class AI_Run_Detail_Screen {
 
 	/**
 	 * @param AI_Run_Artifact_Service|null $artifact_svc
+	 * @param array<string, mixed>         $run            Run record (internal_key, run_metadata, …).
 	 * @return void
 	 */
-	private function render_subtab_full_prompt( ?AI_Run_Artifact_Service $artifact_svc, int $run_post_id, bool $can_view_raw ): void {
+	private function render_subtab_full_prompt( ?AI_Run_Artifact_Service $artifact_svc, int $run_post_id, bool $can_view_raw, array $run ): void {
 		if ( ! $can_view_raw ) {
 			echo '<p class="aio-admin-notice">' . \esc_html__( 'You do not have permission to view full prompt content.', 'aio-page-builder' ) . '</p>';
 			return;
 		}
-		$raw        = $artifact_svc !== null ? $artifact_svc->get( $run_post_id, Artifact_Category_Keys::RAW_PROMPT ) : null;
-		$normalized = $artifact_svc !== null ? $artifact_svc->get( $run_post_id, Artifact_Category_Keys::NORMALIZED_PROMPT_PACKAGE ) : null;
+		$raw            = $artifact_svc !== null ? $artifact_svc->get( $run_post_id, Artifact_Category_Keys::RAW_PROMPT ) : null;
+		$normalized     = $artifact_svc !== null ? $artifact_svc->get( $run_post_id, Artifact_Category_Keys::NORMALIZED_PROMPT_PACKAGE ) : null;
+		$input_snap     = $artifact_svc !== null ? $artifact_svc->get( $run_post_id, Artifact_Category_Keys::INPUT_SNAPSHOT ) : null;
+		$file_manifest  = $artifact_svc !== null ? $artifact_svc->get( $run_post_id, Artifact_Category_Keys::FILE_MANIFEST ) : null;
+		$meta           = isset( $run['run_metadata'] ) && is_array( $run['run_metadata'] ) ? $run['run_metadata'] : array();
+		$meta_safe      = AI_Run_Artifact_Service::redact_sensitive_values( $meta );
+		$dispatch_keys  = array(
+			'request_id',
+			'provider_id',
+			'model_used',
+			'prompt_pack_ref',
+			'created_at',
+			'completed_at',
+			'retry_count',
+			'failover_policy',
+			'failover_attempt',
+			'effective_provider_used',
+			'fallback_provider_reference',
+		);
+		$dispatch_slice = array();
+		foreach ( $dispatch_keys as $dk ) {
+			if ( array_key_exists( $dk, $meta_safe ) ) {
+				$dispatch_slice[ $dk ] = $meta_safe[ $dk ];
+			}
+		}
 		?>
-			<section class="aio-full-prompt-raw" aria-labelledby="aio-full-prompt-raw-heading">
+			<section class="aio-full-prompt-dispatch" aria-labelledby="aio-full-prompt-dispatch-heading">
+				<h2 id="aio-full-prompt-dispatch-heading"><?php \esc_html_e( 'Run request summary', 'aio-page-builder' ); ?></h2>
+				<p class="description"><?php \esc_html_e( 'Provider, model, and trace fields from run metadata (no API secrets).', 'aio-page-builder' ); ?></p>
+				<?php if ( $dispatch_slice === array() ) : ?>
+					<p class="description"><?php \esc_html_e( 'No dispatch metadata rows were available on this record.', 'aio-page-builder' ); ?></p>
+				<?php else : ?>
+					<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $dispatch_slice ) ); ?></pre>
+				<?php endif; ?>
+			</section>
+			<section class="aio-full-prompt-raw" aria-labelledby="aio-full-prompt-raw-heading" style="margin-top:1.5em;">
 				<h2 id="aio-full-prompt-raw-heading"><?php \esc_html_e( 'Raw prompt (capture-ready)', 'aio-page-builder' ); ?></h2>
 				<p class="description"><?php \esc_html_e( 'Exact payload captured for provider dispatch (may include site context). Treat as sensitive.', 'aio-page-builder' ); ?></p>
 				<?php if ( $raw === null || $raw === '' ) : ?>
-					<p class="aio-admin-notice"><?php \esc_html_e( 'No raw prompt artifact was stored. Common causes: JSON encoding or post meta write failed for this payload (check debug log for ARTIFACT_STORE), or the run was created by a code path that does not persist prompts. If input_snapshot exists, the request context was still captured there.', 'aio-page-builder' ); ?></p>
+					<p class="aio-admin-notice"><?php \esc_html_e( 'No raw prompt artifact was stored. Older runs may predate chunked storage; new planning runs should persist this automatically. If this stays empty, check the debug log for ARTIFACT_STORE. Context and prompts may still be reconstructed from input_snapshot and normalized package below when those exist.', 'aio-page-builder' ); ?></p>
 				<?php else : ?>
 					<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $raw ) ); ?></pre>
 				<?php endif; ?>
@@ -560,9 +594,30 @@ final class AI_Run_Detail_Screen {
 				<h2 id="aio-full-prompt-norm-heading"><?php \esc_html_e( 'Normalized prompt package', 'aio-page-builder' ); ?></h2>
 				<p class="description"><?php \esc_html_e( 'Structured package assembled before the provider call. The stored copy omits the nested input_artifact when present (same data as the input_snapshot artifact) to keep meta writes reliable.', 'aio-page-builder' ); ?></p>
 				<?php if ( $normalized === null || $normalized === '' ) : ?>
-					<p class="aio-admin-notice"><?php \esc_html_e( 'No normalized prompt package artifact was stored. See the note for raw prompt above; full site context may still appear under Artifacts → input_snapshot.', 'aio-page-builder' ); ?></p>
+					<p class="aio-admin-notice"><?php \esc_html_e( 'No normalized prompt package artifact was stored.', 'aio-page-builder' ); ?></p>
 				<?php else : ?>
 					<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $normalized ) ); ?></pre>
+				<?php endif; ?>
+			</section>
+			<section class="aio-full-prompt-input-snapshot" aria-labelledby="aio-full-prompt-snap-heading" style="margin-top:1.5em;">
+				<h2 id="aio-full-prompt-snap-heading"><?php \esc_html_e( 'Input snapshot (context assembled for the model)', 'aio-page-builder' ); ?></h2>
+				<p class="description"><?php \esc_html_e( 'Structured artifact fed into the prompt pack (profile, registry, goal, planning guidance, etc.). Same as Artifacts → input_snapshot.', 'aio-page-builder' ); ?></p>
+				<?php if ( $input_snap === null || $input_snap === '' ) : ?>
+					<p class="description"><?php \esc_html_e( 'No input snapshot was stored for this run.', 'aio-page-builder' ); ?></p>
+				<?php else : ?>
+					<details class="aio-full-prompt-details">
+						<summary><?php \esc_html_e( 'Show full input_snapshot JSON', 'aio-page-builder' ); ?></summary>
+						<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $input_snap ) ); ?></pre>
+					</details>
+				<?php endif; ?>
+			</section>
+			<section class="aio-full-prompt-files" aria-labelledby="aio-full-prompt-files-heading" style="margin-top:1.5em;">
+				<h2 id="aio-full-prompt-files-heading"><?php \esc_html_e( 'File manifest', 'aio-page-builder' ); ?></h2>
+				<p class="description"><?php \esc_html_e( 'References to files attached to the provider request when the driver supports them.', 'aio-page-builder' ); ?></p>
+				<?php if ( $file_manifest === null || $file_manifest === '' ) : ?>
+					<p class="description"><?php \esc_html_e( 'No file manifest was stored for this run.', 'aio-page-builder' ); ?></p>
+				<?php else : ?>
+					<pre class="aio-json-dump"><?php echo \esc_html( self::format_payload_for_display( $file_manifest ) ); ?></pre>
 				<?php endif; ?>
 			</section>
 		<?php

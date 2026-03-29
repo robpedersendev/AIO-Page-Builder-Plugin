@@ -42,7 +42,7 @@ final class Template_Lab_Apply_Lineage_Snapshot_Recorder {
 			return;
 		}
 		$snapshot_id = 'snap_tl_' . bin2hex( random_bytes( 8 ) );
-		$definition    = array(
+		$definition  = array(
 			Version_Snapshot_Schema::FIELD_SNAPSHOT_ID    => $snapshot_id,
 			Version_Snapshot_Schema::FIELD_SCOPE_TYPE     => Version_Snapshot_Schema::SCOPE_BUILD_CONTEXT,
 			Version_Snapshot_Schema::FIELD_SCOPE_ID       => self::SCOPE_ID,
@@ -66,7 +66,7 @@ final class Template_Lab_Apply_Lineage_Snapshot_Recorder {
 				'kind' => 'template_lab_canonical_apply',
 			),
 		);
-		$id = $this->snapshots->save_definition( $definition );
+		$id          = $this->snapshots->save_definition( $definition );
 		if ( $id <= 0 ) {
 			Named_Debug_Log::event( Named_Debug_Log_Event::TEMPLATE_LAB_APPLY_LINEAGE_SNAPSHOT_FAIL, 'reason=persist' );
 		}

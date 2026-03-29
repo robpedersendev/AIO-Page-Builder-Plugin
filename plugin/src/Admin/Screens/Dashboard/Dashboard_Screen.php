@@ -278,10 +278,10 @@ final class Dashboard_Screen {
 		if ( empty( $metrics['visible'] ) || ! Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS ) ) {
 			return;
 		}
-		$agg    = isset( $metrics['aggregate'] ) && is_array( $metrics['aggregate'] ) ? $metrics['aggregate'] : array();
-		$c      = isset( $agg['c'] ) && is_array( $agg['c'] ) ? $agg['c'] : array();
+		$agg   = isset( $metrics['aggregate'] ) && is_array( $metrics['aggregate'] ) ? $metrics['aggregate'] : array();
+		$c     = isset( $agg['c'] ) && is_array( $agg['c'] ) ? $agg['c'] : array();
 		$by_st = isset( $agg['by_step'] ) && is_array( $agg['by_step'] ) ? $agg['by_step'] : array();
-		$rec    = isset( $agg['recent'] ) && is_array( $agg['recent'] ) ? $agg['recent'] : array();
+		$rec   = isset( $agg['recent'] ) && is_array( $agg['recent'] ) ? $agg['recent'] : array();
 		?>
 		<div class="aio-dash-onboard-metrics" role="region" aria-labelledby="aio-dash-onboard-metrics-h" style="margin:0 0 1.25rem;padding:1rem 1.15rem;border:1px solid #c3c4c7;border-radius:8px;background:#fff;">
 			<h2 id="aio-dash-onboard-metrics-h" style="margin:0 0 0.5rem;font-size:1rem;"><?php \esc_html_e( 'Onboarding activity (aggregate)', 'aio-page-builder' ); ?></h2>

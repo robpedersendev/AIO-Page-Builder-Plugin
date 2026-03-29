@@ -130,9 +130,11 @@ final class Named_Debug_Log_Event {
 	// Build Plan
 	// -------------------------------------------------------------------------
 	public const BUILD_PLAN_WORKSPACE_UI_STATE_DEBUG = 'AIO_BUILD_PLAN_WORKSPACE_UI_STATE_DEBUG';
-	public const BUILD_PLAN_WORKSPACE_FINALIZE       = 'AIO_BUILD_PLAN_WORKSPACE_FINALIZE';
-	public const BUILD_PLAN_SEO_BULK_ACTION_DEBUG    = 'AIO_BUILD_PLAN_SEO_BULK_ACTION_DEBUG';
-	public const BUILD_PLAN_DESIGN_TOKEN_BULK_DEBUG  = 'AIO_BUILD_PLAN_DESIGN_TOKEN_BULK_DEBUG';
+	/** Empty or step-less _aio_plan_definition repair (run lookup + regenerate into same post). */
+	public const BUILD_PLAN_EMPTY_DEFINITION_REPAIR = 'AIO_BUILD_PLAN_EMPTY_DEFINITION_REPAIR';
+	public const BUILD_PLAN_WORKSPACE_FINALIZE      = 'AIO_BUILD_PLAN_WORKSPACE_FINALIZE';
+	public const BUILD_PLAN_SEO_BULK_ACTION_DEBUG   = 'AIO_BUILD_PLAN_SEO_BULK_ACTION_DEBUG';
+	public const BUILD_PLAN_DESIGN_TOKEN_BULK_DEBUG = 'AIO_BUILD_PLAN_DESIGN_TOKEN_BULK_DEBUG';
 
 	// -------------------------------------------------------------------------
 	// Admin — menu / template seeding / industry bundle

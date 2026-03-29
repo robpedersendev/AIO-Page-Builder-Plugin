@@ -27,11 +27,11 @@ final class Build_Plan_Item_Schema {
 	public const KEY_BLOCKING            = 'blocking';
 	public const KEY_STATUS              = 'status';
 	/** Optional structured review/deny audit (see {@see \AIOPageBuilder\Domain\BuildPlan\Build_Plan_Review_Decision_Meta}). */
-	public const KEY_REVIEW_DECISION     = 'review_decision';
-	public const KEY_SOURCE_SECTION      = 'source_section';
-	public const KEY_SOURCE_INDEX        = 'source_index';
-	public const KEY_CONFIDENCE          = 'confidence';
-	public const KEY_RISK_LEVEL          = 'risk_level';
+	public const KEY_REVIEW_DECISION = 'review_decision';
+	public const KEY_SOURCE_SECTION  = 'source_section';
+	public const KEY_SOURCE_INDEX    = 'source_index';
+	public const KEY_CONFIDENCE      = 'confidence';
+	public const KEY_RISK_LEVEL      = 'risk_level';
 
 	/** Item type enum (build-plan-schema.md §6.1). */
 	public const ITEM_TYPE_EXISTING_PAGE_CHANGE = 'existing_page_change';

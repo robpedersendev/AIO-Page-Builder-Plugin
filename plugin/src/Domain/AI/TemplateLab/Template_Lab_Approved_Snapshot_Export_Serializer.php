@@ -53,7 +53,7 @@ final class Template_Lab_Approved_Snapshot_Export_Serializer {
 		$norm = $artifacts->get( $run_post_id, Artifact_Category_Keys::NORMALIZED_OUTPUT );
 		$norm = is_array( $norm ) ? AI_Run_Artifact_Service::redact_sensitive_values( $norm ) : array();
 
-		$val = $artifacts->get( $run_post_id, Artifact_Category_Keys::VALIDATION_REPORT );
+		$val      = $artifacts->get( $run_post_id, Artifact_Category_Keys::VALIDATION_REPORT );
 		$val_safe = self::summarize_validation_report( $val );
 
 		$meta_slice = array();
@@ -68,19 +68,19 @@ final class Template_Lab_Approved_Snapshot_Export_Serializer {
 			? AI_Run_Artifact_Service::redact_sensitive_values( $run_metadata['template_lab'] )
 			: array();
 
-		$apply = $apply_state->get_template_lab_canonical_apply_record( $run_post_id );
+		$apply   = $apply_state->get_template_lab_canonical_apply_record( $run_post_id );
 		$applied = is_array( $apply ) && (string) ( $apply['canonical_internal_key'] ?? '' ) !== '';
 
 		$out = array(
-			'export_version'        => self::EXPORT_VERSION,
-			'exported_at_utc'       => gmdate( 'c' ),
-			'run_post_id'           => $run_post_id,
-			'safe_run_metadata'     => $meta_slice,
-			'template_lab_state'    => $tl,
-			'template_lab_trace'    => $trace,
-			'normalized_output'     => $norm,
-			'validation_summary'    => $val_safe,
-			'canonical_apply'       => $applied
+			'export_version'     => self::EXPORT_VERSION,
+			'exported_at_utc'    => gmdate( 'c' ),
+			'run_post_id'        => $run_post_id,
+			'safe_run_metadata'  => $meta_slice,
+			'template_lab_state' => $tl,
+			'template_lab_trace' => $trace,
+			'normalized_output'  => $norm,
+			'validation_summary' => $val_safe,
+			'canonical_apply'    => $applied
 				? array(
 					'applied'                => true,
 					'canonical_internal_key' => (string) ( $apply['canonical_internal_key'] ?? '' ),

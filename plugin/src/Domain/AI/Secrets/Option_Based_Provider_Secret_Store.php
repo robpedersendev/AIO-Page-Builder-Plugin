@@ -29,7 +29,7 @@ final class Option_Based_Provider_Secret_Store implements Provider_Secret_Store_
 		if ( $this->loaded ) {
 			return;
 		}
-		$raw          = \get_option( self::OPTION_KEY, array() );
+		$raw          = \get_option( Option_Names::PROVIDER_SECRETS, array() );
 		$this->cache  = is_array( $raw ) ? $raw : array();
 		$this->loaded = true;
 	}

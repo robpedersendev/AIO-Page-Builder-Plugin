@@ -31,6 +31,12 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 	/** Meta key prefix for artifact payloads: _aio_artifact_{category}. */
 	public const META_ARTIFACT_PREFIX = '_aio_artifact_';
 
+	/**
+	 * * When the JSON string for an artifact exceeds this length, it is split across multiple post meta rows
+	 * * (_aio_artifact_{cat}__part_0, …) so large prompts (heavy escaped strings) persist reliably.
+	 */
+	private const ARTIFACT_JSON_CHUNK_BYTES = 524288;
+
 	/** @inheritdoc */
 	protected function get_post_type(): string {
 		return Object_Type_Keys::AI_RUN;
@@ -60,8 +66,15 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 	 */
 	public function save_run_metadata( int $post_id, array $data ): bool {
 		$json = wp_json_encode( $data );
-		if ( $json === false || \update_post_meta( $post_id, self::META_RUN_METADATA, $json ) === false ) {
+		if ( $json === false ) {
 			return false;
+		}
+		$updated = \update_post_meta( $post_id, self::META_RUN_METADATA, $json );
+		if ( $updated === false ) {
+			$existing = \get_post_meta( $post_id, self::META_RUN_METADATA, true );
+			if ( ! is_string( $existing ) || $existing !== $json ) {
+				return false;
+			}
 		}
 		// * Indexed for privacy exporter/eraser (actor-linked queries).
 		$actor = isset( $data['actor'] ) ? (string) $data['actor'] : '';
@@ -115,8 +128,10 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 			'update_post_meta_cache' => false,
 		);
 		if ( $surface !== '' ) {
+			// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Paginated list filter.
 			$args['meta_key']   = self::META_RUN_SURFACE;
 			$args['meta_value'] = $surface;
+			// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 		}
 		$query = new \WP_Query( $args );
 		$ids   = array();
@@ -127,14 +142,80 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 	}
 
 	/**
-	 * Returns artifact payload for a category (stored in meta _aio_artifact_{category}).
+	 * Finds the newest completed AI run whose stored metadata build_plan_ref matches the plan id.
+	 *
+	 * @param string $plan_id Stable build plan internal key.
+	 * @param int    $scan_limit Max recent runs to inspect (bounded for admin repair paths).
+	 * @return string|null Run internal key (run_id) or null.
+	 */
+	public function find_latest_completed_run_internal_key_for_build_plan_ref( string $plan_id, int $scan_limit = 120 ): ?string {
+		$plan_id = \sanitize_text_field( $plan_id );
+		if ( $plan_id === '' ) {
+			return null;
+		}
+		$scan_limit = max( 1, min( 300, $scan_limit ) );
+		$query      = new \WP_Query(
+			array(
+				'post_type'              => $this->get_post_type(),
+				'post_status'            => 'publish',
+				'posts_per_page'         => $scan_limit,
+				'orderby'                => 'date',
+				'order'                  => 'DESC',
+				'no_found_rows'          => true,
+				'fields'                 => 'ids',
+				'update_post_meta_cache' => true,
+			)
+		);
+		foreach ( $query->get_posts() as $pid_raw ) {
+			$pid = (int) $pid_raw;
+			if ( $pid <= 0 ) {
+				continue;
+			}
+			$meta = $this->get_run_metadata( $pid );
+			$ref  = isset( $meta['build_plan_ref'] ) ? trim( (string) $meta['build_plan_ref'] ) : '';
+			if ( $ref !== $plan_id ) {
+				continue;
+			}
+			$record = $this->get_by_id( $pid );
+			if ( $record === null ) {
+				continue;
+			}
+			if ( (string) ( $record['status'] ?? '' ) !== 'completed' ) {
+				continue;
+			}
+			$key = (string) ( $record['internal_key'] ?? '' );
+			return $key !== '' ? $key : null;
+		}
+		return null;
+	}
+
+	/**
+	 * Returns artifact payload for a category (stored in meta _aio_artifact_{category} or chunked parts).
 	 *
 	 * @param int    $post_id  Run post ID.
 	 * @param string $category Artifact_Category_Keys constant.
 	 * @return mixed Decoded payload or null if absent.
 	 */
 	public function get_artifact_payload( int $post_id, string $category ): mixed {
-		$key = self::META_ARTIFACT_PREFIX . $category;
+		$key         = self::META_ARTIFACT_PREFIX . $category;
+		$chunk_count = \get_post_meta( $post_id, $key . '__chunk_count', true );
+		$n           = is_numeric( $chunk_count ) ? (int) $chunk_count : 0;
+		if ( $n > 0 ) {
+			$pieces = array();
+			for ( $i = 0; $i < $n; $i++ ) {
+				$part = \get_post_meta( $post_id, $key . '__part_' . (string) $i, true );
+				if ( ! is_string( $part ) || $part === '' ) {
+					return null;
+				}
+				$pieces[] = $part;
+			}
+			$json = implode( '', $pieces );
+			if ( $json === '' ) {
+				return null;
+			}
+			$decoded = json_decode( $json, true );
+			return $decoded;
+		}
 		$raw = \get_post_meta( $post_id, $key, true );
 		if ( $raw === '' || $raw === null ) {
 			return null;
@@ -163,7 +244,50 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 		if ( $json === false ) {
 			$json = \wp_json_encode( $clean, $flags | ( defined( 'JSON_PARTIAL_OUTPUT_ON_ERROR' ) ? JSON_PARTIAL_OUTPUT_ON_ERROR : 0 ), $depth );
 		}
-		return $json !== false && \update_post_meta( $post_id, $key, $json ) !== false;
+		if ( $json === false ) {
+			return false;
+		}
+		self::clear_artifact_meta_for_category( $post_id, $category );
+		$len = strlen( $json );
+		if ( $len <= self::ARTIFACT_JSON_CHUNK_BYTES ) {
+			return \update_post_meta( $post_id, $key, $json ) !== false;
+		}
+		$offset = 0;
+		$index  = 0;
+		while ( $offset < $len ) {
+			$piece = substr( $json, $offset, self::ARTIFACT_JSON_CHUNK_BYTES );
+			if ( $piece === '' ) {
+				break;
+			}
+			if ( \update_post_meta( $post_id, $key . '__part_' . (string) $index, $piece ) === false ) {
+				return false;
+			}
+			$piece_len = strlen( $piece );
+			if ( $piece_len === 0 ) {
+				break;
+			}
+			$offset += $piece_len;
+			++$index;
+		}
+		return $index > 0 && \update_post_meta( $post_id, $key . '__chunk_count', (string) $index ) !== false;
+	}
+
+	/**
+	 * * Removes single-row and chunked meta rows for an artifact category before rewriting.
+	 *
+	 * @param int    $post_id  Run post ID.
+	 * @param string $category Artifact category key.
+	 * @return void
+	 */
+	private static function clear_artifact_meta_for_category( int $post_id, string $category ): void {
+		$key = self::META_ARTIFACT_PREFIX . $category;
+		$raw = \get_post_meta( $post_id, $key . '__chunk_count', true );
+		$n   = is_numeric( $raw ) ? (int) $raw : 0;
+		for ( $i = 0; $i < $n; $i++ ) {
+			\delete_post_meta( $post_id, $key . '__part_' . (string) $i );
+		}
+		\delete_post_meta( $post_id, $key . '__chunk_count' );
+		\delete_post_meta( $post_id, $key );
 	}
 
 	/**
@@ -266,9 +390,10 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 			'update_post_meta_cache' => true,
 		);
 		if ( $surface !== '' ) {
-			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Admin AI run list filter; paginated.
-			$args['meta_key']    = self::META_RUN_SURFACE;
-			$args['meta_value']  = $surface;
+			// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Admin AI run list filter; paginated.
+			$args['meta_key']   = self::META_RUN_SURFACE;
+			$args['meta_value'] = $surface;
+			// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_meta_key,WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 		}
 		$query = new \WP_Query( $args );
 		$out   = array();

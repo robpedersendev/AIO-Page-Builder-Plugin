@@ -107,9 +107,9 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 	}
 
 	public function test_at_review_with_valid_data_and_provider_shows_advisory_for_placeholder_business_name(): void {
-		$settings      = new Settings_Service();
-		$draft_svc     = new Onboarding_Draft_Service( $settings );
-		$draft         = $draft_svc->get_draft();
+		$settings                  = new Settings_Service();
+		$draft_svc                 = new Onboarding_Draft_Service( $settings );
+		$draft                     = $draft_svc->get_draft();
 		$draft['current_step_key'] = Onboarding_Step_Keys::REVIEW;
 		$draft['overall_status']   = Onboarding_Statuses::IN_PROGRESS;
 		$draft_svc->save_draft( $draft );
@@ -117,11 +117,11 @@ final class Onboarding_UI_State_Builder_Test extends TestCase {
 		$profile_store = new Profile_Store( $settings, $normalizer );
 		$profile_store->merge_business_profile(
 			array(
-				'business_name'             => 'test',
-				'business_type'             => 'Consulting',
-				'target_audience_summary'   => 'Small businesses needing structured sites.',
-				'primary_offers_summary'    => 'Implementation and templates.',
-				'core_geographic_market'    => 'United States',
+				'business_name'           => 'test',
+				'business_type'           => 'Consulting',
+				'target_audience_summary' => 'Small businesses needing structured sites.',
+				'primary_offers_summary'  => 'Implementation and templates.',
+				'core_geographic_market'  => 'United States',
 			)
 		);
 		$profile_store->merge_brand_profile(

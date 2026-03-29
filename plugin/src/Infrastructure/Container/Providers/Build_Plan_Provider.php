@@ -15,6 +15,7 @@ use AIOPageBuilder\Bootstrap\Industry_Packs_Module;
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_Analytics_Service;
 use AIOPageBuilder\Domain\BuildPlan\Build_Plan_Template_Lab_Context_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\Generation\AI_Run_To_Build_Plan_Service;
+use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Empty_Definition_Repair_Service;
 use AIOPageBuilder\Domain\BuildPlan\Lineage\Build_Plan_Lineage_Service;
 use AIOPageBuilder\Domain\BuildPlan\Lineage\Existing_Page_Lineage_Template_Drift_Advisor;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator;
@@ -188,6 +189,16 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 					$container->get( 'build_plan_generator' ),
 					$container->get( 'build_plan_repository' ),
 					$resolver
+				);
+			}
+		);
+		$container->register(
+			'build_plan_empty_definition_repair_service',
+			function () use ( $container ): Build_Plan_Empty_Definition_Repair_Service {
+				return new Build_Plan_Empty_Definition_Repair_Service(
+					$container->get( 'build_plan_repository' ),
+					$container->get( 'ai_run_repository' ),
+					$container->get( 'ai_run_to_build_plan_service' )
 				);
 			}
 		);
@@ -381,7 +392,8 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 					$container->get( 'tokens_step_ui_service' ),
 					$container->get( 'seo_media_step_ui_service' ),
 					$container->get( 'finalization_step_ui_service' ),
-					$container->get( 'history_rollback_step_ui_service' )
+					$container->get( 'history_rollback_step_ui_service' ),
+					$container->get( 'build_plan_empty_definition_repair_service' )
 				);
 			}
 		);

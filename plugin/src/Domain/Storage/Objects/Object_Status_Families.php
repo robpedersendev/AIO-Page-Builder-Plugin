@@ -51,7 +51,7 @@ final class Object_Status_Families {
 		Object_Type_Keys::PROMPT_PACK      => self::DRAFT_ACTIVE_INACTIVE_DEPRECATED,
 		Object_Type_Keys::DOCUMENTATION    => self::DRAFT_ACTIVE_ARCHIVED,
 		Object_Type_Keys::VERSION_SNAPSHOT => self::SNAPSHOT_WORKFLOW,
-		Object_Type_Keys::AI_CHAT_SESSION => self::CHAT_SESSION_LIFECYCLE,
+		Object_Type_Keys::AI_CHAT_SESSION  => self::CHAT_SESSION_LIFECYCLE,
 	);
 
 	/**

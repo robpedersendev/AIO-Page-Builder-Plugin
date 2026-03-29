@@ -115,7 +115,7 @@ final class Prompt_Experiment_Service {
 		Named_Debug_Log::event( Named_Debug_Log_Event::EXPERIMENT_DEFINITION_SAVED, 'id=' . $id );
 		return array(
 			'ok'      => true,
-			'message' => __( 'Experiment saved.', 'aio-page-builder' ),
+			'message' => __( 'Comparison saved.', 'aio-page-builder' ),
 		);
 	}
 
@@ -153,29 +153,29 @@ final class Prompt_Experiment_Service {
 	 */
 	public function validate_definition( array $definition ): string {
 		if ( empty( $definition['name'] ) || ! is_string( $definition['name'] ) ) {
-			return __( 'Experiment name is required.', 'aio-page-builder' );
+			return __( 'Please enter a name for this comparison.', 'aio-page-builder' );
 		}
 		$variants = $definition['variants'] ?? array();
 		if ( ! is_array( $variants ) || count( $variants ) === 0 ) {
-			return __( 'At least one variant is required.', 'aio-page-builder' );
+			return __( 'Add at least one complete alternative row (id, prompt pack, and provider).', 'aio-page-builder' );
 		}
 		foreach ( $variants as $i => $v ) {
 			if ( ! is_array( $v ) ) {
-				return __( 'Variant must be an object.', 'aio-page-builder' );
+				return __( 'Each alternative must be a complete row.', 'aio-page-builder' );
 			}
 			$ref = $v['prompt_pack_ref'] ?? null;
 			if ( ! is_array( $ref ) || empty( $ref['internal_key'] ) || empty( $ref['version'] ) ) {
-				return __( 'Variant must have prompt_pack_ref with internal_key and version.', 'aio-page-builder' );
+				return __( 'Each alternative needs a prompt pack key and version (dropdown or manual fields).', 'aio-page-builder' );
 			}
 			if ( empty( $v['provider_id'] ) || ! is_string( $v['provider_id'] ) ) {
-				return __( 'Variant must have provider_id.', 'aio-page-builder' );
+				return __( 'Each alternative needs a provider id (same id you use under AI Providers).', 'aio-page-builder' );
 			}
 			$vid = $v['variant_id'] ?? '';
 			if ( $vid === '' && isset( $v['label'] ) ) {
 				$vid = (string) $i;
 			}
 			if ( $vid === '' ) {
-				return __( 'Variant must have variant_id or label.', 'aio-page-builder' );
+				return __( 'Each alternative needs a short id or a label in the first two fields.', 'aio-page-builder' );
 			}
 		}
 		return '';
@@ -208,8 +208,8 @@ final class Prompt_Experiment_Service {
 		$metadata[ self::METADATA_VARIANT_LABEL ] = $variant_label;
 		$post_id                                  = $this->run_service->create_run( $run_id, $metadata, $status, $artifacts );
 		$message                                  = $post_id > 0
-			? __( 'Experiment run recorded. View in AI Runs.', 'aio-page-builder' )
-			: __( 'Failed to save experiment run.', 'aio-page-builder' );
+			? __( 'Comparison run saved. Open AI Runs to review it.', 'aio-page-builder' )
+			: __( 'Could not save this comparison run.', 'aio-page-builder' );
 		Named_Debug_Log::event(
 			Named_Debug_Log_Event::EXPERIMENT_RUN_RECORDED,
 			'experiment_id=' . $experiment_id . ' variant=' . $variant_id . ' run_id=' . $run_id . ' post_id=' . (string) $post_id . ' status=' . $status

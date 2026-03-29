@@ -219,7 +219,16 @@ final class Planning_Thin_Output_Enrichment_Service {
 				++$idx;
 				continue;
 			}
-			$slug = $row['proposed_slug'];
+			$slug_raw = $row['proposed_slug'] ?? null;
+			if ( ! is_string( $slug_raw ) ) {
+				++$idx;
+				continue;
+			}
+			$slug = trim( $slug_raw );
+			if ( $slug === '' ) {
+				++$idx;
+				continue;
+			}
 			if ( isset( $used_slugs[ $slug ] ) ) {
 				$row['proposed_slug'] = $this->unique_slug( $slug, $used_slugs );
 				$slug                 = $row['proposed_slug'];
@@ -248,8 +257,8 @@ final class Planning_Thin_Output_Enrichment_Service {
 		$refs             = array_values(
 			array_filter(
 				array_map(
-					static function ( $s ) {
-						return is_string( $s ) ? trim( $s ) : '';
+					static function ( string $s ): string {
+						return trim( $s );
 					},
 					$section_refs
 				)
@@ -289,6 +298,7 @@ final class Planning_Thin_Output_Enrichment_Service {
 
 	/**
 	 * @param array<string, true> $used_slugs
+	 * @param-out array<string, true> $used_slugs
 	 */
 	private function unique_slug( string $base, array &$used_slugs ): string {
 		$n         = 2;
@@ -301,10 +311,10 @@ final class Planning_Thin_Output_Enrichment_Service {
 	}
 
 	private function humanize_template_key_to_title( string $template_key ): string {
-		$clean = preg_replace( '#^pt_#', '', $template_key );
-		$clean = str_replace( array( '_01', '_02', '-' ), array( '', '', ' ' ), $clean ?? '' );
-		$words = explode( '_', $clean ?? '' );
-		$title = implode( ' ', array_map( 'ucfirst', array_map( 'strtolower', $words ) ) );
+		$stripped = preg_replace( '#^pt_#', '', $template_key );
+		$clean    = str_replace( array( '_01', '_02', '-' ), array( '', '', ' ' ), is_string( $stripped ) ? $stripped : '' );
+		$words    = explode( '_', $clean );
+		$title    = implode( ' ', array_map( 'ucfirst', array_map( 'strtolower', $words ) ) );
 		return strlen( $title ) > 0 && strlen( $title ) <= 100 ? $title : __( 'New page', 'aio-page-builder' );
 	}
 }

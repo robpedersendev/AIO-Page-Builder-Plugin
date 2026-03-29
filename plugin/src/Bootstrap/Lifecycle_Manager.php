@@ -10,6 +10,8 @@ declare( strict_types=1 );
 
 namespace AIOPageBuilder\Bootstrap;
 
+use AIOPageBuilder\Infrastructure\Config\Option_Names;
+
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/../Infrastructure/Config/Dependency_Requirements.php';

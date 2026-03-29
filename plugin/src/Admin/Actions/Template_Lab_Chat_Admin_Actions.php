@@ -178,7 +178,7 @@ final class Template_Lab_Chat_Admin_Actions {
 	}
 
 	/**
-	 * @param 'create'|'prompt' $which
+	 * @param 'create'|'prompt'|'fork' $which
 	 */
 	public static function nonce_field( string $which ): void {
 		if ( $which === 'create' ) {

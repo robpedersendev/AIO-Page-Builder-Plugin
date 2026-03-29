@@ -22,7 +22,7 @@ final class Admin_Screen_Hub {
 	public const QUERY_SUBTAB = 'aio_subtab';
 
 	/**
-	 * AI workspace hub: tab id => capability (order: providers, ai_runs, experiments — keep sync with render_ai_workspace_hub).
+	 * AI workspace hub: tab id => capability (order: providers, ai_runs, experiments tab id — keep sync with render_ai_workspace_hub).
 	 *
 	 * @return array<string, string>
 	 */

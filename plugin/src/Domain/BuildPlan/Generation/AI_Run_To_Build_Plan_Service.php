@@ -99,6 +99,12 @@ final class AI_Run_To_Build_Plan_Service {
 		$context = array();
 		if ( $reuse_plan_post_id !== null && $reuse_plan_post_id > 0 ) {
 			$context['target_post_id'] = $reuse_plan_post_id;
+			$reuse_row                 = $this->plan_repository->get_by_id( $reuse_plan_post_id );
+			$stable_key                = $reuse_row !== null ? trim( (string) ( $reuse_row['internal_key'] ?? '' ) ) : '';
+			if ( $stable_key !== '' ) {
+				// * Keeps _aio_internal_key and plan URLs stable when replacing shell or repairing empty meta.
+				$context['reuse_existing_plan_id'] = $stable_key;
+			}
 		}
 
 		$actor  = isset( $options['actor_user_id'] ) ? (int) $options['actor_user_id'] : 0;
@@ -123,7 +129,11 @@ final class AI_Run_To_Build_Plan_Service {
 		$had_template_lab_context = ! empty( $context['template_lab_context'] );
 
 		$result = $this->plan_generator->generate( $normalized, $run_id, $output_ref, $context );
-		if ( ! $result->is_success() || $prev_for_lineage === array() ) {
+		if ( ! $result->is_success() ) {
+			return $result;
+		}
+		// * Generator already persisted; only merge lineage fields from the prior shell when reusing a plan post.
+		if ( $prev_for_lineage === array() ) {
 			return $result;
 		}
 
