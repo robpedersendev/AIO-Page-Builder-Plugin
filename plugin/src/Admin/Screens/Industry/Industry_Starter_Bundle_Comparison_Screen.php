@@ -121,7 +121,7 @@ final class Industry_Starter_Bundle_Comparison_Screen {
 				<input type="hidden" name="<?php echo esc_attr( Admin_Screen_Hub::QUERY_SUBTAB ); ?>" value="bundle" />
 				<label for="aio-bundle-keys"><?php esc_html_e( 'Bundle keys to compare (comma-separated, 2–6)', 'aio-page-builder' ); ?></label>
 				<input type="text" id="aio-bundle-keys" name="<?php echo esc_attr( self::PARAM_BUNDLE_KEYS ); ?>" value="<?php echo esc_attr( implode( ', ', $selected_keys ) ); ?>" placeholder="<?php esc_attr_e( 'e.g. plumber_starter, plumber_residential_starter', 'aio-page-builder' ); ?>" style="width: 100%; max-width: 480px; margin-right: 0.5em;" />
-				<button type="submit" class="button button-primary"><?php esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button button-primary" data-aio-ux-action="industry_comparison_bundle_compare" data-aio-ux-section="industry_bundle_comparison" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="comparisons"><?php esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
 			</form>
 
 			<?php if ( ! empty( $state['all_bundles'] ) ) : ?>

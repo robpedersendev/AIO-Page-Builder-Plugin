@@ -273,7 +273,7 @@ final class Queue_Logs_Screen {
 					</select>
 				</p>
 				<p class="submit">
-					<button type="submit" class="button button-primary"><?php \esc_html_e( 'Export logs', 'aio-page-builder' ); ?></button>
+					<button type="submit" class="button button-primary" data-aio-ux-action="queue_logs_export" data-aio-ux-section="queue_logs_export" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="queue"><?php \esc_html_e( 'Export logs', 'aio-page-builder' ); ?></button>
 				</p>
 			</form>
 		</section>

@@ -111,9 +111,10 @@ final class Admin_Screen_Hub {
 	 * @param array<string, array{label: string, cap: string}> $tabs Tab definitions keyed by tab id.
 	 * @param string                                           $current   Active tab id.
 	 * @param callable(string): bool|null                      $user_can_tab Optional cap check; defaults to Capabilities::current_user_can_for_route.
+	 * @param array<string, scalar|\Stringable>                $extra_query_args Merged into every tab link (e.g. plan_id for Plans hub deep links).
 	 * @return void
 	 */
-	public static function render_nav_tabs( string $page_slug, array $tabs, string $current, ?callable $user_can_tab = null ): void {
+	public static function render_nav_tabs( string $page_slug, array $tabs, string $current, ?callable $user_can_tab = null, array $extra_query_args = array() ): void {
 		$can = $user_can_tab ?? static function ( string $cap ): bool {
 			return \AIOPageBuilder\Infrastructure\Config\Capabilities::current_user_can_for_route( $cap );
 		};
@@ -123,7 +124,7 @@ final class Admin_Screen_Hub {
 				continue;
 			}
 			$active = ( $current === $key ) ? ' nav-tab-active' : '';
-			echo '<a href="' . \esc_url( self::tab_url( $page_slug, $key ) ) . '" class="nav-tab' . \esc_attr( $active ) . '">' . \esc_html( $info['label'] ) . '</a>';
+			echo '<a href="' . \esc_url( self::tab_url( $page_slug, $key, $extra_query_args ) ) . '" class="nav-tab' . \esc_attr( $active ) . '">' . \esc_html( $info['label'] ) . '</a>';
 		}
 		echo '</h2>';
 	}

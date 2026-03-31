@@ -561,7 +561,7 @@ final class AI_Providers_Screen {
 					?>
 					<div class="notice notice-warning inline"><p><?php \esc_html_e( 'Some providers are not fully configured. Routing can be saved, but runs may fail until credentials are stored and validated.', 'aio-page-builder' ); ?></p></div>
 				<?php endif; ?>
-				<p><button type="submit" class="button button-primary"><?php \esc_html_e( 'Save routing', 'aio-page-builder' ); ?></button></p>
+				<p><button type="submit" class="button button-primary" data-aio-ux-action="ai_providers_save_routing" data-aio-ux-section="ai_providers_routing" data-aio-ux-hub="<?php echo \esc_attr( AI_Runs_Screen::HUB_PAGE_SLUG ); ?>" data-aio-ux-tab="providers"><?php \esc_html_e( 'Save routing', 'aio-page-builder' ); ?></button></p>
 			</form>
 		</div>
 		<?php
@@ -887,14 +887,14 @@ final class AI_Providers_Screen {
 										<input type="hidden" name="action" value="aio_pb_test_ai_provider_connection" />
 										<input type="hidden" name="provider_id" value="<?php echo \esc_attr( $row['provider_id'] ); ?>" />
 										<?php \wp_nonce_field( 'aio_pb_test_ai_provider_connection_' . $row['provider_id'] ); ?>
-										<button type="submit" class="button button-small"><?php \esc_html_e( 'Test connection', 'aio-page-builder' ); ?></button>
+										<button type="submit" class="button button-small" data-aio-ux-action="ai_provider_test_connection" data-aio-ux-section="ai_providers_row" data-aio-ux-hub="<?php echo \esc_attr( AI_Runs_Screen::HUB_PAGE_SLUG ); ?>" data-aio-ux-tab="providers"><?php \esc_html_e( 'Test connection', 'aio-page-builder' ); ?></button>
 									</form>
 									<form method="post" action="<?php echo \esc_url( $this->get_hub_providers_base_url() ); ?>" style="display:inline-block;">
 										<input type="hidden" name="action" value="aio_pb_update_ai_provider_credential" />
 										<input type="hidden" name="provider_id" value="<?php echo \esc_attr( $row['provider_id'] ); ?>" />
 										<?php \wp_nonce_field( 'aio_pb_update_ai_provider_credential_' . $row['provider_id'] ); ?>
 										<input type="password" name="provider_credential" value="" autocomplete="off" placeholder="<?php \esc_attr_e( 'New key', 'aio-page-builder' ); ?>" style="max-width:160px;" />
-										<button type="submit" class="button button-small"><?php \esc_html_e( 'Update credential', 'aio-page-builder' ); ?></button>
+										<button type="submit" class="button button-small" data-aio-ux-action="ai_provider_update_credential" data-aio-ux-section="ai_providers_row" data-aio-ux-hub="<?php echo \esc_attr( AI_Runs_Screen::HUB_PAGE_SLUG ); ?>" data-aio-ux-tab="providers"><?php \esc_html_e( 'Update credential', 'aio-page-builder' ); ?></button>
 									</form>
 								</td>
 							</tr>
@@ -1044,7 +1044,7 @@ final class AI_Providers_Screen {
 								</td>
 							</tr>
 						</table>
-						<p><button type="submit" class="button button-primary"><?php \esc_html_e( 'Save cap settings', 'aio-page-builder' ); ?></button></p>
+						<p><button type="submit" class="button button-primary" data-aio-ux-action="ai_providers_save_cap_settings" data-aio-ux-section="ai_providers_spend_caps" data-aio-ux-hub="<?php echo \esc_attr( AI_Runs_Screen::HUB_PAGE_SLUG ); ?>" data-aio-ux-tab="providers"><?php \esc_html_e( 'Save cap settings', 'aio-page-builder' ); ?></button></p>
 					</form>
 				</div>
 			<?php endforeach; ?>

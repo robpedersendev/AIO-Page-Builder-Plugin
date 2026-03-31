@@ -313,7 +313,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 					<input type="text" name="aio_industry_bundle_slug" id="aio_industry_bundle_slug" class="regular-text" value="" />
 				</p>
 				<p>
-					<button type="submit" class="button button-primary" <?php echo $can_apply ? '' : 'disabled'; ?>>
+					<button type="submit" class="button button-primary" data-aio-ux-action="industry_bundle_confirm_apply" data-aio-ux-section="industry_bundle_apply" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="import" <?php echo $can_apply ? '' : 'disabled'; ?>>
 						<?php \esc_html_e( 'Confirm apply', 'aio-page-builder' ); ?>
 					</button>
 				</p>
@@ -322,7 +322,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 
 		<section class="aio-bundle-preview-actions" style="margin: 1.5em 0;">
 			<p>
-				<a href="<?php echo \esc_url( $cancel_url ); ?>" class="button"><?php \esc_html_e( 'Clear preview', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo \esc_url( $cancel_url ); ?>" class="button" data-aio-ux-action="industry_bundle_clear_preview" data-aio-ux-section="industry_bundle_actions" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="import"><?php \esc_html_e( 'Clear preview', 'aio-page-builder' ); ?></a>
 			</p>
 		</section>
 		<?php
@@ -339,7 +339,7 @@ final class Industry_Bundle_Import_Preview_Screen {
 				<input type="file" name="aio_industry_bundle_file" id="aio_industry_bundle_file" accept=".json,application/json" />
 			</p>
 			<p>
-				<button type="submit" class="button button-primary"><?php \esc_html_e( 'Preview bundle', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button button-primary" data-aio-ux-action="industry_bundle_preview_upload" data-aio-ux-section="industry_bundle_upload" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="import"><?php \esc_html_e( 'Preview bundle', 'aio-page-builder' ); ?></button>
 			</p>
 		</form>
 		<?php

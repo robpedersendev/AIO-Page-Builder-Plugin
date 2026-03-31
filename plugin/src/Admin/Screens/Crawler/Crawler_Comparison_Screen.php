@@ -106,7 +106,7 @@ final class Crawler_Comparison_Screen {
 					</select>
 				</p>
 				<p>
-					<button type="submit" class="button button-primary"><?php \esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
+					<button type="submit" class="button button-primary" data-aio-ux-action="crawler_compare_runs" data-aio-ux-section="crawler_comparison_form" data-aio-ux-hub="<?php echo \esc_attr( Crawler_Sessions_Screen::SLUG ); ?>" data-aio-ux-tab="comparison"><?php \esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
 				</p>
 			</form>
 			<?php

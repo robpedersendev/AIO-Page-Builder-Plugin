@@ -17,6 +17,8 @@ use AIOPageBuilder\Domain\AI\Runs\AI_Run_Service;
 use AIOPageBuilder\Domain\BuildPlan\Build_Plan_Template_Lab_Context_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Loads normalized output for a completed run and persists a plan via {@see Build_Plan_Generator}.
@@ -57,16 +59,31 @@ final class AI_Run_To_Build_Plan_Service {
 	 */
 	public function create_from_completed_run( string $run_id, ?int $reuse_plan_post_id = null, array $options = array() ): Plan_Generation_Result {
 		$run_id = trim( $run_id );
+		$reuse  = $reuse_plan_post_id !== null && $reuse_plan_post_id > 0 ? (string) $reuse_plan_post_id : '0';
+		$actor  = isset( $options['actor_user_id'] ) ? (int) $options['actor_user_id'] : 0;
+		$tl_set = isset( $options['template_lab_chat_session_id'] ) && is_string( $options['template_lab_chat_session_id'] )
+			&& trim( $options['template_lab_chat_session_id'] ) !== '';
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::AI_RUN_TO_BP_ENTER,
+			'run_id=' . $run_id . ' reuse_plan_post_id=' . $reuse . ' actor=' . (string) $actor . ' template_lab=' . ( $tl_set ? '1' : '0' )
+		);
 		if ( $run_id === '' ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::AI_RUN_TO_BP_FAIL_EMPTY_RUN_ID, 'ok=0' );
 			return Plan_Generation_Result::failure( array( \__( 'Run ID is required.', 'aio-page-builder' ) ) );
 		}
 
 		$run = $this->run_service->get_run_by_id( $run_id );
 		if ( $run === null ) {
+			Named_Debug_Log::event( Named_Debug_Log_Event::AI_RUN_TO_BP_FAIL_RUN_NOT_FOUND, 'run_id=' . $run_id );
 			return Plan_Generation_Result::failure( array( \__( 'AI run not found.', 'aio-page-builder' ) ) );
 		}
 
-		if ( (string) ( $run['status'] ?? '' ) !== 'completed' ) {
+		$run_status = (string) ( $run['status'] ?? '' );
+		if ( $run_status !== 'completed' ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::AI_RUN_TO_BP_FAIL_NOT_COMPLETED,
+				'run_id=' . $run_id . ' status=' . $run_status
+			);
 			return Plan_Generation_Result::failure(
 				array( \__( 'The run must be completed before creating a Build Plan.', 'aio-page-builder' ) )
 			);
@@ -74,11 +91,20 @@ final class AI_Run_To_Build_Plan_Service {
 
 		$post_id = (int) ( $run['id'] ?? 0 );
 		if ( $post_id <= 0 ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::AI_RUN_TO_BP_FAIL_INVALID_RUN_POST,
+				'run_id=' . $run_id . ' run_post_id=' . (string) $post_id
+			);
 			return Plan_Generation_Result::failure( array( \__( 'Invalid run record.', 'aio-page-builder' ) ) );
 		}
 
 		$normalized = $this->artifact_service->get( $post_id, Artifact_Category_Keys::NORMALIZED_OUTPUT );
 		if ( ! is_array( $normalized ) ) {
+			$norm_type = is_object( $normalized ) ? 'object' : gettype( $normalized );
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::AI_RUN_TO_BP_FAIL_NO_NORMALIZED,
+				'run_id=' . $run_id . ' run_post_id=' . (string) $post_id . ' got=' . $norm_type
+			);
 			return Plan_Generation_Result::failure(
 				array( \__( 'This run has no normalized output artifact.', 'aio-page-builder' ) )
 			);
@@ -107,18 +133,25 @@ final class AI_Run_To_Build_Plan_Service {
 			}
 		}
 
-		$actor  = isset( $options['actor_user_id'] ) ? (int) $options['actor_user_id'] : 0;
 		$tl_sid = isset( $options['template_lab_chat_session_id'] ) && is_string( $options['template_lab_chat_session_id'] )
 			? trim( $options['template_lab_chat_session_id'] )
 			: '';
 		if ( $tl_sid !== '' ) {
 			if ( $this->template_lab_context_resolver === null || $actor <= 0 ) {
+				Named_Debug_Log::event(
+					Named_Debug_Log_Event::AI_RUN_TO_BP_FAIL_TL_UNAVAILABLE,
+					'run_id=' . $run_id . ' resolver=' . ( $this->template_lab_context_resolver === null ? '0' : '1' ) . ' actor=' . (string) $actor
+				);
 				return Plan_Generation_Result::failure(
 					array( \__( 'Template-lab session linkage is unavailable for this request.', 'aio-page-builder' ) )
 				);
 			}
 			$tl = $this->template_lab_context_resolver->resolve_for_actor( $actor, $tl_sid );
 			if ( $tl['code'] !== Build_Plan_Template_Lab_Context_Resolver::CODE_OK ) {
+				Named_Debug_Log::event(
+					Named_Debug_Log_Event::AI_RUN_TO_BP_FAIL_TL_REJECT,
+					'run_id=' . $run_id . ' code=' . (string) $tl['code']
+				);
 				return Plan_Generation_Result::failure(
 					array( '[aio_tl_link] ' . self::template_lab_link_error_message( $tl['code'] ) )
 				);
@@ -128,12 +161,32 @@ final class AI_Run_To_Build_Plan_Service {
 
 		$had_template_lab_context = ! empty( $context['template_lab_context'] );
 
+		$stable_log = isset( $context['reuse_existing_plan_id'] ) ? (string) $context['reuse_existing_plan_id'] : '';
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::AI_RUN_TO_BP_CONTEXT,
+			'run_id=' . $run_id . ' target_post_id=' . ( isset( $context['target_post_id'] ) ? (string) (int) $context['target_post_id'] : '0' )
+			. ' reuse_stable_plan_id_len=' . (string) strlen( $stable_log )
+		);
+
 		$result = $this->plan_generator->generate( $normalized, $run_id, $output_ref, $context );
 		if ( ! $result->is_success() ) {
+			$enc    = \wp_json_encode( $result->get_errors() );
+			$detail = is_string( $enc ) ? $enc : '[]';
+			if ( strlen( $detail ) > 800 ) {
+				$detail = substr( $detail, 0, 800 ) . '…';
+			}
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::AI_RUN_TO_BP_GENERATOR_FAIL,
+				'run_id=' . $run_id . ' errors=' . $detail
+			);
 			return $result;
 		}
 		// * Generator already persisted; only merge lineage fields from the prior shell when reusing a plan post.
 		if ( $prev_for_lineage === array() ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::AI_RUN_TO_BP_SUCCESS,
+				'run_id=' . $run_id . ' plan_id=' . (string) ( $result->get_plan_id() ?? '' ) . ' plan_post_id=' . (string) $result->get_plan_post_id() . ' lineage_merge=0'
+			);
 			return $result;
 		}
 
@@ -146,6 +199,11 @@ final class AI_Run_To_Build_Plan_Service {
 		}
 		$this->plan_repository->save_plan_definition( $result->get_plan_post_id(), $merged );
 
+		Named_Debug_Log::event( Named_Debug_Log_Event::AI_RUN_TO_BP_LINEAGE_MERGED, 'run_id=' . $run_id . ' plan_post_id=' . (string) $result->get_plan_post_id() );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::AI_RUN_TO_BP_SUCCESS,
+			'run_id=' . $run_id . ' plan_id=' . (string) ( $result->get_plan_id() ?? '' ) . ' plan_post_id=' . (string) $result->get_plan_post_id() . ' lineage_merge=1'
+		);
 		return new Plan_Generation_Result(
 			true,
 			isset( $merged[ Build_Plan_Schema::KEY_PLAN_ID ] ) ? (string) $merged[ Build_Plan_Schema::KEY_PLAN_ID ] : $result->get_plan_id(),

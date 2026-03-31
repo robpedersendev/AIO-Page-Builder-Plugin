@@ -140,7 +140,7 @@ final class Future_Subtype_Readiness_Screen {
 			<section class="aio-readiness-section" style="margin-top: 1.5em;" aria-labelledby="aio-fsr-planning-heading">
 				<h2 id="aio-fsr-planning-heading"><?php esc_html_e( 'Subtype planning summary', 'aio-page-builder' ); ?></h2>
 				<p><?php echo esc_html( (string) $vm->get_subtype_scaffold_count() ); ?> <?php esc_html_e( 'subtype scaffold scope(s).', 'aio-page-builder' ); ?></p>
-				<p><a href="<?php echo esc_url( $links['subtype_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Subtype comparison', 'aio-page-builder' ); ?></a></p>
+				<p><a href="<?php echo esc_url( $links['subtype_comparison'] ?? '#' ); ?>" data-aio-ux-action="future_subtype_readiness_subtype_comparison" data-aio-ux-section="future_subtype_readiness" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="author"><?php esc_html_e( 'Subtype comparison', 'aio-page-builder' ); ?></a></p>
 			</section>
 
 			<section class="aio-readiness-section" style="margin-top: 1.5em;" aria-labelledby="aio-fsr-scaffold-heading">
@@ -160,7 +160,7 @@ final class Future_Subtype_Readiness_Screen {
 			</section>
 
 			<p class="description" style="margin-top: 1.5em;">
-				<a href="<?php echo esc_url( $links['author_dashboard'] ?? '#' ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo esc_url( $links['author_dashboard'] ?? '#' ); ?>" data-aio-ux-action="future_subtype_readiness_back_author" data-aio-ux-section="future_subtype_readiness" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="author"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
 			</p>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

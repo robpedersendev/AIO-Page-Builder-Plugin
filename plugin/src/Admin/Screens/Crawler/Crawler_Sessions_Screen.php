@@ -162,7 +162,7 @@ final class Crawler_Sessions_Screen {
 						<option value="<?php echo \esc_attr( $opt['key'] ); ?>"><?php echo \esc_html( $opt['label'] ); ?></option>
 					<?php endforeach; ?>
 				</select>
-				<button type="submit" class="button button-primary"><?php \esc_html_e( 'Start crawl', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button button-primary" data-aio-ux-action="crawler_start_crawl" data-aio-ux-section="crawler_sessions_list" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="sessions"><?php \esc_html_e( 'Start crawl', 'aio-page-builder' ); ?></button>
 			</form>
 			<p id="aio-crawler-profile-desc" class="screen-reader-text"><?php \esc_html_e( 'Bounded profiles only; no custom unbounded crawls.', 'aio-page-builder' ); ?></p>
 			<?php endif; ?>
@@ -197,12 +197,12 @@ final class Crawler_Sessions_Screen {
 								<td><?php echo \esc_html( (string) ( $s['failed_count'] ?? '0' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $s['started_at'] ?? '' ) ); ?></td>
 								<td>
-									<a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG . '&run_id=' . \rawurlencode( (string) ( $s['crawl_run_id'] ?? '' ) ) ) ); ?>"><?php \esc_html_e( 'View pages', 'aio-page-builder' ); ?></a>
+									<a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG . '&run_id=' . \rawurlencode( (string) ( $s['crawl_run_id'] ?? '' ) ) ) ); ?>" data-aio-ux-action="crawler_view_run_pages" data-aio-ux-section="crawler_sessions_list" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="sessions"><?php \esc_html_e( 'View pages', 'aio-page-builder' ); ?></a>
 									<form method="post" action="<?php echo \esc_url( \admin_url( 'admin.php?page=' . self::SLUG ) ); ?>" style="display:inline-block;margin-left:6px;">
 										<input type="hidden" name="action" value="aio_pb_retry_crawl" />
 										<input type="hidden" name="crawl_id" value="<?php echo \esc_attr( (string) ( $s['crawl_run_id'] ?? '' ) ); ?>" />
 										<?php \wp_nonce_field( 'aio_pb_retry_crawl_' . (string) ( $s['crawl_run_id'] ?? '' ) ); ?>
-										<button type="submit" class="button button-small"><?php \esc_html_e( 'Retry crawl', 'aio-page-builder' ); ?></button>
+										<button type="submit" class="button button-small" data-aio-ux-action="crawler_retry_crawl" data-aio-ux-section="crawler_sessions_list" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="sessions"><?php \esc_html_e( 'Retry crawl', 'aio-page-builder' ); ?></button>
 									</form>
 								</td>
 							</tr>

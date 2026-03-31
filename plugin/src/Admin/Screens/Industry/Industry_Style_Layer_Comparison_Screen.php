@@ -181,7 +181,7 @@ final class Industry_Style_Layer_Comparison_Screen {
 							<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $selected_preset, $key ); ?>><?php echo esc_html( $label ); ?> (<?php echo esc_html( $key ); ?>)</option>
 						<?php endforeach; ?>
 					</select>
-					<button type="submit" class="button button-primary"><?php esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
+					<button type="submit" class="button button-primary" data-aio-ux-action="industry_comparison_style_layer_compare" data-aio-ux-section="industry_style_layer_comparison" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="comparisons"><?php esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
 				</form>
 
 				<?php if ( $selected_preset !== '' && $parent['present'] ) : ?>

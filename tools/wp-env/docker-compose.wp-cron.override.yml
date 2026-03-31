@@ -1,0 +1,28 @@
+# Merge with wp-env's docker-compose.yml so Action Scheduler / WP-Cron run without browser traffic.
+# Usage (from repo root, after wp-env start):
+#   npm run wp-env:cron-runner
+#
+# Or manually (replace paths with your wp-env install-path output / inspect labels):
+#   docker compose -p <project> --project-directory <wp-env-dir> \
+#     -f <wp-env-dir>/docker-compose.yml \
+#     -f ./tools/wp-env/docker-compose.wp-cron.override.yml up -d wp-cron-runner
+
+services:
+  wp-cron-runner:
+    image: curlimages/curl:8.11.0
+    depends_on:
+      wordpress:
+        condition: service_started
+    # * Same network as wordpress; hostname "wordpress" matches wp-env service name.
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo '[wp-cron-runner] hitting http://wordpress/wp-cron.php every 60s';
+        while true; do
+          curl -sS --connect-timeout 10 --max-time 120 -o /dev/null \
+            "http://wordpress/wp-cron.php?doing_wp_cron" \
+            || echo '[wp-cron-runner] curl failed (is wordpress up?)';
+          sleep 60;
+        done
+    restart: unless-stopped

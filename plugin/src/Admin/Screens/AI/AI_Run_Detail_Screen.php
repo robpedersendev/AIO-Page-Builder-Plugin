@@ -238,6 +238,47 @@ final class AI_Run_Detail_Screen {
 	}
 
 	/**
+	 * Normalizes usage token counts from stored usage metadata (avoids array-to-string / invalid casts).
+	 *
+	 * @param mixed $v Raw value.
+	 * @return int|null Integer token count or null when not coercible.
+	 */
+	private static function coerce_usage_int( mixed $v ): ?int {
+		if ( $v === null || $v === '' ) {
+			return null;
+		}
+		if ( is_int( $v ) ) {
+			return $v;
+		}
+		if ( is_float( $v ) ) {
+			return (int) round( $v );
+		}
+		if ( is_string( $v ) && is_numeric( $v ) ) {
+			return (int) round( (float) $v );
+		}
+		return null;
+	}
+
+	/**
+	 * Normalizes estimated cost from usage metadata.
+	 *
+	 * @param mixed $v Raw value.
+	 * @return float|null USD amount or null when not coercible.
+	 */
+	private static function coerce_usage_cost_usd( mixed $v ): ?float {
+		if ( $v === null || $v === '' ) {
+			return null;
+		}
+		if ( is_int( $v ) || is_float( $v ) ) {
+			return (float) $v;
+		}
+		if ( is_string( $v ) && is_numeric( $v ) ) {
+			return (float) $v;
+		}
+		return null;
+	}
+
+	/**
 	 * @param array<string, mixed>      $run
 	 * @param string                    $run_id
 	 * @param array<string, mixed>      $meta_safe
@@ -310,25 +351,25 @@ final class AI_Run_Detail_Screen {
 				<h2 id="aio-run-meta-heading"><?php \esc_html_e( 'Run metadata', 'aio-page-builder' ); ?></h2>
 				<table class="widefat striped">
 					<tbody>
-						<tr><th scope="row"><?php \esc_html_e( 'Run ID', 'aio-page-builder' ); ?></th><td><code><?php echo \esc_html( (string) ( $run['internal_key'] ?? $run_id ) ); ?></code></td></tr>
-						<tr><th scope="row"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $run['status'] ?? '' ) ); ?></td></tr>
-						<tr><th scope="row"><?php \esc_html_e( 'Actor', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['actor'] ?? '' ) ); ?></td></tr>
-						<tr><th scope="row"><?php \esc_html_e( 'Created', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['created_at'] ?? '' ) ); ?></td></tr>
-						<tr><th scope="row"><?php \esc_html_e( 'Completed', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['completed_at'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Run ID', 'aio-page-builder' ); ?></th><td><code><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $run['internal_key'] ?? $run_id ) ); ?></code></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Status', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $run['status'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Actor', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['actor'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Created', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['created_at'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Completed', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['completed_at'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Provider', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['provider_id'] ?? '' ) ); ?></td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Model', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['model_used'] ?? '' ) ); ?></td></tr>
 						<?php if ( count( $attempts ) > 1 && $effective !== null && AI_Run_Artifact_Service::format_run_metadata_value_for_display( $effective['provider_id'] ?? '' ) !== '' ) : ?>
 						<tr><th scope="row"><?php \esc_html_e( 'Effective provider used', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $effective['provider_id'] ?? '' ) ); ?> (<?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $effective['model_used'] ?? '' ) ); ?>)</td></tr>
 						<tr><th scope="row"><?php \esc_html_e( 'Failover', 'aio-page-builder' ); ?></th><td><?php \esc_html_e( 'Primary failed; fallback was attempted. See attempt log below.', 'aio-page-builder' ); ?></td></tr>
 						<?php endif; ?>
-						<tr><th scope="row"><?php \esc_html_e( 'Prompt pack', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['prompt_pack_ref'] ?? '' ) ); ?></td></tr>
-						<tr><th scope="row"><?php \esc_html_e( 'Retry count', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['retry_count'] ?? '' ) ); ?></td></tr>
-						<tr><th scope="row"><?php \esc_html_e( 'Build plan ref', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( (string) ( $meta_safe['build_plan_ref'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Prompt pack', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['prompt_pack_ref'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Retry count', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['retry_count'] ?? '' ) ); ?></td></tr>
+						<tr><th scope="row"><?php \esc_html_e( 'Build plan ref', 'aio-page-builder' ); ?></th><td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta_safe['build_plan_ref'] ?? '' ) ); ?></td></tr>
 						<?php
-						$prompt_tok     = isset( $usage_data['prompt_tokens'] ) ? (int) $usage_data['prompt_tokens'] : null;
-						$completion_tok = isset( $usage_data['completion_tokens'] ) ? (int) $usage_data['completion_tokens'] : null;
-						$total_tok      = isset( $usage_data['total_tokens'] ) ? (int) $usage_data['total_tokens'] : null;
-						$cost_usd       = isset( $usage_data['cost_usd'] ) ? $usage_data['cost_usd'] : null;
+						$prompt_tok     = isset( $usage_data['prompt_tokens'] ) ? self::coerce_usage_int( $usage_data['prompt_tokens'] ) : null;
+						$completion_tok = isset( $usage_data['completion_tokens'] ) ? self::coerce_usage_int( $usage_data['completion_tokens'] ) : null;
+						$total_tok      = isset( $usage_data['total_tokens'] ) ? self::coerce_usage_int( $usage_data['total_tokens'] ) : null;
+						$cost_usd       = isset( $usage_data['cost_usd'] ) ? self::coerce_usage_cost_usd( $usage_data['cost_usd'] ) : null;
 						if ( $usage_data !== null ) :
 							$token_str = $total_tok !== null
 								? sprintf(
@@ -340,7 +381,7 @@ final class AI_Run_Detail_Screen {
 								)
 								: \__( 'Not available', 'aio-page-builder' );
 							$cost_str = $cost_usd !== null
-								? '$' . number_format( (float) $cost_usd, 6 )
+								? '$' . number_format( $cost_usd, 6 )
 								: \__( 'Not available (model not in pricing registry)', 'aio-page-builder' );
 							?>
 						<tr>
@@ -386,10 +427,10 @@ final class AI_Run_Detail_Screen {
 							if ( ! is_array( $a ) ) {
 								continue;
 							}
-							$p = isset( $a['provider_id'] ) ? (string) $a['provider_id'] : '';
-							$m = isset( $a['model_used'] ) ? (string) $a['model_used'] : '';
-							$c = isset( $a['category'] ) ? (string) $a['category'] : '';
-							$t = isset( $a['attempted_at'] ) ? (string) $a['attempted_at'] : '';
+							$p = AI_Run_Artifact_Service::format_run_metadata_value_for_display( $a['provider_id'] ?? '' );
+							$m = AI_Run_Artifact_Service::format_run_metadata_value_for_display( $a['model_used'] ?? '' );
+							$c = AI_Run_Artifact_Service::format_run_metadata_value_for_display( $a['category'] ?? '' );
+							$t = AI_Run_Artifact_Service::format_run_metadata_value_for_display( $a['attempted_at'] ?? '' );
 							?>
 						<tr>
 							<td><code><?php echo \esc_html( $p ); ?></code></td>

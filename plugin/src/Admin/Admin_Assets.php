@@ -9,10 +9,12 @@ declare( strict_types=1 );
 
 namespace AIOPageBuilder\Admin;
 
+use AIOPageBuilder\Admin\Admin_Ux_Trace_Ajax;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Bootstrap\Constants;
+use AIOPageBuilder\Support\Logging\Admin_Ux_Trace;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -28,6 +30,8 @@ final class Admin_Assets {
 	public const SCRIPT_TEMPLATE_LIVE_PREVIEW = 'aio-template-live-preview';
 
 	public const STYLE_TEMPLATE_LIVE_PREVIEW = 'aio-template-live-preview';
+
+	public const SCRIPT_ADMIN_UX_TRACE = 'aio-admin-ux-trace';
 
 	/**
 	 * Hooks admin_enqueue_scripts.
@@ -123,6 +127,29 @@ final class Admin_Assets {
 				),
 			)
 		);
+
+		if ( Admin_Ux_Trace::enabled() ) {
+			$ux_js = \trailingslashit( Constants::plugin_url() ) . 'assets/js/admin-ux-trace.js';
+			\wp_enqueue_script(
+				self::SCRIPT_ADMIN_UX_TRACE,
+				$ux_js,
+				array(),
+				Constants::plugin_version(),
+				true
+			);
+			$tab = isset( $_GET['aio_tab'] ) ? \sanitize_key( (string) \wp_unslash( (string) $_GET['aio_tab'] ) ) : '';
+			\wp_localize_script(
+				self::SCRIPT_ADMIN_UX_TRACE,
+				'AioAdminUxTrace',
+				array(
+					'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
+					'nonce'   => \wp_create_nonce( Admin_Ux_Trace_Ajax::NONCE_ACTION ),
+					'action'  => Admin_Ux_Trace_Ajax::ACTION,
+					'hub'     => $page,
+					'tab'     => $tab,
+				)
+			);
+		}
 
 		if ( $page === Page_Template_Detail_Screen::SLUG || $page === Section_Template_Detail_Screen::SLUG ) {
 			$pv_css = \trailingslashit( Constants::plugin_url() ) . 'assets/css/admin/template-live-preview.css';

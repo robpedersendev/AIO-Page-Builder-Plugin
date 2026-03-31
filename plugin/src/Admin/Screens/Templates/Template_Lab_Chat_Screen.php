@@ -166,7 +166,7 @@ final class Template_Lab_Chat_Screen {
 							<label for="aio_tl_f_search"><?php \esc_html_e( 'Search session id', 'aio-page-builder' ); ?></label><br />
 							<input type="search" name="aio_tl_f_search" id="aio_tl_f_search" value="<?php echo \esc_attr( $f_search ); ?>" class="regular-text" />
 						</p>
-						<p><button type="submit" class="button"><?php \esc_html_e( 'Apply filters', 'aio-page-builder' ); ?></button></p>
+						<p><button type="submit" class="button" data-aio-ux-action="template_lab_apply_filters" data-aio-ux-section="template_lab_filters" data-aio-ux-hub="<?php echo \esc_attr( Page_Templates_Directory_Screen::SLUG ); ?>" data-aio-ux-tab="template_lab"><?php \esc_html_e( 'Apply filters', 'aio-page-builder' ); ?></button></p>
 					</form>
 					<?php if ( $sessions === array() ) : ?>
 						<p>
@@ -308,7 +308,21 @@ final class Template_Lab_Chat_Screen {
 								<input type="hidden" name="action" value="<?php echo \esc_attr( Template_Lab_Canonical_Admin_Actions::ACTION_APPROVE ); ?>" />
 								<input type="hidden" name="<?php echo \esc_attr( Template_Lab_Canonical_Admin_Actions::FIELD_SESSION ); ?>" value="<?php echo \esc_attr( (string) ( $detail['session_id'] ?? '' ) ); ?>" />
 								<?php Template_Lab_Canonical_Admin_Actions::nonce_field( 'approve' ); ?>
-								<?php \submit_button( __( 'Approve snapshot for apply', 'aio-page-builder' ), 'secondary', 'aio_tl_approve_submit', false, array( 'id' => 'aio_tl_approve_submit' ) ); ?>
+								<?php
+								\submit_button(
+									__( 'Approve snapshot for apply', 'aio-page-builder' ),
+									'secondary',
+									'aio_tl_approve_submit',
+									false,
+									array(
+										'id'              => 'aio_tl_approve_submit',
+										'data-aio-ux-action' => 'template_lab_approve_snapshot',
+										'data-aio-ux-section' => 'template_lab_session',
+										'data-aio-ux-hub' => Page_Templates_Directory_Screen::SLUG,
+										'data-aio-ux-tab' => 'template_lab',
+									)
+								);
+								?>
 							</form>
 							<?php
 						elseif ( $has_snap && Template_Lab_Approved_Snapshot_Ref_Keys::is_valid_target_kind( $target_k )
@@ -323,7 +337,21 @@ final class Template_Lab_Chat_Screen {
 								<input type="hidden" name="<?php echo \esc_attr( Template_Lab_Canonical_Admin_Actions::FIELD_SESSION ); ?>" value="<?php echo \esc_attr( (string) ( $detail['session_id'] ?? '' ) ); ?>" />
 								<input type="hidden" name="<?php echo \esc_attr( Template_Lab_Canonical_Admin_Actions::FIELD_TARGET ); ?>" value="<?php echo \esc_attr( $target_k ); ?>" />
 								<?php Template_Lab_Canonical_Admin_Actions::nonce_field( 'apply' ); ?>
-								<?php \submit_button( __( 'Apply approved snapshot to canonical registry', 'aio-page-builder' ), 'primary', 'aio_tl_apply_submit', false, array( 'id' => 'aio_tl_apply_submit' ) ); ?>
+								<?php
+								\submit_button(
+									__( 'Apply approved snapshot to canonical registry', 'aio-page-builder' ),
+									'primary',
+									'aio_tl_apply_submit',
+									false,
+									array(
+										'id'              => 'aio_tl_apply_submit',
+										'data-aio-ux-action' => 'template_lab_apply_snapshot',
+										'data-aio-ux-section' => 'template_lab_session',
+										'data-aio-ux-hub' => Page_Templates_Directory_Screen::SLUG,
+										'data-aio-ux-tab' => 'template_lab',
+									)
+								);
+								?>
 							</form>
 						<?php elseif ( $has_snap && $approval_state === Template_Lab_Approved_Snapshot_Ref_Keys::APPROVAL_APPROVED && ! Template_Lab_Access::current_user_can_approve_or_apply_for_target( $target_k ) ) : ?>
 							<p class="description"><?php \esc_html_e( 'Apply is not available for your role on this target type.', 'aio-page-builder' ); ?></p>
@@ -357,7 +385,20 @@ final class Template_Lab_Chat_Screen {
 							<?php Template_Lab_Chat_Admin_Actions::nonce_field( 'prompt' ); ?>
 							<label for="aio_tl_prompt_text" class="screen-reader-text"><?php \esc_html_e( 'Prompt', 'aio-page-builder' ); ?></label>
 							<textarea class="large-text" name="aio_tl_prompt_text" id="aio_tl_prompt_text" rows="4" required></textarea>
-							<?php \submit_button( __( 'Submit prompt (records session + run shell)', 'aio-page-builder' ), 'secondary', 'submit', false ); ?>
+							<?php
+							\submit_button(
+								__( 'Submit prompt (records session + run shell)', 'aio-page-builder' ),
+								'secondary',
+								'submit',
+								false,
+								array(
+									'data-aio-ux-action'  => 'template_lab_submit_prompt',
+									'data-aio-ux-section' => 'template_lab_prompt',
+									'data-aio-ux-hub'     => Page_Templates_Directory_Screen::SLUG,
+									'data-aio-ux-tab'     => 'template_lab',
+								)
+							);
+							?>
 						</form>
 					<?php else : ?>
 						<p class="description"><?php \esc_html_e( 'Open a session to submit a prompt without REST.', 'aio-page-builder' ); ?></p>
@@ -375,7 +416,20 @@ final class Template_Lab_Chat_Screen {
 						<input type="hidden" name="action" value="<?php echo \esc_attr( Template_Lab_Chat_Admin_Actions::ACTION_FORK_SESSION ); ?>" />
 						<input type="hidden" name="<?php echo \esc_attr( Template_Lab_Chat_Admin_Actions::FIELD_FORK_SOURCE ); ?>" value="<?php echo \esc_attr( (string) ( $detail['session_id'] ?? '' ) ); ?>" />
 							<?php Template_Lab_Chat_Admin_Actions::nonce_field( 'fork' ); ?>
-							<?php \submit_button( __( 'Duplicate / fork from this session', 'aio-page-builder' ), 'secondary', 'submit', false ); ?>
+							<?php
+							\submit_button(
+								__( 'Duplicate / fork from this session', 'aio-page-builder' ),
+								'secondary',
+								'submit',
+								false,
+								array(
+									'data-aio-ux-action'  => 'template_lab_fork_session',
+									'data-aio-ux-section' => 'template_lab_fork',
+									'data-aio-ux-hub'     => Page_Templates_Directory_Screen::SLUG,
+									'data-aio-ux-tab'     => 'template_lab',
+								)
+							);
+							?>
 					</form>
 							<?php
 						endif;

@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "wp-env:start": "wp-env start",
+    "wp-env:cron-runner": "node tools/wp-env/attach-cron-runner.mjs",
+    "wp-env:cron-runner:stop": "node tools/wp-env/stop-cron-runner.mjs",
     "wp-env:stop": "wp-env stop",
     "wp-env:destroy": "wp-env destroy",
     "wp-env:clean": "wp-env clean all",

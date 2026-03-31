@@ -163,7 +163,7 @@ final class Industry_Style_Preset_Screen {
 										<input type="hidden" name="action" value="<?php echo \esc_attr( $state['apply_action'] ); ?>" />
 										<input type="hidden" name="preset_key" value="<?php echo \esc_attr( $key ); ?>" />
 										<?php \wp_nonce_field( $state['nonce_action'], $state['nonce_name'], true ); ?>
-										<button type="submit" class="button"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
+										<button type="submit" class="button" data-aio-ux-action="industry_style_preset_apply" data-aio-ux-section="industry_style_preset_list" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="style"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
 									</form>
 								</td>
 							</tr>

@@ -12,6 +12,7 @@ namespace AIOPageBuilder\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Actions\Repair_Empty_Build_Plan_Definition_Action;
 use AIOPageBuilder\Admin\Screens\AI\Profile_Snapshot_History_Panel;
 use AIOPageBuilder\Admin\Screens\Dashboard\Dashboard_Screen;
 use AIOPageBuilder\Admin\Screens\Industry\Industry_Bundle_Import_Preview_Screen;
@@ -118,6 +119,7 @@ final class Admin_Menu {
 		\add_action( 'admin_post_aio_guided_repair_activate', array( $this, 'handle_guided_repair_activate' ), 10 );
 		\add_action( 'admin_post_aio_create_plan_from_bundle', array( $this, 'handle_create_plan_from_bundle' ), 10 );
 		\add_action( 'admin_post_aio_create_build_plan_from_ai_run', array( $this, 'handle_create_build_plan_from_ai_run' ), 10 );
+		\add_action( 'admin_post_' . Repair_Empty_Build_Plan_Definition_Action::ACTION, array( $this, 'handle_repair_empty_build_plan_definition' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_preview', array( $this, 'handle_industry_bundle_preview' ), 10 );
 		\add_action( 'admin_post_aio_industry_bundle_apply', array( $this, 'handle_industry_bundle_apply' ), 10 );
 		\add_action( 'admin_post_aio_reset_onboarding_build_plans', array( $this, 'handle_reset_onboarding_build_plans' ), 10 );
@@ -510,6 +512,15 @@ final class Admin_Menu {
 	 */
 	public function handle_create_build_plan_from_ai_run(): void {
 		\AIOPageBuilder\Admin\Actions\Create_Build_Plan_From_AI_Run_Action::handle( $this->container );
+	}
+
+	/**
+	 * Re-runs empty-definition repair (admin-post) after clearing backoff transient.
+	 *
+	 * @return void
+	 */
+	public function handle_repair_empty_build_plan_definition(): void {
+		Repair_Empty_Build_Plan_Definition_Action::handle( $this->container );
 	}
 
 	/**

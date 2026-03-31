@@ -255,7 +255,7 @@ final class Prompt_Experiments_Screen {
 				<li><?php \esc_html_e( 'It does not call the AI by itself—other features must record comparison runs when they run.', 'aio-page-builder' ); ?></li>
 			</ul>
 			<p>
-				<a class="button button-secondary" href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'Open AI Runs', 'aio-page-builder' ); ?></a>
+				<a class="button button-secondary" href="<?php echo \esc_url( $ai_runs_url ); ?>" data-aio-ux-action="prompt_experiments_open_ai_runs" data-aio-ux-section="prompt_experiments_help" data-aio-ux-hub="<?php echo \esc_attr( AI_Runs_Screen::HUB_PAGE_SLUG ); ?>" data-aio-ux-tab="experiments"><?php \esc_html_e( 'Open AI Runs', 'aio-page-builder' ); ?></a>
 				<?php if ( ! $embed_in_hub ) : ?>
 					<span class="description" style="margin-left: 0.5em;"><?php \esc_html_e( 'Tagged comparison runs show a badge in the list.', 'aio-page-builder' ); ?></span>
 				<?php endif; ?>
@@ -348,7 +348,7 @@ final class Prompt_Experiments_Screen {
 			<?php if ( (string) ( $current['id'] ?? '' ) !== '' ) : ?>
 				<input type="hidden" name="aio_experiment_id" value="<?php echo \esc_attr( (string) $current['id'] ); ?>" />
 			<?php endif; ?>
-			<p class="submit"><input type="submit" name="aio_save_experiment" class="button button-primary" value="<?php \esc_attr_e( 'Save comparison', 'aio-page-builder' ); ?>" /></p>
+			<p class="submit"><input type="submit" name="aio_save_experiment" class="button button-primary" value="<?php \esc_attr_e( 'Save comparison', 'aio-page-builder' ); ?>" data-aio-ux-action="prompt_experiments_save_comparison" data-aio-ux-section="prompt_experiments_form" data-aio-ux-hub="<?php echo \esc_attr( AI_Runs_Screen::HUB_PAGE_SLUG ); ?>" data-aio-ux-tab="experiments" /></p>
 		</form>
 		<?php
 	}

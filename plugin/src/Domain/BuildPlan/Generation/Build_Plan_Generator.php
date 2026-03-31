@@ -19,6 +19,8 @@ use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Statuses;
 use AIOPageBuilder\Domain\Industry\AI\Build_Plan_Scoring_Interface;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Converts validated normalized output plus local context into a structured Build Plan.
@@ -70,6 +72,15 @@ final class Build_Plan_Generator {
 	public function generate( array $normalized_output, string $ai_run_ref, string $normalized_output_ref, array $context = array() ): Plan_Generation_Result {
 		$errors = $this->validate_normalized_output( $normalized_output );
 		if ( $errors !== array() ) {
+			$enc = \wp_json_encode( $errors );
+			$d   = is_string( $enc ) ? $enc : '[]';
+			if ( strlen( $d ) > 800 ) {
+				$d = substr( $d, 0, 800 ) . '…';
+			}
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BUILD_PLAN_GENERATOR_VALIDATE_FAIL,
+				'ai_run_ref=' . $ai_run_ref . ' errors=' . $d
+			);
 			return Plan_Generation_Result::failure( $errors );
 		}
 
@@ -196,12 +207,27 @@ final class Build_Plan_Generator {
 		if ( $target_id > 0 ) {
 			$save_payload['id'] = $target_id;
 		}
+		$step_count = isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			? count( $definition[ Build_Plan_Schema::KEY_STEPS ] )
+			: 0;
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::BUILD_PLAN_GENERATOR_SAVE_START,
+			'ai_run_ref=' . $ai_run_ref . ' plan_id=' . $plan_id . ' target_post_id=' . (string) $target_id . ' steps=' . (string) $step_count
+		);
 		$post_id = $this->repository->save( $save_payload );
 		if ( $post_id === 0 ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BUILD_PLAN_GENERATOR_SAVE_FAIL,
+				'ai_run_ref=' . $ai_run_ref . ' plan_id=' . $plan_id . ' target_post_id=' . (string) $target_id
+			);
 			return Plan_Generation_Result::failure( array( 'Failed to persist Build Plan.' ) );
 		}
 
 		$omitted_report = Omitted_Recommendation_Report::report( $all_omitted );
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::BUILD_PLAN_GENERATOR_SAVE_OK,
+			'ai_run_ref=' . $ai_run_ref . ' plan_id=' . $plan_id . ' plan_post_id=' . (string) $post_id . ' steps=' . (string) $step_count
+		);
 		return new Plan_Generation_Result( true, $plan_id, $post_id, $definition, $omitted_report, array() );
 	}
 

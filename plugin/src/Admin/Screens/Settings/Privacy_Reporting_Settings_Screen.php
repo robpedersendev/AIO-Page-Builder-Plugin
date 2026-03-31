@@ -71,7 +71,7 @@ final class Privacy_Reporting_Settings_Screen {
 					<?php \wp_nonce_field( 'aio_reset_onboarding_build_plans' ); ?>
 					<input type="hidden" name="action" value="aio_reset_onboarding_build_plans" />
 					<p>
-						<button type="submit" class="button button-secondary" onclick="return window.confirm(<?php echo \wp_json_encode( __( 'This permanently deletes all build plans and clears onboarding progress. Continue?', 'aio-page-builder' ) ); ?>);">
+						<button type="submit" class="button button-secondary" data-aio-ux-action="privacy_reset_onboarding_build_plans" data-aio-ux-section="privacy_reset_obp" data-aio-ux-hub="<?php echo \esc_attr( Settings_Screen::SLUG ); ?>" data-aio-ux-tab="privacy" onclick="return window.confirm(<?php echo \wp_json_encode( __( 'This permanently deletes all build plans and clears onboarding progress. Continue?', 'aio-page-builder' ) ); ?>);">
 							<?php \esc_html_e( 'Reset onboarding & delete all build plans', 'aio-page-builder' ); ?>
 						</button>
 					</p>

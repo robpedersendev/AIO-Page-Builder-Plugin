@@ -242,7 +242,7 @@ final class Section_Templates_Directory_Screen {
 				<option value="inactive" <?php selected( $status, 'inactive' ); ?>><?php \esc_html_e( 'Inactive', 'aio-page-builder' ); ?></option>
 				<option value="deprecated" <?php selected( $status, 'deprecated' ); ?>><?php \esc_html_e( 'Deprecated', 'aio-page-builder' ); ?></option>
 			</select>
-			<button type="submit" class="button"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
+			<button type="submit" class="button" data-aio-ux-action="section_templates_apply_filters" data-aio-ux-section="section_templates_filters" data-aio-ux-hub="<?php echo \esc_attr( Page_Templates_Directory_Screen::SLUG ); ?>" data-aio-ux-tab="section_templates"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
 		</form>
 		<?php
 	}
@@ -424,9 +424,9 @@ final class Section_Templates_Directory_Screen {
 							<?php endif; ?>
 							| <a href="<?php echo \esc_url( $preview_url ); ?>"><?php \esc_html_e( 'Structural preview', 'aio-page-builder' ); ?></a>
 							<?php if ( $in_compare ) : ?>
-								| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'section', $key ) ); ?>" data-aio-compare-type="section" data-aio-compare-key="<?php echo \esc_attr( $key ); ?>" data-aio-compare-op="remove"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
+								| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_remove_url( 'section', $key ) ); ?>" data-aio-compare-type="section" data-aio-compare-key="<?php echo \esc_attr( $key ); ?>" data-aio-compare-op="remove" data-aio-ux-action="template_compare_remove_section" data-aio-ux-section="section_templates_row" data-aio-ux-hub="<?php echo \esc_attr( Page_Templates_Directory_Screen::SLUG ); ?>" data-aio-ux-tab="section_templates"><?php \esc_html_e( 'Remove from compare', 'aio-page-builder' ); ?></a>
 							<?php else : ?>
-								| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'section', $key ) ); ?>" data-aio-compare-type="section" data-aio-compare-key="<?php echo \esc_attr( $key ); ?>" data-aio-compare-op="add"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
+								| <a class="aio-compare-action" href="<?php echo \esc_url( Template_Compare_Screen::get_compare_add_url( 'section', $key ) ); ?>" data-aio-compare-type="section" data-aio-compare-key="<?php echo \esc_attr( $key ); ?>" data-aio-compare-op="add" data-aio-ux-action="template_compare_add_section" data-aio-ux-section="section_templates_row" data-aio-ux-hub="<?php echo \esc_attr( Page_Templates_Directory_Screen::SLUG ); ?>" data-aio-ux-tab="section_templates"><?php \esc_html_e( 'Add to compare', 'aio-page-builder' ); ?></a>
 							<?php endif; ?>
 							<?php if ( $section_override !== null ) : ?>
 								| <span class="aio-section-overridden" title="<?php echo \esc_attr( (string) ( $section_override['reason'] ?? '' ) ); ?>"><?php \esc_html_e( 'Overridden', 'aio-page-builder' ); ?></span>
@@ -437,7 +437,7 @@ final class Section_Templates_Directory_Screen {
 									<input type="hidden" name="section_key" value="<?php echo \esc_attr( $key ); ?>" />
 									<input type="hidden" name="state" value="accepted" />
 									<input type="hidden" name="_wp_http_referer" value="<?php echo \esc_attr( $this->get_current_request_uri() ); ?>" />
-									<button type="submit" class="button-link"><?php \esc_html_e( 'Use anyway', 'aio-page-builder' ); ?></button>
+									<button type="submit" class="button-link" data-aio-ux-action="section_template_use_anyway_override" data-aio-ux-section="section_templates_row" data-aio-ux-hub="<?php echo \esc_attr( Page_Templates_Directory_Screen::SLUG ); ?>" data-aio-ux-tab="section_templates"><?php \esc_html_e( 'Use anyway', 'aio-page-builder' ); ?></button>
 								</form>
 							<?php endif; ?>
 						</td>

@@ -338,7 +338,7 @@ final class Page_Template_Detail_Screen {
 					<?php endforeach; ?>
 				</fieldset>
 			<?php endforeach; ?>
-			<p><button type="submit" class="button button-primary"><?php \esc_html_e( 'Save styling', 'aio-page-builder' ); ?></button></p>
+			<p><button type="submit" class="button button-primary" data-aio-ux-action="page_template_detail_save_styling" data-aio-ux-section="page_template_detail_style" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="detail"><?php \esc_html_e( 'Save styling', 'aio-page-builder' ); ?></button></p>
 		</form>
 		<?php
 	}

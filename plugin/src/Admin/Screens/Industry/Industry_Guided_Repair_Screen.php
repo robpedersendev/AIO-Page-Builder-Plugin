@@ -256,7 +256,7 @@ final class Industry_Guided_Repair_Screen {
 										<form method="post" action="<?php echo \esc_url( $migrate_url ); ?>" style="display:inline;">
 											<?php \wp_nonce_field( self::NONCE_ACTION_MIGRATE, 'aio_guided_repair_migrate_nonce', true ); ?>
 											<input type="hidden" name="deprecated_pack_key" value="<?php echo \esc_attr( $c['suggested_value'] ); ?>" />
-											<button type="submit" class="button button-primary"><?php \esc_html_e( 'Migrate to replacement', 'aio-page-builder' ); ?></button>
+											<button type="submit" class="button button-primary" data-aio-ux-action="industry_guided_repair_migrate" data-aio-ux-section="industry_guided_repair_row" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="repair"><?php \esc_html_e( 'Migrate to replacement', 'aio-page-builder' ); ?></button>
 										</form>
 										<?php
 									elseif ( $c['action_type'] === Industry_Guided_Repair_View_Model::ACTION_APPLY_REF && $c['profile_field'] !== '' && $c['suggested_value'] !== '' ) :
@@ -266,7 +266,7 @@ final class Industry_Guided_Repair_Screen {
 											<?php \wp_nonce_field( self::NONCE_ACTION_APPLY_REF, 'aio_guided_repair_apply_ref_nonce', true ); ?>
 											<input type="hidden" name="profile_field" value="<?php echo \esc_attr( $c['profile_field'] ); ?>" />
 											<input type="hidden" name="profile_value" value="<?php echo \esc_attr( $c['suggested_value'] ); ?>" />
-											<button type="submit" class="button button-primary"><?php \esc_html_e( 'Apply suggested ref', 'aio-page-builder' ); ?></button>
+											<button type="submit" class="button button-primary" data-aio-ux-action="industry_guided_repair_apply_ref" data-aio-ux-section="industry_guided_repair_row" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="repair"><?php \esc_html_e( 'Apply suggested ref', 'aio-page-builder' ); ?></button>
 										</form>
 										<?php
 									elseif ( $c['action_type'] === Industry_Guided_Repair_View_Model::ACTION_ACTIVATE_PACK && $c['suggested_value'] !== '' ) :
@@ -275,10 +275,10 @@ final class Industry_Guided_Repair_Screen {
 										<form method="post" action="<?php echo \esc_url( $act_url ); ?>" style="display:inline;">
 											<?php \wp_nonce_field( self::NONCE_ACTION_ACTIVATE, 'aio_guided_repair_activate_nonce', true ); ?>
 											<input type="hidden" name="industry_pack_key" value="<?php echo \esc_attr( $c['suggested_value'] ); ?>" />
-											<button type="submit" class="button button-secondary"><?php \esc_html_e( 'Enable pack', 'aio-page-builder' ); ?></button>
+											<button type="submit" class="button button-secondary" data-aio-ux-action="industry_guided_repair_enable_pack" data-aio-ux-section="industry_guided_repair_row" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="repair"><?php \esc_html_e( 'Enable pack', 'aio-page-builder' ); ?></button>
 										</form>
 									<?php elseif ( $c['action_type'] === Industry_Guided_Repair_View_Model::ACTION_LINK_OVERRIDE_MANAGEMENT ) : ?>
-										<a href="<?php echo \esc_url( $links['override_management'] ?? $base ); ?>" class="button"><?php \esc_html_e( 'Resolve in Override Management', 'aio-page-builder' ); ?></a>
+										<a href="<?php echo \esc_url( $links['override_management'] ?? $base ); ?>" class="button" data-aio-ux-action="industry_guided_repair_open_override_management" data-aio-ux-section="industry_guided_repair_row" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="repair"><?php \esc_html_e( 'Resolve in Override Management', 'aio-page-builder' ); ?></a>
 									<?php else : ?>
 										—
 									<?php endif; ?>

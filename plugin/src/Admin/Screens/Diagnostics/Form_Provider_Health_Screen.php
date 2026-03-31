@@ -13,6 +13,7 @@ namespace AIOPageBuilder\Admin\Screens\Diagnostics;
 
 defined( 'ABSPATH' ) || exit;
 
+use AIOPageBuilder\Admin\Screens\Diagnostics_Screen;
 use AIOPageBuilder\Domain\Reporting\FormProvider\Form_Provider_Health_Summary_Service;
 use AIOPageBuilder\Infrastructure\AdminRouting\Template_Library_Hub_Urls;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -197,8 +198,8 @@ final class Form_Provider_Health_Screen {
 		<div class="aio-form-provider-health-links card" style="max-width: 800px; padding: 1em; margin: 1em 0;">
 			<h2 class="aio-form-provider-health-section-title"><?php \esc_html_e( 'Related screens', 'aio-page-builder' ); ?></h2>
 			<ul>
-				<li><a href="<?php echo \esc_url( $section_url ); ?>"><?php \esc_html_e( 'Section Templates', 'aio-page-builder' ); ?></a> — <?php \esc_html_e( 'Browse section templates (filter by form_embed for form sections).', 'aio-page-builder' ); ?></li>
-				<li><a href="<?php echo \esc_url( $page_url ); ?>"><?php \esc_html_e( 'Page Templates', 'aio-page-builder' ); ?></a> — <?php \esc_html_e( 'Browse page templates (request-form and compositions with form sections).', 'aio-page-builder' ); ?></li>
+				<li><a href="<?php echo \esc_url( $section_url ); ?>" data-aio-ux-action="diagnostics_form_provider_open_section_templates" data-aio-ux-section="form_provider_related" data-aio-ux-hub="<?php echo \esc_attr( Diagnostics_Screen::SLUG ); ?>" data-aio-ux-tab="form_provider"><?php \esc_html_e( 'Section Templates', 'aio-page-builder' ); ?></a> — <?php \esc_html_e( 'Browse section templates (filter by form_embed for form sections).', 'aio-page-builder' ); ?></li>
+				<li><a href="<?php echo \esc_url( $page_url ); ?>" data-aio-ux-action="diagnostics_form_provider_open_page_templates" data-aio-ux-section="form_provider_related" data-aio-ux-hub="<?php echo \esc_attr( Diagnostics_Screen::SLUG ); ?>" data-aio-ux-tab="form_provider"><?php \esc_html_e( 'Page Templates', 'aio-page-builder' ); ?></a> — <?php \esc_html_e( 'Browse page templates (request-form and compositions with form sections).', 'aio-page-builder' ); ?></li>
 			</ul>
 		</div>
 		<?php

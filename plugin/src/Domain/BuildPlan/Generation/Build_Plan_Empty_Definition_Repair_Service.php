@@ -59,47 +59,109 @@ final class Build_Plan_Empty_Definition_Repair_Service {
 	 */
 	public function repair_if_needed( int $plan_post_id, string $plan_lookup_key ): bool {
 		if ( $plan_post_id <= 0 ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_SKIP_INVALID_INPUT,
+				'reason=bad_post_id plan_post_id=' . (string) $plan_post_id
+			);
 			return false;
 		}
 		$plan_lookup_key = \sanitize_text_field( $plan_lookup_key );
 		if ( $plan_lookup_key === '' ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_SKIP_INVALID_INPUT,
+				'reason=empty_plan_key plan_post_id=' . (string) $plan_post_id
+			);
 			return false;
 		}
 		$definition = $this->plan_repository->get_plan_definition( $plan_post_id );
 		if ( ! self::definition_lacks_steps( $definition ) ) {
+			$steps  = $definition[ Build_Plan_Schema::KEY_STEPS ] ?? null;
+			$step_n = is_array( $steps ) ? count( $steps ) : 0;
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_SKIP_ALREADY_HAS_STEPS,
+				'plan_post_id=' . (string) $plan_post_id . ' step_count=' . (string) $step_n
+			);
 			return false;
 		}
 		$skip_key = 'aio_bp_empty_def_repair_skip_' . (string) $plan_post_id;
 		if ( \get_transient( $skip_key ) ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_SKIP_BACKOFF_TRANSIENT,
+				'plan_post_id=' . (string) $plan_post_id
+			);
 			return false;
 		}
-		$run_id = $this->run_repository->find_latest_completed_run_internal_key_for_build_plan_ref( $plan_lookup_key );
+		$run_id = $this->resolve_source_run_internal_key( $plan_post_id, $plan_lookup_key );
 		if ( $run_id === null || $run_id === '' ) {
-			\set_transient( $skip_key, '1', 600 );
+			\set_transient( $skip_key, '1', 180 );
 			Named_Debug_Log::event(
-				Named_Debug_Log_Event::BUILD_PLAN_EMPTY_DEFINITION_REPAIR,
-				'no_run plan_post_id=' . (string) $plan_post_id . ' plan_key=' . $plan_lookup_key
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_FAILED,
+				'plan_post_id=' . (string) $plan_post_id . ' plan_key=' . $plan_lookup_key
 			);
 			return false;
 		}
 		Named_Debug_Log::event(
-			Named_Debug_Log_Event::BUILD_PLAN_EMPTY_DEFINITION_REPAIR,
-			'attempt plan_post_id=' . (string) $plan_post_id . ' run_id=' . $run_id
+			Named_Debug_Log_Event::BP_EMPTY_REPAIR_CREATE_START,
+			'plan_post_id=' . (string) $plan_post_id . ' run_id=' . $run_id
 		);
+		\update_post_meta( $plan_post_id, Build_Plan_Repository::META_PLAN_SOURCE_AI_RUN_REF, \sanitize_text_field( $run_id ) );
 		$result = $this->from_run_service->create_from_completed_run( $run_id, $plan_post_id );
 		if ( ! $result->is_success() ) {
-			\set_transient( $skip_key, '1', 300 );
+			\set_transient( $skip_key, '1', 180 );
+			$enc        = \wp_json_encode( $result->get_errors() );
+			$err_detail = is_string( $enc ) ? $enc : '[]';
+			if ( strlen( $err_detail ) > 800 ) {
+				$err_detail = substr( $err_detail, 0, 800 ) . '…';
+			}
 			Named_Debug_Log::event(
-				Named_Debug_Log_Event::BUILD_PLAN_EMPTY_DEFINITION_REPAIR,
-				'failed plan_post_id=' . (string) $plan_post_id . ' errors=' . \wp_json_encode( $result->get_errors() )
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_CREATE_FAIL,
+				'plan_post_id=' . (string) $plan_post_id . ' run_id=' . $run_id . ' errors=' . $err_detail
 			);
 			return false;
 		}
 		\delete_transient( $skip_key );
 		Named_Debug_Log::event(
-			Named_Debug_Log_Event::BUILD_PLAN_EMPTY_DEFINITION_REPAIR,
-			'ok plan_post_id=' . (string) $plan_post_id
+			Named_Debug_Log_Event::BP_EMPTY_REPAIR_CREATE_OK,
+			'plan_post_id=' . (string) $plan_post_id . ' run_id=' . $run_id . ' plan_id=' . (string) ( $result->get_plan_id() ?? '' )
 		);
 		return true;
+	}
+
+	/**
+	 * Prefers run metadata build_plan_ref match; falls back to plan post meta written when JSON persists.
+	 *
+	 * @return string|null Run internal key.
+	 */
+	private function resolve_source_run_internal_key( int $plan_post_id, string $plan_lookup_key ): ?string {
+		$from_ref = $this->run_repository->find_latest_completed_run_internal_key_for_build_plan_ref( $plan_lookup_key );
+		if ( $from_ref !== null && $from_ref !== '' ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_FROM_REF,
+				'plan_post_id=' . (string) $plan_post_id . ' plan_key=' . $plan_lookup_key . ' run_id=' . $from_ref
+			);
+			return $from_ref;
+		}
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_REF_SCAN_EMPTY,
+			'plan_post_id=' . (string) $plan_post_id . ' plan_key=' . $plan_lookup_key
+		);
+		$stored = trim( (string) \get_post_meta( $plan_post_id, Build_Plan_Repository::META_PLAN_SOURCE_AI_RUN_REF, true ) );
+		if ( $stored === '' ) {
+			return null;
+		}
+		$record = $this->run_repository->get_by_key( $stored );
+		if ( $record === null || (string) ( $record['status'] ?? '' ) !== 'completed' ) {
+			$st = $record !== null ? (string) ( $record['status'] ?? '' ) : 'no_record';
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_META_INVALID,
+				'plan_post_id=' . (string) $plan_post_id . ' stored_run_key=' . $stored . ' status=' . $st
+			);
+			return null;
+		}
+		Named_Debug_Log::event(
+			Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_FROM_POST_META,
+			'plan_post_id=' . (string) $plan_post_id . ' run_id=' . $stored
+		);
+		return $stored;
 	}
 }

@@ -115,7 +115,7 @@ final class Industry_Subtype_Comparison_Screen {
 			<?php if ( $primary === '' ) : ?>
 				<div class="notice notice-warning inline" style="margin: 1em 0;">
 					<p><?php \esc_html_e( 'Set a primary industry in Industry Profile to see comparison data.', 'aio-page-builder' ); ?>
-						<a href="<?php echo \esc_url( $state['profile_url'] ); ?>"><?php \esc_html_e( 'Go to Industry Profile', 'aio-page-builder' ); ?></a>
+						<a href="<?php echo \esc_url( $state['profile_url'] ); ?>" data-aio-ux-action="industry_subtype_comparison_profile" data-aio-ux-section="industry_subtype_comparison_cta" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="comparisons"><?php \esc_html_e( 'Go to Industry Profile', 'aio-page-builder' ); ?></a>
 					</p>
 				</div>
 				<?php return; ?>
@@ -137,7 +137,7 @@ final class Industry_Subtype_Comparison_Screen {
 			<?php else : ?>
 				<div class="notice notice-info inline" style="margin: 1em 0;">
 					<p><?php \esc_html_e( 'Select a subtype in Industry Profile to compare parent vs subtype bundles and recommendations.', 'aio-page-builder' ); ?>
-						<a href="<?php echo \esc_url( $state['profile_url'] ); ?>"><?php \esc_html_e( 'Industry Profile', 'aio-page-builder' ); ?></a>
+						<a href="<?php echo \esc_url( $state['profile_url'] ); ?>" data-aio-ux-action="industry_subtype_comparison_profile" data-aio-ux-section="industry_subtype_comparison_cta" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="comparisons"><?php \esc_html_e( 'Industry Profile', 'aio-page-builder' ); ?></a>
 					</p>
 				</div>
 			<?php endif; ?>

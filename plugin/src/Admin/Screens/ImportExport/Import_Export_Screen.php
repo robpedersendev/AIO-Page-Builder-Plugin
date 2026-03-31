@@ -164,7 +164,7 @@ final class Import_Export_Screen {
 						</tr>
 					</table>
 					<p class="submit">
-						<button type="submit" class="button button-primary"><?php \esc_html_e( 'Create export', 'aio-page-builder' ); ?></button>
+						<button type="submit" class="button button-primary" data-aio-ux-action="import_export_create_export" data-aio-ux-section="import_export_export" data-aio-ux-hub="<?php echo \esc_attr( Settings_Screen::SLUG ); ?>" data-aio-ux-tab="import_export"><?php \esc_html_e( 'Create export', 'aio-page-builder' ); ?></button>
 					</p>
 				</form>
 			</section>
@@ -228,7 +228,7 @@ final class Import_Export_Screen {
 						</tr>
 					</table>
 					<p class="submit">
-						<button type="submit" class="button button-primary"><?php \esc_html_e( 'Preview import', 'aio-page-builder' ); ?></button>
+						<button type="submit" class="button button-primary" data-aio-ux-action="import_export_preview_import" data-aio-ux-section="import_export_validate" data-aio-ux-hub="<?php echo \esc_attr( Settings_Screen::SLUG ); ?>" data-aio-ux-tab="import_export"><?php \esc_html_e( 'Preview import', 'aio-page-builder' ); ?></button>
 					</p>
 				</form>
 
@@ -371,7 +371,7 @@ final class Import_Export_Screen {
 								</tr>
 							</table>
 							<p class="submit">
-								<button type="submit" class="button button-primary"><?php \esc_html_e( 'Confirm restore', 'aio-page-builder' ); ?></button>
+								<button type="submit" class="button button-primary" data-aio-ux-action="import_export_confirm_restore" data-aio-ux-section="import_export_restore" data-aio-ux-hub="<?php echo \esc_attr( Settings_Screen::SLUG ); ?>" data-aio-ux-tab="import_export"><?php \esc_html_e( 'Confirm restore', 'aio-page-builder' ); ?></button>
 							</p>
 						</form>
 					<?php endif; ?>

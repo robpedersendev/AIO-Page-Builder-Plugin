@@ -364,7 +364,7 @@ final class Compositions_Screen {
 				<option value="active" <?php selected( $status, 'active' ); ?>><?php \esc_html_e( 'Active', 'aio-page-builder' ); ?></option>
 				<option value="draft" <?php selected( $status, 'draft' ); ?>><?php \esc_html_e( 'Draft', 'aio-page-builder' ); ?></option>
 			</select>
-			<button type="submit" class="button"><?php \esc_html_e( 'Apply filters', 'aio-page-builder' ); ?></button>
+			<button type="submit" class="button" data-aio-ux-action="compositions_apply_filters" data-aio-ux-section="compositions_filters" data-aio-ux-hub="<?php echo \esc_attr( Page_Templates_Directory_Screen::SLUG ); ?>" data-aio-ux-tab="compositions"><?php \esc_html_e( 'Apply filters', 'aio-page-builder' ); ?></button>
 		</form>
 		<?php
 	}

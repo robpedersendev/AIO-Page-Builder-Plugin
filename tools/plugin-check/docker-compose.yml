@@ -51,5 +51,22 @@ services:
         source: ${PLUGIN_SOURCE:-../../plugin}
         target: /var/www/html/wp-content/plugins/aio-page-builder
 
+  # * Triggers WP-Cron / Action Scheduler on an interval (no host traffic required for PCP env).
+  wp_cron_runner:
+    image: curlimages/curl:8.11.0
+    depends_on:
+      - wordpress
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo '[wp-cron-runner] http://wordpress/wp-cron.php every 60s';
+        while true; do
+          curl -sS --connect-timeout 10 --max-time 120 -o /dev/null \
+            "http://wordpress/wp-cron.php?doing_wp_cron" || true;
+          sleep 60;
+        done
+    restart: unless-stopped
+
 volumes:
   wp_html:

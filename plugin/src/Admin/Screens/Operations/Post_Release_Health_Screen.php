@@ -80,7 +80,7 @@ final class Post_Release_Health_Screen {
 				<input type="date" id="date_from" name="date_from" value="<?php echo \esc_attr( $summary['period_start'] ?? '' ); ?>" />
 				<label for="date_to"><?php \esc_html_e( 'To (Y-m-d):', 'aio-page-builder' ); ?></label>
 				<input type="date" id="date_to" name="date_to" value="<?php echo \esc_attr( $summary['period_end'] ?? '' ); ?>" />
-				<button type="submit" class="button button-primary"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button button-primary" data-aio-ux-action="post_release_health_apply" data-aio-ux-section="post_release_filters" data-aio-ux-hub="<?php echo \esc_attr( Queue_Logs_Screen::SLUG ); ?>" data-aio-ux-tab="post_release"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
 				<a href="
 				<?php
 				echo \esc_url(

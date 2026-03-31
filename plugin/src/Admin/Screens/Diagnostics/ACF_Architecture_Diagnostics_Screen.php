@@ -136,9 +136,9 @@ final class ACF_Architecture_Diagnostics_Screen {
 		?>
 		<div class="aio-acf-diagnostics-filters" style="margin: 1em 0;">
 			<span class="filter-label"><?php \esc_html_e( 'Filter:', 'aio-page-builder' ); ?></span>
-			<a href="<?php echo \esc_url( $base ); ?>"><?php \esc_html_e( 'All', 'aio-page-builder' ); ?></a>
-			| <a href="<?php echo \esc_url( \add_query_arg( 'severity', 'warning', $base ) ); ?>"><?php \esc_html_e( 'Warnings', 'aio-page-builder' ); ?></a>
-			| <a href="<?php echo \esc_url( \add_query_arg( 'severity', 'error', $base ) ); ?>"><?php \esc_html_e( 'Errors', 'aio-page-builder' ); ?></a>
+			<a href="<?php echo \esc_url( $base ); ?>" data-aio-ux-action="diagnostics_acf_filter_all" data-aio-ux-section="acf_diagnostics_filters" data-aio-ux-hub="<?php echo \esc_attr( Diagnostics_Screen::SLUG ); ?>" data-aio-ux-tab="acf"><?php \esc_html_e( 'All', 'aio-page-builder' ); ?></a>
+			| <a href="<?php echo \esc_url( \add_query_arg( 'severity', 'warning', $base ) ); ?>" data-aio-ux-action="diagnostics_acf_filter_warnings" data-aio-ux-section="acf_diagnostics_filters" data-aio-ux-hub="<?php echo \esc_attr( Diagnostics_Screen::SLUG ); ?>" data-aio-ux-tab="acf"><?php \esc_html_e( 'Warnings', 'aio-page-builder' ); ?></a>
+			| <a href="<?php echo \esc_url( \add_query_arg( 'severity', 'error', $base ) ); ?>" data-aio-ux-action="diagnostics_acf_filter_errors" data-aio-ux-section="acf_diagnostics_filters" data-aio-ux-hub="<?php echo \esc_attr( Diagnostics_Screen::SLUG ); ?>" data-aio-ux-tab="acf"><?php \esc_html_e( 'Errors', 'aio-page-builder' ); ?></a>
 			<?php if ( ! empty( $filters ) ) : ?>
 				<span class="aio-acf-diagnostics-filters-applied" style="margin-left: 0.5em;">
 					<?php \esc_html_e( 'Applied:', 'aio-page-builder' ); ?>
@@ -347,7 +347,7 @@ final class ACF_Architecture_Diagnostics_Screen {
 				<?php \esc_html_e( 'Use the regeneration tool to rebuild field groups and page assignments from the plugin registry (Prompt 222). Run a dry-run first to preview changes.', 'aio-page-builder' ); ?>
 			</p>
 			<p>
-				<a href="<?php echo \esc_url( $diagnostics_url ); ?>" class="button button-secondary"><?php \esc_html_e( 'Refresh diagnostics', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo \esc_url( $diagnostics_url ); ?>" class="button button-secondary" data-aio-ux-action="diagnostics_acf_refresh" data-aio-ux-section="acf_diagnostics_repair" data-aio-ux-hub="<?php echo \esc_attr( Diagnostics_Screen::SLUG ); ?>" data-aio-ux-tab="acf"><?php \esc_html_e( 'Refresh diagnostics', 'aio-page-builder' ); ?></a>
 				<span class="description"><?php \esc_html_e( 'Regeneration is performed via the dedicated repair service (API or support tool).', 'aio-page-builder' ); ?></span>
 			</p>
 		</div>

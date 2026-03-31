@@ -335,10 +335,15 @@ final class Onboarding_Screen {
 								$bootstrap->sync_wizard_snapshot( $bp_result->get_plan_post_id(), $draft_fresh, $prefill, $industry );
 							}
 							if ( $plan_key !== '' ) {
+								$bp_tab_extra = array( 'plan_id' => $plan_key );
+								$bppid        = $bp_result->get_plan_post_id();
+								if ( $bppid > 0 ) {
+									$bp_tab_extra['id'] = (string) $bppid;
+								}
 								return Admin_Screen_Hub::tab_url(
 									Build_Plans_Screen::SLUG,
 									'build_plans',
-									array( 'plan_id' => $plan_key )
+									$bp_tab_extra
 								);
 							}
 						}
@@ -582,35 +587,6 @@ final class Onboarding_Screen {
 			$allowed[] = $pinned;
 		}
 		return $allowed;
-	}
-
-	/**
-	 * Human-readable label for a crawl run id (timestamp when available).
-	 */
-	private function format_crawl_run_select_label( string $run_id ): string {
-		if ( ! $this->container->has( 'crawl_snapshot_service' ) ) {
-			return $run_id;
-		}
-		$snap = $this->container->get( 'crawl_snapshot_service' );
-		if ( ! $snap instanceof Crawl_Snapshot_Service ) {
-			return $run_id;
-		}
-		$sess = $snap->get_session( $run_id );
-		if ( ! \is_array( $sess ) ) {
-			return $run_id;
-		}
-		$ended   = isset( $sess['ended_at'] ) && \is_string( $sess['ended_at'] ) ? \trim( $sess['ended_at'] ) : '';
-		$started = isset( $sess['started_at'] ) && \is_string( $sess['started_at'] ) ? \trim( $sess['started_at'] ) : '';
-		$ts_raw  = $ended !== '' ? $ended : ( $started !== '' ? $started : '' );
-		if ( $ts_raw === '' ) {
-			return $run_id;
-		}
-		$ts = \strtotime( $ts_raw );
-		if ( $ts === false ) {
-			return $run_id . ' — ' . $ts_raw;
-		}
-		$when = \wp_date( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), $ts );
-		return $run_id . ' — ' . $when;
 	}
 
 	/**
@@ -1033,7 +1009,7 @@ final class Onboarding_Screen {
 									<?php \wp_nonce_field( $nonce_action, self::NONCE_ACTION ); ?>
 									<input type="hidden" name="aio_onboarding_action" value="goto_step" />
 									<input type="hidden" name="aio_onboarding_target_step" value="<?php echo \esc_attr( $step['key'] ); ?>" />
-									<button type="submit" class="aio-onboarding-step-link">
+									<button type="submit" class="aio-onboarding-step-link" data-aio-ux-action="onboarding_goto_step" data-aio-ux-section="onboarding_stepper" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="onboarding">
 										<span class="aio-step-label"><?php echo \esc_html( $step['label'] ); ?></span>
 									</button>
 								</form>
@@ -1063,12 +1039,12 @@ final class Onboarding_Screen {
 				?>
 				<p class="submit">
 					<?php if ( $current_step_key !== Onboarding_Step_Keys::WELCOME ) : ?>
-						<button type="submit" name="aio_onboarding_action" value="go_back" class="button"><?php \esc_html_e( 'Back', 'aio-page-builder' ); ?></button>
+						<button type="submit" name="aio_onboarding_action" value="go_back" class="button" data-aio-ux-action="onboarding_go_back" data-aio-ux-section="onboarding_actions" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="onboarding"><?php \esc_html_e( 'Back', 'aio-page-builder' ); ?></button>
 					<?php endif; ?>
 					<?php if ( $current_step_key !== Onboarding_Step_Keys::SUBMISSION ) : ?>
-						<button type="submit" name="aio_onboarding_action" value="save_draft" class="button"><?php \esc_html_e( 'Save draft', 'aio-page-builder' ); ?></button>
+						<button type="submit" name="aio_onboarding_action" value="save_draft" class="button" data-aio-ux-action="onboarding_save_draft" data-aio-ux-section="onboarding_actions" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="onboarding"><?php \esc_html_e( 'Save draft', 'aio-page-builder' ); ?></button>
 						<?php if ( $current_step_key !== Onboarding_Step_Keys::REVIEW || empty( $state['is_blocked'] ) ) : ?>
-							<button type="submit" name="aio_onboarding_action" value="advance_step" class="button button-primary">
+							<button type="submit" name="aio_onboarding_action" value="advance_step" class="button button-primary" data-aio-ux-action="onboarding_advance_step" data-aio-ux-section="onboarding_actions" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="onboarding">
 								<?php
 								if ( $current_step_key === Onboarding_Step_Keys::WELCOME ) {
 									\esc_html_e( 'Get started', 'aio-page-builder' );
@@ -1079,11 +1055,11 @@ final class Onboarding_Screen {
 							</button>
 						<?php endif; ?>
 					<?php else : ?>
-						<button type="submit" name="aio_onboarding_action" value="save_draft" class="button"><?php \esc_html_e( 'Save draft', 'aio-page-builder' ); ?></button>
+						<button type="submit" name="aio_onboarding_action" value="save_draft" class="button" data-aio-ux-action="onboarding_save_draft" data-aio-ux-section="onboarding_actions" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="onboarding"><?php \esc_html_e( 'Save draft', 'aio-page-builder' ); ?></button>
 						<?php if ( ! empty( $state['is_blocked'] ) ) : ?>
 							<p class="aio-onboarding-ready"><?php \esc_html_e( 'Complete the required steps above before requesting a plan.', 'aio-page-builder' ); ?></p>
 						<?php else : ?>
-							<button type="submit" name="aio_onboarding_action" value="submit_planning_request" class="button button-primary" onclick="return window.confirm(<?php echo \wp_json_encode( __( 'Send a planning request to your AI provider using this profile and context? External API usage may apply charges according to your provider account.', 'aio-page-builder' ) ); ?>);"><?php \esc_html_e( 'Request AI plan', 'aio-page-builder' ); ?></button>
+							<button type="submit" name="aio_onboarding_action" value="submit_planning_request" class="button button-primary" data-aio-ux-action="onboarding_submit_planning_request" data-aio-ux-section="onboarding_actions" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="onboarding" onclick="return window.confirm(<?php echo \wp_json_encode( __( 'Send a planning request to your AI provider using this profile and context? External API usage may apply charges according to your provider account.', 'aio-page-builder' ) ); ?>);"><?php \esc_html_e( 'Request AI plan', 'aio-page-builder' ); ?></button>
 						<?php endif; ?>
 					<?php endif; ?>
 				</p>

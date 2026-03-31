@@ -164,14 +164,14 @@ final class Global_Component_Override_Settings_Screen {
 				<?php endforeach; ?>
 
 				<p class="submit">
-					<button type="submit" class="button button-primary"><?php \esc_html_e( 'Save overrides', 'aio-page-builder' ); ?></button>
+					<button type="submit" class="button button-primary" data-aio-ux-action="global_component_overrides_save" data-aio-ux-section="global_component_overrides_form" data-aio-ux-hub="<?php echo \esc_attr( Global_Style_Token_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="overrides"><?php \esc_html_e( 'Save overrides', 'aio-page-builder' ); ?></button>
 				</p>
 			</form>
 
 			<form method="post" action="<?php echo \esc_url( $this->get_settings_url() ); ?>" id="aio-global-component-overrides-reset" style="margin-top: 1.5em;">
 				<input type="hidden" name="action" value="<?php echo \esc_attr( self::RESET_ACTION ); ?>" />
 				<?php \wp_nonce_field( self::NONCE_RESET, self::NONCE_RESET ); ?>
-				<button type="submit" class="button" onclick="return confirm('<?php echo \esc_js( __( 'Reset all component overrides to defaults?', 'aio-page-builder' ) ); ?>');"><?php \esc_html_e( 'Reset to defaults', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button" data-aio-ux-action="global_component_overrides_reset" data-aio-ux-section="global_component_overrides_form" data-aio-ux-hub="<?php echo \esc_attr( Global_Style_Token_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="overrides" onclick="return confirm('<?php echo \esc_js( __( 'Reset all component overrides to defaults?', 'aio-page-builder' ) ); ?>');"><?php \esc_html_e( 'Reset to defaults', 'aio-page-builder' ); ?></button>
 			</form>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

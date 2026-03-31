@@ -422,6 +422,18 @@ final class Build_Plan_Item_Generator {
 			return is_string( $json ) ? $json : '';
 		}
 		if ( is_string( $value ) ) {
+			$t = trim( $value );
+			if ( $t !== '' && ( str_starts_with( $t, '[' ) || str_starts_with( $t, '{' ) ) ) {
+				$flags = JSON_BIGINT_AS_STRING;
+				if ( \defined( 'JSON_INVALID_UTF8_SUBSTITUTE' ) ) {
+					$flags |= JSON_INVALID_UTF8_SUBSTITUTE;
+				}
+				$decoded = \json_decode( $t, true, 512, $flags );
+				if ( \is_array( $decoded ) ) {
+					$json = function_exists( 'wp_json_encode' ) ? \wp_json_encode( $decoded ) : \json_encode( $decoded );
+					return \is_string( $json ) ? $json : '';
+				}
+			}
 			return $value;
 		}
 		return '';

@@ -155,14 +155,14 @@ final class Global_Style_Token_Settings_Screen {
 				<?php endforeach; ?>
 
 				<p class="submit">
-					<button type="submit" class="button button-primary"><?php \esc_html_e( 'Save token values', 'aio-page-builder' ); ?></button>
+					<button type="submit" class="button button-primary" data-aio-ux-action="global_style_tokens_save" data-aio-ux-section="global_style_tokens_form" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="tokens"><?php \esc_html_e( 'Save token values', 'aio-page-builder' ); ?></button>
 				</p>
 			</form>
 
 			<form method="post" action="<?php echo \esc_url( $this->get_settings_url() ); ?>" id="aio-global-style-tokens-reset" style="margin-top: 1.5em;">
 				<input type="hidden" name="action" value="<?php echo \esc_attr( self::RESET_ACTION ); ?>" />
 				<?php \wp_nonce_field( self::NONCE_RESET, self::NONCE_RESET ); ?>
-				<button type="submit" class="button" onclick="return confirm('<?php echo \esc_js( __( 'Reset all global token values to defaults?', 'aio-page-builder' ) ); ?>');"><?php \esc_html_e( 'Reset to defaults', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button" data-aio-ux-action="global_style_tokens_reset" data-aio-ux-section="global_style_tokens_form" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="tokens" onclick="return confirm('<?php echo \esc_js( __( 'Reset all global token values to defaults?', 'aio-page-builder' ) ); ?>');"><?php \esc_html_e( 'Reset to defaults', 'aio-page-builder' ); ?></button>
 			</form>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

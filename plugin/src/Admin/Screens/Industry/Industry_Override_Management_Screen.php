@@ -111,7 +111,7 @@ final class Industry_Override_Management_Screen {
 					<option value="<?php echo \esc_attr( Industry_Override_Schema::STATE_REJECTED ); ?>" <?php selected( $filters[ Industry_Override_Read_Model_Builder::FILTER_STATE ] ?? '', Industry_Override_Schema::STATE_REJECTED ); ?>><?php \esc_html_e( 'Rejected', 'aio-page-builder' ); ?></option>
 				</select>
 				<label><input type="checkbox" name="reason_present" value="1" <?php checked( ! empty( $filters[ Industry_Override_Read_Model_Builder::FILTER_REASON_PRESENT ] ) ); ?> /> <?php \esc_html_e( 'With reason', 'aio-page-builder' ); ?></label>
-				<button type="submit" class="button"><?php \esc_html_e( 'Filter', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button" data-aio-ux-action="industry_overrides_filter" data-aio-ux-section="industry_overrides_filters" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="overrides"><?php \esc_html_e( 'Filter', 'aio-page-builder' ); ?></button>
 			</form>
 
 			<?php if ( $rows === array() ) : ?>
@@ -282,7 +282,7 @@ final class Industry_Override_Management_Screen {
 			<?php if ( $plan_id !== null && $plan_id !== '' ) : ?>
 				<input type="hidden" name="plan_id" value="<?php echo \esc_attr( (string) $plan_id ); ?>" />
 			<?php endif; ?>
-			<button type="submit" class="button button-small"><?php \esc_html_e( 'Remove', 'aio-page-builder' ); ?></button>
+			<button type="submit" class="button button-small" data-aio-ux-action="industry_override_remove" data-aio-ux-section="industry_overrides_row" data-aio-ux-hub="<?php echo \esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="overrides"><?php \esc_html_e( 'Remove', 'aio-page-builder' ); ?></button>
 		</form>
 		<?php
 	}

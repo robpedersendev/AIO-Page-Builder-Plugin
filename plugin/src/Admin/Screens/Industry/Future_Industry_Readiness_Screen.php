@@ -163,7 +163,7 @@ final class Future_Industry_Readiness_Screen {
 				<h2 id="aio-fir-candidate-heading"><?php esc_html_e( 'Candidate scorecard summary', 'aio-page-builder' ); ?></h2>
 				<p><strong><?php esc_html_e( 'Readiness:', 'aio-page-builder' ); ?></strong> <?php echo esc_html( $vm->get_candidate_readiness_label() ); ?></p>
 				<p><strong><?php esc_html_e( 'Maturity floor:', 'aio-page-builder' ); ?></strong> <?php echo esc_html( $vm->get_maturity_floor_label() ); ?></p>
-				<p><a href="<?php echo esc_url( $links['pack_family_comparison'] ?? '#' ); ?>"><?php esc_html_e( 'Pack family comparison', 'aio-page-builder' ); ?></a></p>
+				<p><a href="<?php echo esc_url( $links['pack_family_comparison'] ?? '#' ); ?>" data-aio-ux-action="future_industry_readiness_pack_family" data-aio-ux-section="future_industry_readiness" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="author"><?php esc_html_e( 'Pack family comparison', 'aio-page-builder' ); ?></a></p>
 			</section>
 
 			<section class="aio-readiness-section" style="margin-top: 1.5em;" aria-labelledby="aio-fir-scaffold-heading">
@@ -184,7 +184,7 @@ final class Future_Industry_Readiness_Screen {
 			</section>
 
 			<p class="description" style="margin-top: 1.5em;">
-				<a href="<?php echo esc_url( $links['author_dashboard'] ?? '#' ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo esc_url( $links['author_dashboard'] ?? '#' ); ?>" data-aio-ux-action="future_industry_readiness_back_author" data-aio-ux-section="future_industry_readiness" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="author"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
 			</p>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

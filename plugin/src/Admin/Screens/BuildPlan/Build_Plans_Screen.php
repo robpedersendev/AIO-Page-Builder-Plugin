@@ -18,6 +18,7 @@ use AIOPageBuilder\Domain\Storage\Objects\Object_Type_Keys;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Admin_Ux_Trace;
 
 /**
  * Lists Build Plans; with plan_id or id in request, delegates to Build_Plan_Workspace_Screen.
@@ -41,6 +42,32 @@ final class Build_Plans_Screen {
 	}
 
 	/**
+	 * Plans hub URL for the Build Plans tab (sets aio_tab=build_plans).
+	 */
+	public static function hub_plans_list_url(): string {
+		return Admin_Screen_Hub::tab_url( self::SLUG, 'build_plans' );
+	}
+
+	/**
+	 * Workspace URL inside the Plans hub Build Plans tab (preserves aio_tab for redirects, stepper, and bulk bars).
+	 *
+	 * @param array<string, string|int> $query_args plan_id, id, step, detail, etc. Empty string values are omitted.
+	 */
+	public static function hub_workspace_url( array $query_args ): string {
+		$args = array();
+		foreach ( $query_args as $key => $value ) {
+			if ( is_int( $value ) ) {
+				$value = (string) $value;
+			}
+			if ( ! is_string( $value ) || $value === '' ) {
+				continue;
+			}
+			$args[ (string) $key ] = $value;
+		}
+		return Admin_Screen_Hub::tab_url( self::SLUG, 'build_plans', $args );
+	}
+
+	/**
 	 * Renders list or delegates to workspace when plan_id/id present.
 	 *
 	 * @return void
@@ -54,6 +81,11 @@ final class Build_Plans_Screen {
 			if ( isset( $_GET[ Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT ] ) ) {
 				$bp_flag = \sanitize_key( (string) \wp_unslash( (string) $_GET[ Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT ] ) );
 				if ( Create_Build_Plan_From_AI_Run_Action::RESULT_CREATED === $bp_flag ) {
+					Admin_Ux_Trace::notice_rendered(
+						'bp_created_from_run_banner',
+						'notice-success',
+						array( 'hub:' . self::SLUG, 'tab:build_plans', 'section:workspace' )
+					);
 					?>
 					<div class="notice notice-success is-dismissible" role="status"><p><?php \esc_html_e( 'Build Plan created from the AI run. Review steps below.', 'aio-page-builder' ); ?></p></div>
 					<?php
@@ -87,7 +119,7 @@ final class Build_Plans_Screen {
 						<?php
 						$ai_runs_url = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' );
 						?>
-						<a class="button button-primary" href="<?php echo \esc_url( $ai_runs_url ); ?>"><?php \esc_html_e( 'Open AI Runs', 'aio-page-builder' ); ?></a>
+						<a class="button button-primary" href="<?php echo \esc_url( $ai_runs_url ); ?>" data-aio-ux-action="plans_list_open_ai_runs" data-aio-ux-section="bp_list_empty_state" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="build_plans"><?php \esc_html_e( 'Open AI Runs', 'aio-page-builder' ); ?></a>
 						<span class="aio-bp-empty-card__hint-rest"><?php \esc_html_e( 'Create a plan from a completed run, or finish onboarding.', 'aio-page-builder' ); ?></span>
 					<?php else : ?>
 						<?php \esc_html_e( 'Ask an administrator to create a plan from a completed AI run.', 'aio-page-builder' ); ?>
@@ -155,7 +187,7 @@ final class Build_Plans_Screen {
 									</div>
 									<div class="aio-bp-version-card__action">
 										<?php if ( $open !== '' ) : ?>
-											<a class="button button-primary" href="<?php echo \esc_url( $open ); ?>"><?php \esc_html_e( 'Open plan', 'aio-page-builder' ); ?></a>
+											<a class="button button-primary" href="<?php echo \esc_url( $open ); ?>" data-aio-ux-action="plans_list_open_plan" data-aio-ux-section="bp_version_list" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="build_plans"><?php \esc_html_e( 'Open plan', 'aio-page-builder' ); ?></a>
 										<?php else : ?>
 											<span class="aio-bp-incomplete" role="note"><?php \esc_html_e( 'Plan ID missing — re-save or repair from AI run.', 'aio-page-builder' ); ?></span>
 										<?php endif; ?>
@@ -203,7 +235,7 @@ final class Build_Plans_Screen {
 									</dl>
 									<div class="aio-bp-orphan-card__action">
 										<?php if ( $open !== '' ) : ?>
-											<a class="button button-primary" href="<?php echo \esc_url( $open ); ?>"><?php \esc_html_e( 'Open plan', 'aio-page-builder' ); ?></a>
+											<a class="button button-primary" href="<?php echo \esc_url( $open ); ?>" data-aio-ux-action="plans_list_open_plan_orphan" data-aio-ux-section="bp_orphan_list" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="build_plans"><?php \esc_html_e( 'Open plan', 'aio-page-builder' ); ?></a>
 										<?php else : ?>
 											<span class="aio-bp-incomplete"><?php \esc_html_e( 'No plan ID', 'aio-page-builder' ); ?></span>
 										<?php endif; ?>
@@ -242,7 +274,7 @@ final class Build_Plans_Screen {
 		if ( $extra === array() ) {
 			return '';
 		}
-		return Admin_Screen_Hub::tab_url( self::SLUG, 'build_plans', $extra );
+		return self::hub_workspace_url( $extra );
 	}
 
 	private function truncate_list_label( string $text, int $max ): string {

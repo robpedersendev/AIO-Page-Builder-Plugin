@@ -15,6 +15,7 @@ namespace AIOPageBuilder\Admin\Screens\Support;
 defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
+use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Logs\Queue_Logs_Screen;
 use AIOPageBuilder\Domain\Reporting\UI\Support_Triage_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
@@ -132,17 +133,32 @@ final class Support_Triage_Dashboard_Screen {
 		return $state;
 	}
 
+	/**
+	 * HTML fragment (leading space) of data-aio-ux-* attributes for triage deep links.
+	 *
+	 * @param string $action  Stable trace action id.
+	 * @param string $section Section id for grouping.
+	 */
+	private function triage_ux_attrs( string $action, string $section ): string {
+		return sprintf(
+			' data-aio-ux-action="%s" data-aio-ux-section="%s" data-aio-ux-hub="%s" data-aio-ux-tab="triage"',
+			\esc_attr( $action ),
+			\esc_attr( $section ),
+			\esc_attr( Queue_Logs_Screen::SLUG )
+		);
+	}
+
 	/** @param array<string, mixed> $state */
 	private function render_filter_links( array $state ): void {
 		$base = Admin_Screen_Hub::tab_url( Queue_Logs_Screen::SLUG, 'triage' );
 		?>
 		<div class="aio-support-triage-filters">
 			<span class="filter-label"><?php \esc_html_e( 'Filter:', 'aio-page-builder' ); ?></span>
-			<a href="<?php echo \esc_url( $base ); ?>"><?php \esc_html_e( 'All', 'aio-page-builder' ); ?></a>
-			| <a href="<?php echo \esc_url( \add_query_arg( 'domain', 'queue', $base ) ); ?>"><?php \esc_html_e( 'Queue', 'aio-page-builder' ); ?></a>
-			| <a href="<?php echo \esc_url( \add_query_arg( 'domain', 'reporting', $base ) ); ?>"><?php \esc_html_e( 'Reporting', 'aio-page-builder' ); ?></a>
-			| <a href="<?php echo \esc_url( \add_query_arg( 'domain', 'ai_runs', $base ) ); ?>"><?php \esc_html_e( 'AI Runs', 'aio-page-builder' ); ?></a>
-			| <a href="<?php echo \esc_url( \add_query_arg( 'severity', 'critical', $base ) ); ?>"><?php \esc_html_e( 'Critical only', 'aio-page-builder' ); ?></a>
+			<a href="<?php echo \esc_url( $base ); ?>" data-aio-ux-action="support_triage_filter_all" data-aio-ux-section="support_triage_filters" data-aio-ux-hub="<?php echo \esc_attr( Queue_Logs_Screen::SLUG ); ?>" data-aio-ux-tab="triage"><?php \esc_html_e( 'All', 'aio-page-builder' ); ?></a>
+			| <a href="<?php echo \esc_url( \add_query_arg( 'domain', 'queue', $base ) ); ?>" data-aio-ux-action="support_triage_filter_domain_queue" data-aio-ux-section="support_triage_filters" data-aio-ux-hub="<?php echo \esc_attr( Queue_Logs_Screen::SLUG ); ?>" data-aio-ux-tab="triage"><?php \esc_html_e( 'Queue', 'aio-page-builder' ); ?></a>
+			| <a href="<?php echo \esc_url( \add_query_arg( 'domain', 'reporting', $base ) ); ?>" data-aio-ux-action="support_triage_filter_domain_reporting" data-aio-ux-section="support_triage_filters" data-aio-ux-hub="<?php echo \esc_attr( Queue_Logs_Screen::SLUG ); ?>" data-aio-ux-tab="triage"><?php \esc_html_e( 'Reporting', 'aio-page-builder' ); ?></a>
+			| <a href="<?php echo \esc_url( \add_query_arg( 'domain', 'ai_runs', $base ) ); ?>" data-aio-ux-action="support_triage_filter_domain_ai_runs" data-aio-ux-section="support_triage_filters" data-aio-ux-hub="<?php echo \esc_attr( Queue_Logs_Screen::SLUG ); ?>" data-aio-ux-tab="triage"><?php \esc_html_e( 'AI Runs', 'aio-page-builder' ); ?></a>
+			| <a href="<?php echo \esc_url( \add_query_arg( 'severity', 'critical', $base ) ); ?>" data-aio-ux-action="support_triage_filter_severity_critical" data-aio-ux-section="support_triage_filters" data-aio-ux-hub="<?php echo \esc_attr( Queue_Logs_Screen::SLUG ); ?>" data-aio-ux-tab="triage"><?php \esc_html_e( 'Critical only', 'aio-page-builder' ); ?></a>
 		</div>
 		<?php
 	}
@@ -160,7 +176,7 @@ final class Support_Triage_Dashboard_Screen {
 						<li class="aio-triage-item aio-severity-<?php echo \esc_attr( \sanitize_key( (string) ( $item['severity'] ?? '' ) ) ); ?>" style="border-left: 4px solid #d63638; padding: 0.5em 0.75em; margin: 0.25em 0; background: #fcf0f1;">
 							<strong><?php echo \esc_html( (string) ( $item['title'] ?? '' ) ); ?></strong>
 							<p style="margin: 0.25em 0;"><?php echo \esc_html( (string) ( $item['message'] ?? '' ) ); ?></p>
-							<p style="margin: 0.25em 0;"><a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a></p>
+							<p style="margin: 0.25em 0;"><a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"<?php echo $this->triage_ux_attrs( 'support_triage_critical_issue_link', 'support_triage_critical' ); ?>><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a></p>
 						</li>
 					<?php endforeach; ?>
 				</ul>
@@ -181,7 +197,7 @@ final class Support_Triage_Dashboard_Screen {
 					<?php foreach ( $items as $item ) : ?>
 						<li class="aio-triage-item aio-triage-item--warning">
 							<strong><?php echo \esc_html( (string) ( $item['title'] ?? '' ) ); ?></strong> — <?php echo \esc_html( (string) ( $item['message'] ?? '' ) ); ?>
-							<a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a>
+							<a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"<?php echo $this->triage_ux_attrs( 'support_triage_degraded_system_link', 'support_triage_degraded' ); ?>><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a>
 						</li>
 					<?php endforeach; ?>
 				</ul>
@@ -205,7 +221,7 @@ final class Support_Triage_Dashboard_Screen {
 							<tr>
 								<td><?php echo \esc_html( (string) ( $item['domain'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $item['summary'] ?? '' ) ); ?></td>
-								<td><a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a></td>
+								<td><a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"<?php echo $this->triage_ux_attrs( 'support_triage_failed_workflow_link', 'support_triage_failed_workflows' ); ?>><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a></td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
@@ -229,19 +245,7 @@ final class Support_Triage_Dashboard_Screen {
 				<ul class="aio-triage-plans-plain">
 					<?php foreach ( $stale_plans as $plan ) : ?>
 						<?php $plan_id = (string) ( $plan['plan_id'] ?? '' ); ?>
-						<li><a href="
-						<?php
-						echo \esc_url(
-							\add_query_arg(
-								array(
-									'page'    => 'aio-page-builder-build-plans',
-									'plan_id' => $plan_id,
-								),
-								$base
-							)
-						);
-						?>
-										"><?php echo \esc_html( (string) ( $plan['title'] ?? $plan_id ) ); ?></a> — <?php echo \esc_html( (string) ( $plan['status'] ?? '' ) ); ?></li>
+						<li><a href="<?php echo \esc_url( \add_query_arg( array( 'page' => Build_Plans_Screen::SLUG, 'plan_id' => $plan_id ), $base ) ); ?>"<?php echo $this->triage_ux_attrs( 'support_triage_open_stale_plan', 'support_triage_stale_plans' ); ?>><?php echo \esc_html( (string) ( $plan['title'] ?? $plan_id ) ); ?></a> — <?php echo \esc_html( (string) ( $plan['status'] ?? '' ) ); ?></li>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
@@ -255,7 +259,7 @@ final class Support_Triage_Dashboard_Screen {
 								<td><?php echo \esc_html( (string) ( $row['job_type'] ?? '' ) ); ?></td>
 								<td><code><?php echo \esc_html( (string) ( $row['plan_id'] ?? '' ) ); ?></code></td>
 								<td><?php echo \esc_html( (string) ( $row['completed_at'] ?? '' ) ); ?></td>
-								<td><a href="<?php echo \esc_url( (string) ( $row['link_url'] ?? '#' ) ); ?>"><?php echo \esc_html( (string) ( $row['link_label'] ?? '' ) ); ?></a></td>
+								<td><a href="<?php echo \esc_url( (string) ( $row['link_url'] ?? '#' ) ); ?>"<?php echo $this->triage_ux_attrs( 'support_triage_rollback_candidate_link', 'support_triage_rollback' ); ?>><?php echo \esc_html( (string) ( $row['link_label'] ?? '' ) ); ?></a></td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
@@ -278,7 +282,7 @@ final class Support_Triage_Dashboard_Screen {
 			<?php else : ?>
 				<ul class="aio-triage-list">
 					<?php foreach ( $items as $item ) : ?>
-						<li><?php echo \esc_html( (string) ( $item['message'] ?? '' ) ); ?> <a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a></li>
+						<li><?php echo \esc_html( (string) ( $item['message'] ?? '' ) ); ?> <a href="<?php echo \esc_url( (string) ( $item['link_url'] ?? '#' ) ); ?>"<?php echo $this->triage_ux_attrs( 'support_triage_import_export_failure_link', 'support_triage_import_export' ); ?>><?php echo \esc_html( (string) ( $item['link_label'] ?? '' ) ); ?></a></li>
 					<?php endforeach; ?>
 				</ul>
 			<?php endif; ?>
@@ -293,7 +297,7 @@ final class Support_Triage_Dashboard_Screen {
 			<h2 id="aio-triage-links-heading"><?php \esc_html_e( 'Recommended next steps', 'aio-page-builder' ); ?></h2>
 			<ul class="aio-triage-links">
 				<?php foreach ( $items as $item ) : ?>
-					<li><a href="<?php echo \esc_url( (string) ( $item['url'] ?? '#' ) ); ?>" class="button"><?php echo \esc_html( (string) ( $item['label'] ?? '' ) ); ?></a> <span class="description"><?php echo \esc_html( (string) ( $item['description'] ?? '' ) ); ?></span></li>
+					<li><a href="<?php echo \esc_url( (string) ( $item['url'] ?? '#' ) ); ?>" class="button"<?php echo $this->triage_ux_attrs( 'support_triage_recommended_step_link', 'support_triage_recommended' ); ?>><?php echo \esc_html( (string) ( $item['label'] ?? '' ) ); ?></a> <span class="description"><?php echo \esc_html( (string) ( $item['description'] ?? '' ) ); ?></span></li>
 				<?php endforeach; ?>
 			</ul>
 		</section>

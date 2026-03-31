@@ -15,6 +15,8 @@ use AIOPageBuilder\Admin\Screens\AI\AI_Providers_Screen;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Onboarding_Screen;
 use AIOPageBuilder\Admin\Screens\AI\Profile_Snapshot_History_Panel;
+use AIOPageBuilder\Admin\Actions\Create_Build_Plan_From_AI_Run_Action;
+use AIOPageBuilder\Admin\Actions\Repair_Empty_Build_Plan_Definition_Action;
 use AIOPageBuilder\Admin\Screens\AI\Prompt_Experiments_Screen;
 use AIOPageBuilder\Admin\Screens\Analytics\Template_Analytics_Screen;
 use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Analytics_Screen;
@@ -62,6 +64,7 @@ use AIOPageBuilder\Bootstrap\Capability_Registrar;
 use AIOPageBuilder\Domain\AI\UI\AI_Providers_UI_State_Builder;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Admin_Ux_Trace;
 
 /**
  * Renders consolidated hub screens and registers visible/hidden admin submenus.
@@ -710,7 +713,7 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
-		$general_subtabs = array(
+		$general_subtabs       = array(
 			Settings_Screen::SETTINGS_SUBTAB_OVERVIEW => array(
 				'label' => __( 'Overview', 'aio-page-builder' ),
 				'cap'   => Capabilities::MANAGE_SETTINGS,
@@ -720,6 +723,15 @@ final class Admin_Menu_Hub_Renderer {
 				'cap'   => Capabilities::MANAGE_SETTINGS,
 			),
 		);
+		$settings_subtab_trace = '';
+		if ( $tab === 'general' ) {
+			$sub_default           = Admin_Screen_Hub::first_accessible_tab( Settings_Screen::SETTINGS_SUBTAB_OVERVIEW, $general_subtabs );
+			$settings_subtab_trace = Admin_Screen_Hub::current_subtab( $sub_default, array_keys( $general_subtabs ) );
+			if ( ! isset( $general_subtabs[ $settings_subtab_trace ] ) || ! Capabilities::current_user_can_for_route( $general_subtabs[ $settings_subtab_trace ]['cap'] ) ) {
+				$settings_subtab_trace = $sub_default;
+			}
+		}
+		$this->trace_hub_navigation( Settings_Screen::SLUG, $tab, $settings_subtab_trace );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Settings', 'aio-page-builder' ); ?></h1>
@@ -771,6 +783,7 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
+		$this->trace_hub_navigation( Diagnostics_Screen::SLUG, $tab, '' );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Diagnostics', 'aio-page-builder' ); ?></h1>
@@ -812,6 +825,7 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
+		$this->trace_hub_navigation( Onboarding_Screen::SLUG, $tab, '' );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Onboarding', 'aio-page-builder' ); ?></h1>
@@ -856,6 +870,7 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
+		$this->trace_hub_navigation( AI_Runs_Screen::HUB_PAGE_SLUG, $tab, '' );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'AI', 'aio-page-builder' ); ?></h1>
@@ -930,6 +945,7 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
+		$this->trace_hub_navigation( Crawler_Sessions_Screen::SLUG, $tab, '' );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Crawler', 'aio-page-builder' ); ?></h1>
@@ -943,6 +959,49 @@ final class Admin_Menu_Hub_Renderer {
 			?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Preserves workspace deep-link query args when switching primary tabs (otherwise plan_id is dropped and the list/empty state reappears).
+	 *
+	 * @return array<string, string>
+	 */
+	private function plans_hub_tab_passthrough_query_args(): array {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only; builds tab hrefs only.
+		$out  = array();
+		$keys = array(
+			'plan_id',
+			'id',
+			'step',
+			'detail',
+			Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT,
+			Repair_Empty_Build_Plan_Definition_Action::QUERY_RESULT,
+		);
+		foreach ( $keys as $key ) {
+			if ( ! isset( $_GET[ $key ] ) ) {
+				continue;
+			}
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Value sanitized per key in branches below (sanitize_key, int cast, sanitize_text_field).
+			$raw = \wp_unslash( (string) $_GET[ $key ] );
+			if ( $key === Create_Build_Plan_From_AI_Run_Action::QUERY_RESULT
+				|| $key === Repair_Empty_Build_Plan_Definition_Action::QUERY_RESULT ) {
+				$val = \sanitize_key( $raw );
+			} elseif ( $key === 'id' ) {
+				$pid = (int) $raw;
+				if ( $pid <= 0 ) {
+					continue;
+				}
+				$val = (string) $pid;
+			} else {
+				$val = \sanitize_text_field( $raw );
+			}
+			if ( $val === '' ) {
+				continue;
+			}
+			$out[ $key ] = $val;
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		return $out;
 	}
 
 	/**
@@ -973,18 +1032,19 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
-		// * Deep links (?plan_id= / ?id=) must show the Build Plans screen, not another hub tab left selected (e.g. analytics).
-		$deep = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
-		if ( $deep === '' && isset( $_GET['id'] ) ) {
-			$deep = \sanitize_text_field( \wp_unslash( (string) $_GET['id'] ) );
-		}
-		if ( $deep !== '' && Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS ) ) {
-			$tab = 'build_plans';
-		}
+		$plan_id_get = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
+		$id_get      = isset( $_GET['id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['id'] ) ) : '';
+		$tab         = Plans_Hub_Tab_Resolver::apply_deep_link_to_tab(
+			$tab,
+			$plan_id_get,
+			$id_get,
+			Capabilities::current_user_can_for_route( Capabilities::VIEW_BUILD_PLANS )
+		);
+		$this->trace_hub_navigation( Build_Plans_Screen::SLUG, $tab, '' );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Plans & analytics', 'aio-page-builder' ); ?></h1>
-			<?php Admin_Screen_Hub::render_nav_tabs( Build_Plans_Screen::SLUG, $tabs, $tab ); ?>
+			<?php Admin_Screen_Hub::render_nav_tabs( Build_Plans_Screen::SLUG, $tabs, $tab, null, $this->plans_hub_tab_passthrough_query_args() ); ?>
 			<?php
 			if ( $tab === 'bp_analytics' ) {
 				$this->build_plan_analytics->render( true );
@@ -1052,6 +1112,12 @@ final class Admin_Menu_Hub_Renderer {
 		}
 
 		if ( $accessible_keys === array() ) {
+			$this->trace_hub_navigation(
+				Page_Templates_Directory_Screen::SLUG,
+				'none',
+				'',
+				array( 'surface:no_accessible_tabs' )
+			);
 			?>
 			<div class="wrap aio-hub-wrap">
 				<h1><?php echo \esc_html__( 'Template library', 'aio-page-builder' ); ?></h1>
@@ -1068,6 +1134,7 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! \in_array( $tab, $accessible_keys, true ) ) {
 			$tab = $default;
 		}
+		$this->trace_hub_navigation( Page_Templates_Directory_Screen::SLUG, $tab, '' );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Template library', 'aio-page-builder' ); ?></h1>
@@ -1117,6 +1184,7 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
+		$this->trace_hub_navigation( Queue_Logs_Screen::SLUG, $tab, '' );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Operations', 'aio-page-builder' ); ?></h1>
@@ -1264,6 +1332,7 @@ final class Admin_Menu_Hub_Renderer {
 			}
 		}
 
+		$this->trace_hub_navigation( Industry_Profile_Settings_Screen::SLUG, $tab, $subtab );
 		?>
 		<div class="wrap aio-hub-wrap aio-industry-hub">
 			<h1><?php echo \esc_html__( 'Industry', 'aio-page-builder' ); ?></h1>
@@ -1367,6 +1436,7 @@ final class Admin_Menu_Hub_Renderer {
 		if ( ! isset( $tabs[ $tab ] ) || ! Capabilities::current_user_can_for_route( $tabs[ $tab ]['cap'] ) ) {
 			$tab = $default;
 		}
+		$this->trace_hub_navigation( Global_Style_Token_Settings_Screen::SLUG, $tab, '' );
 		?>
 		<div class="wrap aio-hub-wrap">
 			<h1><?php echo \esc_html__( 'Global styling', 'aio-page-builder' ); ?></h1>
@@ -1380,5 +1450,12 @@ final class Admin_Menu_Hub_Renderer {
 			?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * @param array<int, string> $extra_tags
+	 */
+	private function trace_hub_navigation( string $hub_page_slug, string $tab, string $subtab = '', array $extra_tags = array() ): void {
+		Admin_Ux_Trace::hub_entry( $hub_page_slug, $tab, $subtab, $extra_tags );
 	}
 }

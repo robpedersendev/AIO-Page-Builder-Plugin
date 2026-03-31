@@ -23,6 +23,8 @@ use AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Empty_Definition_Repair_Service;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log;
+use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 
 /**
  * Consumes plan_id; loads plan via repository; returns structured payload for context rail and shell.
@@ -113,12 +115,19 @@ final class Build_Plan_UI_State_Builder {
 		}
 		$post_id = (int) ( $record['id'] ?? 0 );
 		// * Prefer meta-backed definition: flattened merge in post_to_record is skipped when stored JSON is empty, which would otherwise treat post row fields as the "definition" and yield an empty stepper.
-		$from_meta = $post_id > 0 ? $this->repository->get_plan_definition( $post_id ) : array();
+		$from_meta      = $post_id > 0 ? $this->repository->get_plan_definition( $post_id ) : array();
+		$pre_steps_n    = isset( $from_meta[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $from_meta[ Build_Plan_Schema::KEY_STEPS ] )
+			? count( $from_meta[ Build_Plan_Schema::KEY_STEPS ] )
+			: -1;
+		$repair_invoked = false;
 		if ( $this->empty_definition_repair !== null && Build_Plan_Empty_Definition_Repair_Service::definition_lacks_steps( $from_meta ) ) {
-			$lookup = (string) ( $record['internal_key'] ?? $plan_id );
-			$this->empty_definition_repair->repair_if_needed( $post_id, $lookup );
-			$from_meta = $post_id > 0 ? $this->repository->get_plan_definition( $post_id ) : array();
+			$lookup         = (string) ( $record['internal_key'] ?? $plan_id );
+			$repair_invoked = $this->empty_definition_repair->repair_if_needed( $post_id, $lookup );
+			$from_meta      = $post_id > 0 ? $this->repository->get_plan_definition( $post_id ) : array();
 		}
+		$post_repair_steps_n = isset( $from_meta[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $from_meta[ Build_Plan_Schema::KEY_STEPS ] )
+			? count( $from_meta[ Build_Plan_Schema::KEY_STEPS ] )
+			: -1;
 		if ( $from_meta !== array() ) {
 			$definition = $from_meta;
 		} else {
@@ -129,6 +138,19 @@ final class Build_Plan_UI_State_Builder {
 		$context_rail     = $this->build_context_rail( $definition, $stepper_steps );
 		if ( (string) ( $context_rail['plan_id'] ?? '' ) === '' && $plan_id_from_def !== '' ) {
 			$context_rail['plan_id'] = $plan_id_from_def;
+		}
+
+		if ( Named_Debug_Log::build_plan_meta_trace_enabled() && $post_id > 0 ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BP_PLAN_DEFINITION_UI_STATE_AFTER_LOAD,
+				'plan_post_id=' . (string) $post_id
+				. ' plan_lookup=' . $plan_id
+				. ' pre_meta_steps_n=' . (string) $pre_steps_n
+				. ' post_repair_meta_steps_n=' . (string) $post_repair_steps_n
+				. ' repair_invoked=' . ( $repair_invoked ? '1' : '0' )
+				. ' stepper_n=' . (string) count( $stepper_steps )
+				. ' def_root_steps_n=' . (string) ( isset( $definition[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $definition[ Build_Plan_Schema::KEY_STEPS ] ) ? count( $definition[ Build_Plan_Schema::KEY_STEPS ] ) : -1 )
+			);
 		}
 
 		return array(

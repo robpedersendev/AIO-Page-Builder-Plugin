@@ -126,7 +126,7 @@ final class Template_Analytics_Screen {
 					<input type="text" id="aio-template-family" name="template_family" value="<?php echo \esc_attr( $template_family ); ?>" placeholder="<?php \esc_attr_e( 'optional', 'aio-page-builder' ); ?>" />
 					<label for="aio-page-class"><?php \esc_html_e( 'Page class:', 'aio-page-builder' ); ?></label>
 					<input type="text" id="aio-page-class" name="page_class" value="<?php echo \esc_attr( $page_class ); ?>" placeholder="<?php \esc_attr_e( 'optional', 'aio-page-builder' ); ?>" />
-					<button type="submit" class="button button-primary"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
+					<button type="submit" class="button button-primary" data-aio-ux-action="template_analytics_apply_filters" data-aio-ux-section="template_analytics_filters" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="template_analytics"><?php \esc_html_e( 'Apply', 'aio-page-builder' ); ?></button>
 				</p>
 			</form>
 

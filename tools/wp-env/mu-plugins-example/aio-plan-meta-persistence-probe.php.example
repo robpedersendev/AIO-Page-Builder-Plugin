@@ -1,0 +1,37 @@
+<?php
+/**
+ * Example mu-plugin: blocks update_post_meta for aio_build_plan + _aio_plan_definition only.
+ *
+ * Copy to wp-content/mu-plugins/aio-plan-meta-persistence-probe.php (drop .example), reproduce a save,
+ * confirm AIO_BP_PLAN_DEFINITION_DB_INSERT_FALLBACK_OK in debug.log, then delete this file.
+ *
+ * @package AIOPageBuilder
+ */
+
+declare( strict_types=1 );
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * @param null|bool $check Skip short-circuit.
+ * @param int       $post_id Post ID.
+ * @param string    $meta_key Meta key.
+ */
+add_filter(
+	'update_post_metadata',
+	static function ( $check, $post_id, $meta_key ) {
+		if ( $check !== null ) {
+			return $check;
+		}
+		if ( $meta_key !== '_aio_plan_definition' ) {
+			return $check;
+		}
+		$pt = get_post_type( (int) $post_id );
+		if ( $pt !== 'aio_build_plan' ) {
+			return $check;
+		}
+		return false;
+	},
+	9999,
+	3
+);

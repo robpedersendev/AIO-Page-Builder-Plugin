@@ -194,7 +194,7 @@ final class Conversion_Goal_Comparison_Screen {
 				<input type="hidden" name="<?php echo esc_attr( Admin_Screen_Hub::QUERY_SUBTAB ); ?>" value="goal" />
 				<label for="aio-alternate-goal-key"><?php esc_html_e( 'Compare with alternate goal key (optional)', 'aio-page-builder' ); ?></label>
 				<input type="text" id="aio-alternate-goal-key" name="<?php echo esc_attr( $state['alternate_goal_param'] ); ?>" value="<?php echo esc_attr( isset( $_GET[ self::PARAM_ALTERNATE_GOAL_KEY ] ) && is_string( $_GET[ self::PARAM_ALTERNATE_GOAL_KEY ] ) ? sanitize_text_field( wp_unslash( $_GET[ self::PARAM_ALTERNATE_GOAL_KEY ] ) ) : '' ); ?>" placeholder="<?php esc_attr_e( 'e.g. bookings, lead_capture', 'aio-page-builder' ); ?>" style="width: 100%; max-width: 280px; margin-right: 0.5em;" />
-				<button type="submit" class="button button-secondary"><?php esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button button-secondary" data-aio-ux-action="industry_comparison_goal_compare" data-aio-ux-section="industry_goal_comparison" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="comparisons"><?php esc_html_e( 'Compare', 'aio-page-builder' ); ?></button>
 			</form>
 
 			<?php if ( empty( $scenarios ) ) : ?>

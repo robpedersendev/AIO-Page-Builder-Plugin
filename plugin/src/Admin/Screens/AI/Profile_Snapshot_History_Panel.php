@@ -241,7 +241,8 @@ final class Profile_Snapshot_History_Panel {
 		echo '<input type="hidden" name="snapshot_id" value="' . \esc_attr( $snapshot_id ) . '">';
 		\wp_nonce_field( self::NONCE_ACTION_RESTORE );
 		printf(
-			'<button type="submit" class="button button-secondary" onclick="return confirm(%s);">%s</button>',
+			'<button type="submit" class="button button-secondary" data-aio-ux-action="profile_snapshot_restore" data-aio-ux-section="profile_snapshots_row" data-aio-ux-hub="%s" data-aio-ux-tab="snapshots" onclick="return confirm(%s);">%s</button>',
+			\esc_attr( Onboarding_Screen::SLUG ),
 			\esc_attr(
 				'"' . \esc_js( __( 'Restore this snapshot? This will overwrite your current brand and business profile. A backup snapshot will be saved first.', 'aio-page-builder' ) ) . '"'
 			),

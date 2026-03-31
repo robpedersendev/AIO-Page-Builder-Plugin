@@ -567,6 +567,29 @@ if ( ! function_exists( 'get_post' ) ) {
 		return isset( $GLOBALS['_aio_get_post_return'] ) ? $GLOBALS['_aio_get_post_return'] : null;
 	}
 }
+if ( ! function_exists( 'get_post_type' ) ) {
+	/**
+	 * Per-ID map in _aio_get_post_type_by_id, else post_type from get_post(), else false.
+	 *
+	 * @param int|null $post_id Post ID.
+	 * @return string|false
+	 */
+	function get_post_type( $post_id = null ) {
+		if ( $post_id === null ) {
+			return false;
+		}
+		$key = (int) $post_id;
+		if ( ! empty( $GLOBALS['_aio_get_post_type_by_id'] ) && is_array( $GLOBALS['_aio_get_post_type_by_id'] )
+			&& array_key_exists( $key, $GLOBALS['_aio_get_post_type_by_id'] ) ) {
+			return (string) $GLOBALS['_aio_get_post_type_by_id'][ $key ];
+		}
+		$post = \get_post( $post_id );
+		if ( $post && is_object( $post ) && isset( $post->post_type ) ) {
+			return (string) $post->post_type;
+		}
+		return false;
+	}
+}
 if ( ! function_exists( 'get_term' ) ) {
 	function get_term( $term_id, $taxonomy = '' ) {
 		return isset( $GLOBALS['_aio_get_term_return'] ) ? $GLOBALS['_aio_get_term_return'] : null;
@@ -616,6 +639,10 @@ if ( ! function_exists( 'get_post_meta' ) ) {
 }
 if ( ! function_exists( 'update_post_meta' ) ) {
 	function update_post_meta( $post_id, $meta_key, $meta_value ) {
+		if ( isset( $GLOBALS['_aio_update_post_meta_force_false_for_key'] )
+			&& (string) $meta_key === (string) $GLOBALS['_aio_update_post_meta_force_false_for_key'] ) {
+			return false;
+		}
 		$id = (string) $post_id;
 		if ( ! isset( $GLOBALS['_aio_post_meta'][ $id ] ) ) {
 			$GLOBALS['_aio_post_meta'][ $id ] = array();

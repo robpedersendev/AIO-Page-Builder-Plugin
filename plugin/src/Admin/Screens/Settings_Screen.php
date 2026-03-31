@@ -40,6 +40,25 @@ final class Settings_Screen {
 	}
 
 	/**
+	 * Outputs a submit control with data-aio-ux-* for client UX trace batching.
+	 *
+	 * @param string $text    Button label.
+	 * @param string $type    WordPress button type (primary, secondary, delete).
+	 * @param string $name    Input name attribute.
+	 * @param string $action  Stable trace action id (snake_case).
+	 * @param string $section Stable section id for grouping.
+	 */
+	private function ux_traced_submit_button( string $text, string $type, string $name, string $action, string $section ): void {
+		$attrs = sprintf(
+			'data-aio-ux-action="%s" data-aio-ux-section="%s" data-aio-ux-hub="%s" data-aio-ux-tab="general"',
+			\esc_attr( $action ),
+			\esc_attr( $section ),
+			\esc_attr( self::SLUG )
+		);
+		\submit_button( $text, $type, $name, false, $attrs );
+	}
+
+	/**
 	 * Renders the screen. No business logic; markup only.
 	 *
 	 * @param string $settings_subtab Hub nested tab: overview or section/page template batches.
@@ -90,7 +109,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_form_templates" />
 				<?php \wp_nonce_field( 'aio_seed_form_templates', 'aio_seed_form_templates_nonce' ); ?>
-				<?php \submit_button( __( 'Seed form section and request page template', 'aio-page-builder' ), 'secondary', 'aio_seed_form_templates_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed form section and request page template', 'aio-page-builder' ), 'secondary', 'aio_seed_form_templates_submit', 'settings_seed_form_templates', 'settings_overview' ); ?>
 			</form>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>
@@ -149,12 +168,12 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0.5em 1em 0;display:inline-block;vertical-align:top;">
 				<input type="hidden" name="action" value="aio_seed_all_section_templates" />
 				<?php \wp_nonce_field( 'aio_seed_all_section_templates', 'aio_seed_all_section_templates_nonce' ); ?>
-				<?php \submit_button( __( 'Seed all section templates', 'aio-page-builder' ), 'primary', 'aio_seed_all_section_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed all section templates', 'aio-page-builder' ), 'primary', 'aio_seed_all_section_submit', 'settings_seed_all_section_templates', 'settings_section_page_batches' ); ?>
 			</form>
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;display:inline-block;vertical-align:top;">
 				<input type="hidden" name="action" value="aio_seed_all_page_templates" />
 				<?php \wp_nonce_field( 'aio_seed_all_page_templates', 'aio_seed_all_page_templates_nonce' ); ?>
-				<?php \submit_button( __( 'Seed all page templates', 'aio-page-builder' ), 'primary', 'aio_seed_all_page_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed all page templates', 'aio-page-builder' ), 'primary', 'aio_seed_all_page_submit', 'settings_seed_all_page_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<hr />
@@ -170,7 +189,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_section_expansion_pack" />
 				<?php \wp_nonce_field( 'aio_seed_section_expansion_pack', 'aio_seed_expansion_pack_nonce' ); ?>
-				<?php \submit_button( __( 'Seed section expansion pack', 'aio-page-builder' ), 'secondary', 'aio_seed_expansion_pack_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed section expansion pack', 'aio-page-builder' ), 'secondary', 'aio_seed_expansion_pack_submit', 'settings_seed_section_expansion_pack', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $hero_intro_batch_seed_result === 'success' ) : ?>
@@ -184,7 +203,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_hero_intro_library_batch" />
 				<?php \wp_nonce_field( 'aio_seed_hero_intro_library_batch', 'aio_seed_hero_intro_batch_nonce' ); ?>
-				<?php \submit_button( __( 'Seed hero/intro library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_hero_intro_batch_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed hero/intro library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_hero_intro_batch_submit', 'settings_seed_hero_intro_library_batch', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $trust_proof_batch_seed_result === 'success' ) : ?>
@@ -198,7 +217,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_trust_proof_library_batch" />
 				<?php \wp_nonce_field( 'aio_seed_trust_proof_library_batch', 'aio_seed_trust_proof_batch_nonce' ); ?>
-				<?php \submit_button( __( 'Seed trust/proof library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_trust_proof_batch_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed trust/proof library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_trust_proof_batch_submit', 'settings_seed_trust_proof_library_batch', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $fb_value_batch_seed_result === 'success' ) : ?>
@@ -212,7 +231,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_feature_benefit_value_batch" />
 				<?php \wp_nonce_field( 'aio_seed_feature_benefit_value_batch', 'aio_seed_fb_value_batch_nonce' ); ?>
-				<?php \submit_button( __( 'Seed feature/benefit/value library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_fb_value_batch_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed feature/benefit/value library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_fb_value_batch_submit', 'settings_seed_feature_benefit_value_batch', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $ptf_batch_seed_result === 'success' ) : ?>
@@ -226,7 +245,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_process_timeline_faq_batch" />
 				<?php \wp_nonce_field( 'aio_seed_process_timeline_faq_batch', 'aio_seed_ptf_batch_nonce' ); ?>
-				<?php \submit_button( __( 'Seed process/timeline/FAQ library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_ptf_batch_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed process/timeline/FAQ library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_ptf_batch_submit', 'settings_seed_process_timeline_faq_batch', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $mlp_batch_seed_result === 'success' ) : ?>
@@ -240,7 +259,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_media_listing_profile_batch" />
 				<?php \wp_nonce_field( 'aio_seed_media_listing_profile_batch', 'aio_seed_mlp_batch_nonce' ); ?>
-				<?php \submit_button( __( 'Seed media/listing/profile/detail library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_mlp_batch_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed media/listing/profile/detail library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_mlp_batch_submit', 'settings_seed_media_listing_profile_batch', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $lpu_batch_seed_result === 'success' ) : ?>
@@ -254,7 +273,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_legal_policy_utility_batch" />
 				<?php \wp_nonce_field( 'aio_seed_legal_policy_utility_batch', 'aio_seed_lpu_batch_nonce' ); ?>
-				<?php \submit_button( __( 'Seed legal/policy/utility library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_lpu_batch_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed legal/policy/utility library batch', 'aio-page-builder' ), 'secondary', 'aio_seed_lpu_batch_submit', 'settings_seed_legal_policy_utility_batch', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $cta_super_seed_result === 'success' ) : ?>
@@ -268,7 +287,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_cta_super_library_batch" />
 				<?php \wp_nonce_field( 'aio_seed_cta_super_library_batch', 'aio_seed_cta_super_nonce' ); ?>
-				<?php \submit_button( __( 'Seed CTA super-library', 'aio-page-builder' ), 'secondary', 'aio_seed_cta_super_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed CTA super-library', 'aio-page-builder' ), 'secondary', 'aio_seed_cta_super_submit', 'settings_seed_cta_super_library_batch', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $pt_comp_expansion_seed_result === 'success' ) : ?>
@@ -282,7 +301,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_page_composition_expansion_pack" />
 				<?php \wp_nonce_field( 'aio_seed_page_composition_expansion_pack', 'aio_seed_pt_comp_expansion_nonce' ); ?>
-				<?php \submit_button( __( 'Seed page template and composition expansion pack', 'aio-page-builder' ), 'secondary', 'aio_seed_pt_comp_expansion_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed page template and composition expansion pack', 'aio-page-builder' ), 'secondary', 'aio_seed_pt_comp_expansion_submit', 'settings_seed_page_composition_expansion_pack', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $top_level_marketing_seed_result === 'success' ) : ?>
@@ -296,7 +315,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_top_level_marketing_templates" />
 				<?php \wp_nonce_field( 'aio_seed_top_level_marketing_templates', 'aio_seed_top_level_marketing_nonce' ); ?>
-				<?php \submit_button( __( 'Seed top-level marketing page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_marketing_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed top-level marketing page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_marketing_submit', 'settings_seed_top_level_marketing_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $top_level_legal_utility_seed_result === 'success' ) : ?>
@@ -310,7 +329,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_top_level_legal_utility_templates" />
 				<?php \wp_nonce_field( 'aio_seed_top_level_legal_utility_templates', 'aio_seed_top_level_legal_utility_nonce' ); ?>
-				<?php \submit_button( __( 'Seed top-level legal/utility page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_legal_utility_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed top-level legal/utility page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_legal_utility_submit', 'settings_seed_top_level_legal_utility_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $top_level_edu_resource_authority_seed_result === 'success' ) : ?>
@@ -324,7 +343,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_top_level_educational_resource_authority_templates" />
 				<?php \wp_nonce_field( 'aio_seed_top_level_educational_resource_authority_templates', 'aio_seed_top_level_edu_resource_authority_nonce' ); ?>
-				<?php \submit_button( __( 'Seed top-level educational/resource/authority page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_edu_resource_authority_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed top-level educational/resource/authority page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_edu_resource_authority_submit', 'settings_seed_top_level_educational_resource_authority_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $top_level_variant_expansion_seed_result === 'success' ) : ?>
@@ -338,7 +357,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_top_level_variant_expansion_templates" />
 				<?php \wp_nonce_field( 'aio_seed_top_level_variant_expansion_templates', 'aio_seed_top_level_variant_expansion_nonce' ); ?>
-				<?php \submit_button( __( 'Seed top-level variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_variant_expansion_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed top-level variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_top_level_variant_expansion_submit', 'settings_seed_top_level_variant_expansion_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $hub_page_seed_result === 'success' ) : ?>
@@ -352,7 +371,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_hub_page_templates" />
 				<?php \wp_nonce_field( 'aio_seed_hub_page_templates', 'aio_seed_hub_page_templates_nonce' ); ?>
-				<?php \submit_button( __( 'Seed hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_hub_page_templates_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_hub_page_templates_submit', 'settings_seed_hub_page_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $geographic_hub_seed_result === 'success' ) : ?>
@@ -366,7 +385,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_geographic_hub_templates" />
 				<?php \wp_nonce_field( 'aio_seed_geographic_hub_templates', 'aio_seed_geographic_hub_nonce' ); ?>
-				<?php \submit_button( __( 'Seed geographic hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_geographic_hub_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed geographic hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_geographic_hub_submit', 'settings_seed_geographic_hub_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $nested_hub_seed_result === 'success' ) : ?>
@@ -380,7 +399,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_nested_hub_templates" />
 				<?php \wp_nonce_field( 'aio_seed_nested_hub_templates', 'aio_seed_nested_hub_nonce' ); ?>
-				<?php \submit_button( __( 'Seed nested hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_nested_hub_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed nested hub page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_nested_hub_submit', 'settings_seed_nested_hub_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $hub_nested_hub_variant_expansion_seed_result === 'success' ) : ?>
@@ -394,7 +413,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_hub_nested_hub_variant_expansion_templates" />
 				<?php \wp_nonce_field( 'aio_seed_hub_nested_hub_variant_expansion_templates', 'aio_seed_hub_nested_hub_variant_expansion_nonce' ); ?>
-				<?php \submit_button( __( 'Seed hub and nested hub variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_hub_nested_hub_variant_expansion_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed hub and nested hub variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_hub_nested_hub_variant_expansion_submit', 'settings_seed_hub_nested_hub_variant_expansion_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $child_detail_seed_result === 'success' ) : ?>
@@ -408,7 +427,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_child_detail_templates" />
 				<?php \wp_nonce_field( 'aio_seed_child_detail_templates', 'aio_seed_child_detail_nonce' ); ?>
-				<?php \submit_button( __( 'Seed child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_submit', 'settings_seed_child_detail_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $child_detail_product_seed_result === 'success' ) : ?>
@@ -422,7 +441,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_child_detail_product_templates" />
 				<?php \wp_nonce_field( 'aio_seed_child_detail_product_templates', 'aio_seed_child_detail_product_nonce' ); ?>
-				<?php \submit_button( __( 'Seed product/catalog child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_product_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed product/catalog child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_product_submit', 'settings_seed_child_detail_product_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $child_detail_profile_entity_seed_result === 'success' ) : ?>
@@ -436,7 +455,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_child_detail_profile_entity_templates" />
 				<?php \wp_nonce_field( 'aio_seed_child_detail_profile_entity_templates', 'aio_seed_child_detail_profile_entity_nonce' ); ?>
-				<?php \submit_button( __( 'Seed directory/profile/entity/resource child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_profile_entity_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed directory/profile/entity/resource child/detail page template batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_profile_entity_submit', 'settings_seed_child_detail_profile_entity_templates', 'settings_section_page_batches' ); ?>
 			</form>
 
 			<?php if ( $child_detail_variant_expansion_seed_result === 'success' ) : ?>
@@ -450,7 +469,7 @@ final class Settings_Screen {
 			<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" style="margin: 1em 0;">
 				<input type="hidden" name="action" value="aio_seed_child_detail_variant_expansion_templates" />
 				<?php \wp_nonce_field( 'aio_seed_child_detail_variant_expansion_templates', 'aio_seed_child_detail_variant_expansion_nonce' ); ?>
-				<?php \submit_button( __( 'Seed child/detail variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_variant_expansion_submit', false ); ?>
+				<?php $this->ux_traced_submit_button( __( 'Seed child/detail variant expansion super-batch', 'aio-page-builder' ), 'secondary', 'aio_seed_child_detail_variant_expansion_submit', 'settings_seed_child_detail_variant_expansion_templates', 'settings_section_page_batches' ); ?>
 			</form>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

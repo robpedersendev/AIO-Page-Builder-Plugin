@@ -150,7 +150,7 @@ final class AI_Runs_Screen {
 					<option value="template_lab" <?php selected( $surface_filter, 'template_lab' ); ?>><?php \esc_html_e( 'Template lab', 'aio-page-builder' ); ?></option>
 					<option value="build_plan" <?php selected( $surface_filter, 'build_plan' ); ?>><?php \esc_html_e( 'Build plan', 'aio-page-builder' ); ?></option>
 				</select>
-				<button type="submit" class="button"><?php \esc_html_e( 'Filter', 'aio-page-builder' ); ?></button>
+				<button type="submit" class="button" data-aio-ux-action="ai_runs_filter" data-aio-ux-section="ai_runs_filters" data-aio-ux-hub="<?php echo \esc_attr( self::HUB_PAGE_SLUG ); ?>" data-aio-ux-tab="ai_runs"><?php \esc_html_e( 'Filter', 'aio-page-builder' ); ?></button>
 			</form>
 			<?php if ( ! empty( $spend_summaries ) ) : ?>
 			<section class="aio-spend-summary" aria-labelledby="aio-spend-summary-heading">
@@ -248,7 +248,7 @@ final class AI_Runs_Screen {
 								<td><?php echo \esc_html( AI_Run_Artifact_Service::format_run_metadata_value_for_display( $meta['prompt_pack_ref'] ?? '' ) ); ?></td>
 								<td><?php echo \esc_html( (string) ( $meta['created_at'] ?? '' ) ); ?></td>
 								<td>
-									<a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( self::HUB_PAGE_SLUG, 'ai_runs', array( 'run_id' => $run_id ) ) ); ?>"><?php \esc_html_e( 'View details', 'aio-page-builder' ); ?></a>
+									<a href="<?php echo \esc_url( Admin_Screen_Hub::tab_url( self::HUB_PAGE_SLUG, 'ai_runs', array( 'run_id' => $run_id ) ) ); ?>" data-aio-ux-action="ai_runs_view_details" data-aio-ux-section="ai_runs_list" data-aio-ux-hub="<?php echo \esc_attr( self::HUB_PAGE_SLUG ); ?>" data-aio-ux-tab="ai_runs"><?php \esc_html_e( 'View details', 'aio-page-builder' ); ?></a>
 								</td>
 							</tr>
 						<?php endforeach; ?>

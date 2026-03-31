@@ -149,7 +149,7 @@ final class Industry_Drift_Report_Screen {
 			<?php endif; ?>
 
 			<p class="description" style="margin-top: 1.5em;">
-				<a href="<?php echo esc_url( Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'author' ) ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo esc_url( Admin_Screen_Hub::tab_url( Industry_Profile_Settings_Screen::SLUG, 'author' ) ); ?>" data-aio-ux-action="industry_drift_report_back_author" data-aio-ux-section="industry_drift_report" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="author"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
 			</p>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

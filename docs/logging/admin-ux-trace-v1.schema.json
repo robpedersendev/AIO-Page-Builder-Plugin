@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aio-page-builder.local/schemas/admin-ux-trace-v1.json",
+  "title": "AIO Page Builder admin UX trace record v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "ts_utc",
+    "sequence",
+    "severity",
+    "category",
+    "facet",
+    "source",
+    "actor_user_id",
+    "request_method",
+    "url_path",
+    "query_snapshot"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "ts_utc": {
+      "type": "string",
+      "description": "ISO 8601 UTC timestamp"
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per PHP request for server-emitted rows; interleaved with client_sequence for browser rows"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "error",
+        "critical",
+        "flow",
+        "expected",
+        "actual",
+        "assert_ok",
+        "assert_fail"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "description": "Usually admin_ux"
+    },
+    "facet": {
+      "type": "string",
+      "enum": [
+        "navigation",
+        "form_submit",
+        "admin_post",
+        "redirect",
+        "notice",
+        "capability",
+        "render",
+        "client_interaction",
+        "dom_marker"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["php", "browser"]
+    },
+    "hub": {
+      "type": "string",
+      "description": "Registered admin page slug (e.g. aio-page-builder-build-plans)"
+    },
+    "tab": {
+      "type": "string",
+      "description": "Primary aio_tab value when applicable"
+    },
+    "subtab": {
+      "type": "string",
+      "description": "aio_subtab when applicable"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 120 },
+      "maxItems": 24
+    },
+    "message_id": {
+      "type": "string",
+      "description": "Stable notice or UI message identifier (not translated copy)"
+    },
+    "detail": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Small scalar map of expected UI or flow state"
+    },
+    "actual": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Small scalar map of observed state"
+    },
+    "actor_user_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "request_method": {
+      "type": "string"
+    },
+    "url_path": {
+      "type": "string",
+      "description": "Basename of script (e.g. admin.php)"
+    },
+    "query_snapshot": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Allowlisted GET keys only; sensitive ids as len=…,h=…"
+    },
+    "client_sequence": {
+      "type": "integer",
+      "description": "Optional ordering from browser batch payloads"
+    }
+  },
+  "additionalProperties": true
+}

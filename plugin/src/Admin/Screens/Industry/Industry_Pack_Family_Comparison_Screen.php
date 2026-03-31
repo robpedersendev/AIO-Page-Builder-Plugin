@@ -122,7 +122,7 @@ final class Industry_Pack_Family_Comparison_Screen {
 			<?php if ( count( $rows ) === 0 ) : ?>
 				<div class="notice notice-info inline" style="margin: 1em 0;">
 					<p><?php esc_html_e( 'No pack or subtype families to compare. Ensure active packs are registered and completeness report is available.', 'aio-page-builder' ); ?></p>
-					<p><a href="<?php echo esc_url( $state['dashboard_url'] ?? '#' ); ?>"><?php esc_html_e( 'Industry Author Dashboard', 'aio-page-builder' ); ?></a></p>
+					<p><a href="<?php echo esc_url( $state['dashboard_url'] ?? '#' ); ?>" data-aio-ux-action="industry_pack_family_open_author_dashboard" data-aio-ux-section="industry_pack_family_empty" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="author"><?php esc_html_e( 'Industry Author Dashboard', 'aio-page-builder' ); ?></a></p>
 				</div>
 				<?php return; ?>
 			<?php endif; ?>
@@ -151,7 +151,7 @@ final class Industry_Pack_Family_Comparison_Screen {
 			</table>
 
 			<p class="description" style="margin-top: 1.5em;">
-				<a href="<?php echo esc_url( $state['dashboard_url'] ?? '#' ); ?>"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
+				<a href="<?php echo esc_url( $state['dashboard_url'] ?? '#' ); ?>" data-aio-ux-action="industry_pack_family_back_author_dashboard" data-aio-ux-section="industry_pack_family_footer" data-aio-ux-hub="<?php echo esc_attr( Industry_Profile_Settings_Screen::SLUG ); ?>" data-aio-ux-tab="author"><?php esc_html_e( 'Back to Industry Author Dashboard', 'aio-page-builder' ); ?></a>
 			</p>
 		<?php if ( ! $embed_in_hub ) : ?>
 		</div>

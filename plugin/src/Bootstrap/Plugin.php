@@ -277,6 +277,7 @@ final class Plugin {
 			\AIOPageBuilder\Infrastructure\Config\Hub_Menu_Capabilities::register();
 			\AIOPageBuilder\Admin\Admin_Assets::register();
 			\AIOPageBuilder\Admin\Admin_Template_Compare_Ajax::register();
+			\AIOPageBuilder\Admin\Admin_Ux_Trace_Ajax::register();
 			// * State-changing admin.php requests must redirect in admin_init (see Admin_Early_Redirect_Coordinator) before HTML output.
 			add_action( 'admin_init', array( $this, 'dispatch_early_admin_redirects' ), 0 );
 			// * Priority 0: admin-post.php dispatches admin_post_* after admin_init; those hooks are never registered on admin_menu.

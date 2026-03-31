@@ -117,6 +117,28 @@ final class Admin_Router {
 	 * @param array<string, mixed>  $args
 	 * @return array<string, string>
 	 */
+	/**
+	 * Named route ids registered in {@see register_defaults()} (for inventory / contract tests).
+	 *
+	 * @return list<string>
+	 */
+	public function list_route_names(): array {
+		return array_keys( $this->routes );
+	}
+
+	/**
+	 * route_name => admin page slug.
+	 *
+	 * @return array<string, string>
+	 */
+	public function list_route_pages(): array {
+		$out = array();
+		foreach ( $this->routes as $name => $meta ) {
+			$out[ (string) $name ] = (string) ( $meta['page'] ?? '' );
+		}
+		return $out;
+	}
+
 	public function normalize_args( array $arg_types, array $args ): array {
 		$out = array();
 		foreach ( $arg_types as $key => $type ) {

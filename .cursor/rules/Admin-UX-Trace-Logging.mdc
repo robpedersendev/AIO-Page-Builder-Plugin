@@ -1,0 +1,46 @@
+---
+description: Admin UX trace ([AIO_UX] JSON lines) for WP_DEBUG builds; keep schema, PHP, JS, and docs aligned.
+globs: plugin/src/**/*.php, plugin/assets/js/**/*.js, docs/logging/*
+alwaysApply: false
+---
+
+# Admin UX trace logging
+
+## When to use
+
+- **Server:** `AIOPageBuilder\Support\Logging\Admin_Ux_Trace` — `hub_entry()`, `notice_rendered()`, `admin_post_boundary()` for hub render, notices, and `admin-post.php` flows.
+- **Browser:** Add `data-aio-ux-action`, optional `data-aio-ux-section`, `data-aio-ux-hub`, `data-aio-ux-tab` on interactive controls; script [plugin/assets/js/admin-ux-trace.js](plugin/assets/js/admin-ux-trace.js) batches to `Admin_Ux_Trace_Ajax`.
+
+## Activation
+
+- **Gate:** `WP_DEBUG` true (see `Admin_Ux_Trace::enabled()`).
+- **Sink:** `WP_DEBUG_LOG` true → `error_log`; otherwise `wp-content/uploads/aio-admin-ux-trace.log` when writable.
+- **Never** log secrets, nonces, cookies, raw POST bodies, or PII. Use stable `message_id` and hashed/length-only ids for plans/runs in `query_snapshot`.
+
+## Domain events vs UX trace
+
+- Keep **`Named_Debug_Log` / `Named_Debug_Log_Event`** for domain diagnostics (see [Named-Debug-Logging.mdc](Named-Debug-Logging.mdc)).
+- Use **`Admin_Ux_Trace`** for navigation, notices, client clicks, and admin-post **expected/actual** summaries.
+
+## Schema and documentation
+
+- Contract: [docs/logging/admin-ux-trace-v1.schema.json](docs/logging/admin-ux-trace-v1.schema.json) and [docs/logging/admin-ux-trace-v1.md](docs/logging/admin-ux-trace-v1.md).
+- If you add or rename JSON fields, severities, or facets: bump **`schema_version`** in `Admin_Ux_Trace::SCHEMA_VERSION`, update the **schema JSON**, **examples jsonl**, and the **md** companion in the same change.
+
+## New features checklist
+
+1. Hub render: call `Admin_Ux_Trace::hub_entry( $page_slug, $tab, $subtab )` after tab/subtab resolution.
+2. New buttons/forms: add `data-aio-ux-*` attributes; ensure submit handlers include a marked control inside the form for submit capture.
+3. New `admin-post` actions: `admin_post_boundary( $action_slug, $phase, $expected, $actual, $tags )` at validate and redirect boundaries.
+4. Notices: `notice_rendered( $message_id, $notice_class, $tags )` when printing dismissible banners tied to query args.
+
+## AJAX batch security
+
+- Handler: `Admin_Ux_Trace_Ajax` — requires nonce + one of the listed `ACCESS_*` hub capabilities. Do not widen without review.
+
+## Client transport (industry practice)
+
+- **Encoding:** `application/x-www-form-urlencoded` (`action`, `nonce`, `batch` as JSON string). Avoid `sendBeacon` + `FormData` for admin-ajax compatibility across strict hosts.
+- **Unload:** `fetch` with `keepalive: true` drains the queue in chunks (best-effort).
+- **Backstop:** `setInterval` (~5s) and debounced post-interaction `fetch` without `keepalive` deliver batches while the document remains active if unload delivery fails.
+- **Multi-submit forms:** Put `data-aio-ux-action` on each submit control; the capture script prefers `event.submitter` so the correct button is traced (not only the first marked control in the form).

@@ -32,14 +32,47 @@ function resolveWpPluginDirName( repoRoot: string ): string {
 /**
  * Resets the E2E Build Plan before Playwright when CI=1 or AIO_E2E_SEED=1 (requires wp-env).
  */
+/**
+ * Ensures Playwright restricted-role user exists (idempotent). Skipped when AIO_E2E_SKIP_SUBSCRIBER=1 or wp-env is unavailable.
+ */
+function ensureE2ESubscriberUser( repoRoot: string ): void {
+	if ( process.env.AIO_E2E_SKIP_SUBSCRIBER === '1' ) {
+		return;
+	}
+	try {
+		execSync( 'npx wp-env run cli wp user get aio_e2e_subscriber --field=ID', {
+			cwd: repoRoot,
+			stdio: 'pipe',
+			env: { ...process.env },
+		} );
+	} catch {
+		try {
+			execSync(
+				'npx wp-env run cli wp user create aio_e2e_subscriber aioe2e_subscriber@example.test --role=subscriber --user_pass=password',
+				{
+					cwd: repoRoot,
+					stdio: 'inherit',
+					env: { ...process.env },
+				}
+			);
+		} catch {
+			// * wp-env not running: restricted-role tests skip after failed login probe.
+			console.warn(
+				'[global-setup] Could not create aio_e2e_subscriber (start wp-env for restricted-role E2E).'
+			);
+		}
+	}
+}
+
 export default function globalSetup(): void {
+	const repoRoot = process.cwd();
+	ensureE2ESubscriberUser( repoRoot );
 	if ( process.env.AIO_E2E_SKIP_SEED === '1' ) {
 		return;
 	}
 	if ( process.env.CI !== 'true' && process.env.AIO_E2E_SEED !== '1' ) {
 		return;
 	}
-	const repoRoot = process.cwd();
 	const pluginDir = resolveWpPluginDirName( repoRoot );
 	const evalPath = `wp-content/plugins/${ pluginDir }/tools/e2e-seed-build-plan.php`;
 	execSync( `npx wp-env run cli wp eval-file ${ evalPath }`, {

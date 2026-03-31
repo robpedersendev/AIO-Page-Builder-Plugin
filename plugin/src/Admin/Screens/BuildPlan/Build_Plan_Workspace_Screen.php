@@ -24,6 +24,7 @@ use AIOPageBuilder\Domain\BuildPlan\UI\Components\Detail_Panel_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Item_List_Component;
 use AIOPageBuilder\Domain\BuildPlan\UI\Components\Step_Message_Component;
 use AIOPageBuilder\Domain\AI\Validation\Build_Plan_Draft_Schema;
+use AIOPageBuilder\Admin\Actions\Repair_Empty_Build_Plan_Definition_Action;
 use AIOPageBuilder\Admin\Admin_Screen_Hub;
 use AIOPageBuilder\Admin\Screens\AI\AI_Runs_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
@@ -31,6 +32,7 @@ use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
 use AIOPageBuilder\Domain\AI\Runs\AI_Run_Artifact_Service;
 use AIOPageBuilder\Infrastructure\Config\Capabilities;
 use AIOPageBuilder\Infrastructure\Container\Service_Container;
+use AIOPageBuilder\Support\Logging\Admin_Ux_Trace;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log_Event;
 use AIOPageBuilder\Support\Testing\Redirect_Capture_Exception;
@@ -213,7 +215,12 @@ final class Build_Plan_Workspace_Screen {
 		if ( $plan_id === '' || ! $this->container->has( 'single_action_executor' ) || ! $this->container->has( 'build_plan_repository' ) ) {
 			return false;
 		}
-		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=6' );
+		$redirect_url = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => '6',
+			)
+		);
 
 		$repo = $this->container->get( 'build_plan_repository' );
 		if ( ! $repo || ! \method_exists( $repo, 'get_by_key' ) || ! \method_exists( $repo, 'get_plan_definition' ) ) {
@@ -273,7 +280,12 @@ final class Build_Plan_Workspace_Screen {
 		if ( $plan_id === '' ) {
 			return false;
 		}
-		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
+		$redirect_url = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => '1',
+			)
+		);
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
 			$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
@@ -355,7 +367,12 @@ final class Build_Plan_Workspace_Screen {
 		if ( $plan_id === '' ) {
 			return false;
 		}
-		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+		$redirect_url = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => '2',
+			)
+		);
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
 			$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
@@ -498,7 +515,12 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 		$nav_step_index = Navigation_Bulk_Action_Service::STEP_INDEX_NAVIGATION;
-		$redirect_url   = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $nav_step_index );
+		$redirect_url   = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $nav_step_index,
+			)
+		);
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
 			$action = \sanitize_text_field( \wp_unslash( (string) $_POST['aio_build_plan_action'] ) );
@@ -571,8 +593,11 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 
-		$redirect_url = \admin_url(
-			'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $tokens_step_index
+		$redirect_url = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $tokens_step_index,
+			)
 		);
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
@@ -968,8 +993,11 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 
-		$redirect_url = \admin_url(
-			'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $hierarchy_step_index
+		$redirect_url = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $hierarchy_step_index,
+			)
 		);
 
 		// Bulk execute (POST).
@@ -1257,8 +1285,11 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 
-		$redirect_url = \admin_url(
-			'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $nav_step_index
+		$redirect_url = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $nav_step_index,
+			)
 		);
 
 		// Bulk execute (POST).
@@ -1538,8 +1569,11 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 
-		$redirect_url = \admin_url(
-			'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $seo_step_index
+		$redirect_url = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $seo_step_index,
+			)
 		);
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_build_plan_action'] ) ) {
@@ -1647,7 +1681,12 @@ final class Build_Plan_Workspace_Screen {
 			return false;
 		}
 		$step_7_index = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
-		$redirect_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
+		$redirect_url = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $step_7_index,
+			)
+		);
 
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['aio_rollback_request'] ) ) {
 			$nonce = isset( $_POST['_wpnonce'] ) ? \sanitize_text_field( \wp_unslash( (string) $_POST['_wpnonce'] ) ) : '';
@@ -1799,12 +1838,93 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	private function render_not_found( string $plan_id ): void {
-		$list_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
+		$list_url = Build_Plans_Screen::hub_plans_list_url();
 		?>
 		<div class="wrap aio-page-builder-screen aio-build-plan-workspace" data-testid="aio-build-plan-not-found" role="main" aria-label="<?php \esc_attr_e( 'Build Plan', 'aio-page-builder' ); ?>">
 			<h1><?php \esc_html_e( 'Build Plan', 'aio-page-builder' ); ?></h1>
 			<p class="aio-admin-notice"><?php \esc_html_e( 'Plan not found.', 'aio-page-builder' ); ?></p>
 			<p><a href="<?php echo \esc_url( $list_url ); ?>"><?php \esc_html_e( 'Back to Build Plans', 'aio-page-builder' ); ?></a></p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Surfaces admin-post repair outcome (redirect query arg).
+	 *
+	 * @return void
+	 */
+	private function maybe_render_build_plan_repair_feedback_notice(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Read-only GET notice.
+		if ( ! isset( $_GET[ Repair_Empty_Build_Plan_Definition_Action::QUERY_RESULT ] ) ) {
+			return;
+		}
+		$code = \sanitize_key( (string) \wp_unslash( (string) $_GET[ Repair_Empty_Build_Plan_Definition_Action::QUERY_RESULT ] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		if ( $code === Repair_Empty_Build_Plan_Definition_Action::RESULT_OK ) {
+			Admin_Ux_Trace::notice_rendered(
+				'bp_empty_def_repair_ok',
+				'notice-success',
+				array( 'hub:' . Build_Plans_Screen::SLUG, 'tab:build_plans', 'section:workspace_repair_feedback' )
+			);
+			echo '<div class="notice notice-success is-dismissible" role="status"><p>' . \esc_html__( 'Plan steps were rebuilt from the linked AI run. Reload if the stepper does not update.', 'aio-page-builder' ) . '</p></div>';
+			return;
+		}
+		if ( $code === Repair_Empty_Build_Plan_Definition_Action::RESULT_FAIL ) {
+			Admin_Ux_Trace::notice_rendered(
+				'bp_empty_def_repair_fail',
+				'notice-warning',
+				array( 'hub:' . Build_Plans_Screen::SLUG, 'tab:build_plans', 'section:workspace_repair_feedback' )
+			);
+			echo '<div class="notice notice-warning is-dismissible" role="alert"><p>' . \esc_html__( 'Rebuild did not complete. Confirm the source AI run is completed and still has normalized output, then try again or create a new plan from that run.', 'aio-page-builder' ) . '</p></div>';
+			return;
+		}
+		if ( $code === Repair_Empty_Build_Plan_Definition_Action::RESULT_UNAUTHORIZED ) {
+			Admin_Ux_Trace::notice_rendered(
+				'bp_empty_def_repair_unauthorized',
+				'notice-error',
+				array( 'hub:' . Build_Plans_Screen::SLUG, 'tab:build_plans', 'section:workspace_repair_feedback' )
+			);
+			echo '<div class="notice notice-error is-dismissible" role="alert"><p>' . \esc_html__( 'You do not have permission to rebuild this plan.', 'aio-page-builder' ) . '</p></div>';
+			return;
+		}
+		if ( $code === Repair_Empty_Build_Plan_Definition_Action::RESULT_BAD_REQUEST ) {
+			Admin_Ux_Trace::notice_rendered(
+				'bp_empty_def_repair_bad_request',
+				'notice-error',
+				array( 'hub:' . Build_Plans_Screen::SLUG, 'tab:build_plans', 'section:workspace_repair_feedback' )
+			);
+			echo '<div class="notice notice-error is-dismissible" role="alert"><p>' . \esc_html__( 'Rebuild request was invalid. Reload and try again.', 'aio-page-builder' ) . '</p></div>';
+		}
+	}
+
+	/**
+	 * Primary action when the plan CPT exists but JSON definition is empty.
+	 *
+	 * @param array<string, mixed> $state Workspace state.
+	 */
+	private function render_empty_plan_definition_repair_actions( array $state ): void {
+		$post_id = (int) ( $state['plan_post_id'] ?? 0 );
+		if ( $post_id <= 0 ) {
+			return;
+		}
+		$runs_url = Admin_Screen_Hub::tab_url( AI_Runs_Screen::HUB_PAGE_SLUG, 'ai_runs' );
+		?>
+		<div class="aio-bp-empty-definition-actions" role="region" aria-label="<?php echo \esc_attr__( 'Recover empty plan', 'aio-page-builder' ); ?>">
+			<?php if ( Capabilities::current_user_can_for_route( Capabilities::APPROVE_BUILD_PLANS ) ) : ?>
+				<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>" class="aio-bp-repair-empty-form">
+					<input type="hidden" name="action" value="<?php echo \esc_attr( Repair_Empty_Build_Plan_Definition_Action::ACTION ); ?>" />
+					<?php \wp_nonce_field( Repair_Empty_Build_Plan_Definition_Action::NONCE_ACTION, Repair_Empty_Build_Plan_Definition_Action::NONCE_NAME ); ?>
+					<input type="hidden" name="<?php echo \esc_attr( Repair_Empty_Build_Plan_Definition_Action::PARAM_PLAN_POST_ID ); ?>" value="<?php echo \esc_attr( (string) $post_id ); ?>" />
+					<p>
+						<button type="submit" class="button button-primary" data-aio-ux-action="workspace_rebuild_from_linked_run" data-aio-ux-section="empty_plan_repair" data-aio-ux-hub="<?php echo \esc_attr( Build_Plans_Screen::SLUG ); ?>" data-aio-ux-tab="build_plans"><?php \esc_html_e( 'Rebuild plan from linked AI run', 'aio-page-builder' ); ?></button>
+					</p>
+				</form>
+			<?php else : ?>
+				<p class="description"><?php \esc_html_e( 'Ask an administrator to rebuild this plan or create a new one from the AI run.', 'aio-page-builder' ); ?></p>
+			<?php endif; ?>
+			<p class="description">
+				<a href="<?php echo \esc_url( $runs_url ); ?>" data-aio-ux-action="workspace_open_ai_runs_from_repair" data-aio-ux-section="empty_plan_repair" data-aio-ux-hub="<?php echo \esc_attr( Build_Plans_Screen::SLUG ); ?>" data-aio-ux-tab="build_plans"><?php \esc_html_e( 'Open AI Runs', 'aio-page-builder' ); ?></a>
+			</p>
 		</div>
 		<?php
 	}
@@ -1824,7 +1944,7 @@ final class Build_Plan_Workspace_Screen {
 		if ( $ver === '' && $purpose === '' && $cost === '' && $lid === '' ) {
 			return;
 		}
-		$list_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
+		$list_url = Build_Plans_Screen::hub_plans_list_url();
 		?>
 		<div class="notice notice-info aio-build-plan-version-banner" role="region" aria-label="<?php \esc_attr_e( 'Plan version', 'aio-page-builder' ); ?>">
 			<?php if ( $ver !== '' ) : ?>
@@ -1850,7 +1970,7 @@ final class Build_Plan_Workspace_Screen {
 		$steps              = $state['stepper_steps'] ?? array();
 		$definition         = $state['plan_definition'] ?? array();
 		$current_step       = $steps[ $active_step_index ] ?? null;
-		$base_url           = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) );
+		$base_url           = Build_Plans_Screen::hub_workspace_url( array( 'plan_id' => $plan_id ) );
 		$can_export         = Capabilities::current_user_can_for_route( Capabilities::EXPORT_DATA ) || Capabilities::current_user_can_for_route( Capabilities::DOWNLOAD_ARTIFACTS );
 		$can_view_artifacts = Capabilities::current_user_can_for_route( Capabilities::VIEW_SENSITIVE_DIAGNOSTICS );
 		$export_url         = '';
@@ -1869,6 +1989,7 @@ final class Build_Plan_Workspace_Screen {
 				<?php $this->render_context_rail( $rail, $plan_id, $base_url, $export_url, $can_view_artifacts ); ?>
 			</aside>
 			<main class="aio-build-plan-main" id="aio-build-plan-main" aria-label="<?php \esc_attr_e( 'Build Plan steps and content', 'aio-page-builder' ); ?>">
+				<?php $this->maybe_render_build_plan_repair_feedback_notice(); ?>
 				<?php $this->render_plan_version_banner( $definition, $rail ); ?>
 				<div class="aio-build-plan-stepper">
 					<?php $this->render_stepper( $steps, $active_step_index, $base_url ); ?>
@@ -1882,7 +2003,7 @@ final class Build_Plan_Workspace_Screen {
 	}
 
 	private function render_context_rail( array $rail, string $plan_id, string $base_url, string $export_url, bool $can_view_artifacts ): void {
-		$list_url = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG );
+		$list_url = Build_Plans_Screen::hub_plans_list_url();
 		?>
 		<div class="aio-context-rail-inner">
 			<h2 class="aio-context-rail-title"><?php echo \esc_html( (string) ( $rail['plan_title'] ?? __( 'Build Plan', 'aio-page-builder' ) ) ); ?></h2>
@@ -2004,6 +2125,7 @@ final class Build_Plan_Workspace_Screen {
 			$stepper = $state['stepper_steps'] ?? array();
 			if ( $stepper === array() ) {
 				echo '<div class="notice notice-error inline aio-build-plan-definition-missing" role="alert"><p>' . \esc_html__( 'This build plan has no saved steps. The plan definition in the database is missing or empty—often after an interrupted save or a background job that never finished. Check the Action Scheduler / cron notice if shown, open the source AI run to rebuild the plan, or submit onboarding planning again.', 'aio-page-builder' ) . '</p></div>';
+				$this->render_empty_plan_definition_repair_actions( $state );
 				echo '<p class="aio-empty-state">' . \esc_html__( 'Nothing to review yet.', 'aio-page-builder' ) . '</p>';
 				return;
 			}
@@ -2198,7 +2320,12 @@ final class Build_Plan_Workspace_Screen {
 				'plan_id' => $plan_id,
 				'step'    => 1,
 			)
-		) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
+		) : Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => '1',
+			)
+		);
 		$rows   = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
@@ -2261,16 +2388,20 @@ final class Build_Plan_Workspace_Screen {
 			return;
 		}
 		$router                           = $this->container->has( 'admin_router' ) ? $this->container->get( 'admin_router' ) : null;
+		$step_7                           = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
 		$workspace['preview_link']['url'] = $router
 			? (string) $router->url(
 				'build_plan_workspace',
 				array(
 					'plan_id' => $plan_id,
-					'step'    => \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK,
+					'step'    => $step_7,
 				)
 			)
-			: \admin_url(
-				'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK
+			: Build_Plans_Screen::hub_workspace_url(
+				array(
+					'plan_id' => $plan_id,
+					'step'    => (string) $step_7,
+				)
 			);
 	}
 
@@ -2288,7 +2419,12 @@ final class Build_Plan_Workspace_Screen {
 				'plan_id' => $plan_id,
 				'step'    => 2,
 			)
-		) : \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+		) : Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => '2',
+			)
+		);
 		$rows   = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
@@ -2437,7 +2573,12 @@ final class Build_Plan_Workspace_Screen {
 					'step'    => $tokens_step_index,
 				)
 			)
-			: \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $tokens_step_index );
+			: Build_Plans_Screen::hub_workspace_url(
+				array(
+					'plan_id' => $plan_id,
+					'step'    => (string) $tokens_step_index,
+				)
+			);
 
 		$action_map = array(
 			Build_Plan_Row_Action_Resolver::ACTION_APPROVE => 'approve_token_item',
@@ -2531,7 +2672,12 @@ final class Build_Plan_Workspace_Screen {
 					'step'    => $seo_step_index,
 				)
 			)
-			: \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $seo_step_index );
+			: Build_Plans_Screen::hub_workspace_url(
+				array(
+					'plan_id' => $plan_id,
+					'step'    => (string) $seo_step_index,
+				)
+			);
 
 		$action_map = array(
 			Build_Plan_Row_Action_Resolver::ACTION_APPROVE => 'approve_seo_item',
@@ -2598,7 +2744,12 @@ final class Build_Plan_Workspace_Screen {
 	 */
 	private function inject_navigation_action_urls( array &$workspace, string $plan_id ): void {
 		$nav_step_index = Navigation_Bulk_Action_Service::STEP_INDEX_NAVIGATION;
-		$base           = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $nav_step_index );
+		$base           = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $nav_step_index,
+			)
+		);
 		$nonce          = \wp_create_nonce( self::NONCE_ACTION_NAVIGATION_REVIEW );
 		$rows           = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
@@ -2627,7 +2778,12 @@ final class Build_Plan_Workspace_Screen {
 	private function inject_rollback_entry_data( array &$workspace, string $plan_id ): void {
 		$step_7_index                     = \AIOPageBuilder\Domain\BuildPlan\Steps\History\History_Rollback_Step_UI_Service::STEP_INDEX_LOGS_ROLLBACK;
 		$workspace['rollback_nonce']      = \wp_create_nonce( self::NONCE_ACTION_ROLLBACK );
-		$workspace['rollback_action_url'] = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_7_index );
+		$workspace['rollback_action_url'] = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $step_7_index,
+			)
+		);
 		$rows                             = &$workspace['step_list_rows'];
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $i => $row ) {
@@ -2723,7 +2879,12 @@ final class Build_Plan_Workspace_Screen {
 		$clear_enabled     = ! empty( $clear_sel['enabled'] );
 		$apply_sel_count   = (int) ( $apply_sel['count_selected'] ?? 0 );
 		$plan_id           = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
-		$base_url          = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=1' );
+		$base_url          = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => '1',
+			)
+		);
 		?>
 		<div class="aio-bulk-action-bar aio-step1-bulk-bar">
 			<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -2777,7 +2938,12 @@ final class Build_Plan_Workspace_Screen {
 		$deny_sel_count    = (int) ( $deny_sel['count_selected'] ?? 0 );
 		$deny_count        = (int) ( $deny_all['count_eligible'] ?? 0 );
 		$plan_id           = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
-		$base_url          = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=2' );
+		$base_url          = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => '2',
+			)
+		);
 		?>
 		<div class="aio-bulk-action-bar aio-step2-bulk-bar">
 			<?php echo $nonce_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -2852,7 +3018,12 @@ final class Build_Plan_Workspace_Screen {
 
 		$plan_id            = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
 		$step_index         = \AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service::STEP_INDEX_DESIGN_TOKENS;
-		$base_url           = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_index );
+		$base_url           = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $step_index,
+			)
+		);
 		$execute_nonce_html = \wp_nonce_field( self::NONCE_ACTION_EXECUTE_TOKEN_BULK, '_wpnonce_execute', false, false );
 
 		?>
@@ -2923,7 +3094,12 @@ final class Build_Plan_Workspace_Screen {
 
 		$plan_id    = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
 		$step_index = \AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service::STEP_INDEX_SEO;
-		$base_url   = \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( $plan_id ) . '&step=' . $step_index );
+		$base_url   = Build_Plans_Screen::hub_workspace_url(
+			array(
+				'plan_id' => $plan_id,
+				'step'    => (string) $step_index,
+			)
+		);
 
 		$apply_all_label = (string) ( $apply_all['label'] ?? \__( 'Apply all', 'aio-page-builder' ) );
 		$apply_sel_label = (string) ( $apply_sel['label'] ?? \__( 'Apply to selected', 'aio-page-builder' ) );
@@ -3035,7 +3211,18 @@ final class Build_Plan_Workspace_Screen {
 			endif;
 			?>
 			<p><strong><?php \esc_html_e( 'Planning mode:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $planning_mode ); ?> | <strong><?php \esc_html_e( 'Confidence:', 'aio-page-builder' ); ?></strong> <?php echo \esc_html( $confidence ); ?></p>
-			<p class="aio-overview-actions"><a href="<?php echo \esc_url( \admin_url( 'admin.php?page=' . Build_Plans_Screen::SLUG . '&plan_id=' . \rawurlencode( (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' ) ) . '&step=1' ) ); ?>" class="button button-primary"><?php \esc_html_e( 'Start review', 'aio-page-builder' ); ?></a></p>
+			<p class="aio-overview-actions"><a href="
+			<?php
+			echo \esc_url(
+				Build_Plans_Screen::hub_workspace_url(
+					array(
+						'plan_id' => (string) ( $definition[ Build_Plan_Schema::KEY_PLAN_ID ] ?? '' ),
+						'step'    => '1',
+					)
+				)
+			);
+			?>
+														" class="button button-primary"><?php \esc_html_e( 'Start review', 'aio-page-builder' ); ?></a></p>
 		</div>
 		<?php
 	}

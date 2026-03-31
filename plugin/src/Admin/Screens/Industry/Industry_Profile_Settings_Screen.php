@@ -244,7 +244,7 @@ final class Industry_Profile_Settings_Screen {
 					<input type="hidden" name="aio_industry_pack_key" value="<?php echo \esc_attr( $primary_key ); ?>" />
 					<input type="hidden" name="aio_industry_pack_disable" value="0" />
 						<?php \wp_nonce_field( $toggle_action, 'aio_toggle_industry_pack_nonce', true ); ?>
-					<button type="submit" class="button button-secondary"><?php \esc_html_e( 'Re-enable this pack', 'aio-page-builder' ); ?></button>
+					<button type="submit" class="button button-secondary" data-aio-ux-action="industry_pack_re_enable" data-aio-ux-section="industry_profile_pack_toggle" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="profile"><?php \esc_html_e( 'Re-enable this pack', 'aio-page-builder' ); ?></button>
 				</form>
 				<?php endif; ?>
 				<?php elseif ( ( $state['toggle_controller'] ?? null ) !== null && ( $state['primary_industry_key'] ?? '' ) !== '' ) : ?>
@@ -253,7 +253,7 @@ final class Industry_Profile_Settings_Screen {
 					<input type="hidden" name="aio_industry_pack_key" value="<?php echo \esc_attr( $state['primary_industry_key'] ); ?>" />
 					<input type="hidden" name="aio_industry_pack_disable" value="1" />
 					<?php \wp_nonce_field( 'aio_toggle_industry_pack', 'aio_toggle_industry_pack_nonce', true ); ?>
-					<button type="submit" class="button button-secondary"><?php \esc_html_e( 'Disable this pack', 'aio-page-builder' ); ?></button>
+					<button type="submit" class="button button-secondary" data-aio-ux-action="industry_pack_disable" data-aio-ux-section="industry_profile_pack_toggle" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="profile"><?php \esc_html_e( 'Disable this pack', 'aio-page-builder' ); ?></button>
 				</form>
 				<?php endif; ?>
 			</section>
@@ -343,7 +343,7 @@ final class Industry_Profile_Settings_Screen {
 						?>
 					</table>
 					<p class="submit">
-						<button type="submit" class="button button-primary"><?php \esc_html_e( 'Save industry profile', 'aio-page-builder' ); ?></button>
+						<button type="submit" class="button button-primary" data-aio-ux-action="industry_profile_save" data-aio-ux-section="industry_profile_form" data-aio-ux-hub="<?php echo \esc_attr( self::SLUG ); ?>" data-aio-ux-tab="profile"><?php \esc_html_e( 'Save industry profile', 'aio-page-builder' ); ?></button>
 					</p>
 				</form>
 			</section>
