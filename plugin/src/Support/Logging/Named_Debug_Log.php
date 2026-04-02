@@ -40,6 +40,50 @@ final class Named_Debug_Log {
 	}
 
 	/**
+	 * Structured one-line JSON payload after the event id (parse with jq/grep `payload=`). Scalar values only; long strings truncated.
+	 *
+	 * @param string               $event_id Stable id: use only Named_Debug_Log_Event::*.
+	 * @param array<string, mixed> $payload  Keys snake_case; bool|int|float|string only (no nested arrays/objects).
+	 */
+	public static function event_json_payload( string $event_id, array $payload ): void {
+		if ( ! self::sink_enabled() ) {
+			return;
+		}
+		$sanitized = array();
+		foreach ( $payload as $k => $v ) {
+			$key = is_string( $k ) ? $k : (string) $k;
+			if ( is_bool( $v ) ) {
+				$sanitized[ $key ] = $v;
+			} elseif ( is_int( $v ) || is_float( $v ) ) {
+				$sanitized[ $key ] = $v;
+			} elseif ( is_string( $v ) ) {
+				$max = 500;
+				if ( strlen( $v ) > $max ) {
+					$sanitized[ $key ] = substr( $v, 0, $max ) . '…';
+				} else {
+					$sanitized[ $key ] = $v;
+				}
+			} elseif ( $v === null ) {
+				$sanitized[ $key ] = '';
+			} else {
+				$sanitized[ $key ] = get_debug_type( $v );
+			}
+		}
+		$flags = 0;
+		if ( \defined( 'JSON_UNESCAPED_SLASHES' ) ) {
+			$flags |= JSON_UNESCAPED_SLASHES;
+		}
+		if ( \defined( 'JSON_INVALID_UTF8_SUBSTITUTE' ) ) {
+			$flags |= JSON_INVALID_UTF8_SUBSTITUTE;
+		}
+		$json = \wp_json_encode( $sanitized, $flags );
+		if ( ! is_string( $json ) ) {
+			$json = '{}';
+		}
+		self::event( $event_id, 'payload=' . $json );
+	}
+
+	/**
 	 * Whether _aio_plan_definition diagnostics (get trace, save verify ok, UI state snapshot) run. Same gate as {@see event()}: WP_DEBUG and WP_DEBUG_LOG — no extra constants.
 	 */
 	public static function build_plan_meta_trace_enabled(): bool {

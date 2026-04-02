@@ -17,6 +17,7 @@ use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Statuses;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Design_Token_Step_Minimum_Merger;
 use AIOPageBuilder\Domain\Industry\AI\Build_Plan_Scoring_Interface;
 use AIOPageBuilder\Domain\Storage\Repositories\Build_Plan_Repository;
 use AIOPageBuilder\Support\Logging\Named_Debug_Log;
@@ -50,14 +51,19 @@ final class Build_Plan_Generator {
 	/** @var Build_Plan_Scoring_Interface|null */
 	private $scoring_service;
 
+	/** @var Design_Token_Step_Minimum_Merger|null */
+	private $design_token_minimum_merger;
+
 	public function __construct(
 		Build_Plan_Repository $repository,
 		Build_Plan_Item_Generator $item_generator,
-		?Build_Plan_Scoring_Interface $scoring_service = null
+		?Build_Plan_Scoring_Interface $scoring_service = null,
+		?Design_Token_Step_Minimum_Merger $design_token_minimum_merger = null
 	) {
-		$this->repository      = $repository;
-		$this->item_generator  = $item_generator;
-		$this->scoring_service = $scoring_service;
+		$this->repository                  = $repository;
+		$this->item_generator              = $item_generator;
+		$this->scoring_service             = $scoring_service;
+		$this->design_token_minimum_merger = $design_token_minimum_merger;
 	}
 
 	/**
@@ -202,6 +208,30 @@ final class Build_Plan_Generator {
 			$definition = Build_Plan_Template_Lab_Context::merge_into_definition( $definition, $context['template_lab_context'] );
 		}
 
+		$encode_opts = 0;
+		if ( \defined( 'JSON_INVALID_UTF8_SUBSTITUTE' ) ) {
+			$encode_opts |= JSON_INVALID_UTF8_SUBSTITUTE;
+		}
+		if ( \defined( 'JSON_UNESCAPED_UNICODE' ) ) {
+			$encode_opts |= JSON_UNESCAPED_UNICODE;
+		}
+		$persist_probe = \wp_json_encode( $definition, $encode_opts );
+		if ( ! is_string( $persist_probe ) ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BUILD_PLAN_GENERATOR_VALIDATE_FAIL,
+				'ai_run_ref=' . $ai_run_ref . ' reason=definition_not_json_encodable'
+			);
+			return Plan_Generation_Result::failure( array( 'Build Plan definition could not be encoded for storage.' ) );
+		}
+		$decoded_probe = \json_decode( $persist_probe, true, 512, JSON_BIGINT_AS_STRING | ( \defined( 'JSON_INVALID_UTF8_SUBSTITUTE' ) ? JSON_INVALID_UTF8_SUBSTITUTE : 0 ) );
+		if ( ! is_array( $decoded_probe ) ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BUILD_PLAN_GENERATOR_VALIDATE_FAIL,
+				'ai_run_ref=' . $ai_run_ref . ' reason=definition_encode_roundtrip_invalid'
+			);
+			return Plan_Generation_Result::failure( array( 'Build Plan definition failed JSON round-trip validation.' ) );
+		}
+
 		$save_payload = array( 'plan_definition' => $definition );
 		$target_id    = isset( $context['target_post_id'] ) ? (int) $context['target_post_id'] : 0;
 		if ( $target_id > 0 ) {
@@ -306,13 +336,20 @@ final class Build_Plan_Generator {
 				: array();
 			$result      = $this->item_generator->generate_for_section( $section_key, $records, $plan_id );
 			$all_omitted = array_merge( $all_omitted, $result['omitted'] );
-			$step_type   = $step_type_by_section[ $section_key ];
-			$steps[]     = array(
+			$items       = $result['items'];
+			if (
+				$section_key === Build_Plan_Draft_Schema::KEY_DESIGN_TOKEN_RECOMMENDATIONS
+				&& $this->design_token_minimum_merger !== null
+			) {
+				$items = $this->design_token_minimum_merger->merge_required_into_items( $items, $plan_id );
+			}
+			$step_type = $step_type_by_section[ $section_key ];
+			$steps[]   = array(
 				Build_Plan_Item_Schema::KEY_STEP_ID   => $plan_id . '_step_' . $step_type,
 				Build_Plan_Item_Schema::KEY_STEP_TYPE => $step_type,
 				Build_Plan_Item_Schema::KEY_TITLE     => self::STEP_TITLES[ $step_type ],
 				Build_Plan_Item_Schema::KEY_ORDER     => $order++,
-				Build_Plan_Item_Schema::KEY_ITEMS     => $result['items'],
+				Build_Plan_Item_Schema::KEY_ITEMS     => $items,
 			);
 		}
 

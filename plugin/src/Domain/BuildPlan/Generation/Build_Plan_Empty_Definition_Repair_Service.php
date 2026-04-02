@@ -98,6 +98,15 @@ final class Build_Plan_Empty_Definition_Repair_Service {
 				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_FAILED,
 				'plan_post_id=' . (string) $plan_post_id . ' plan_key=' . $plan_lookup_key
 			);
+			Named_Debug_Log::event_json_payload(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_FAILED,
+				array(
+					'plan_post_id' => $plan_post_id,
+					'plan_key_h12' => substr( \hash( 'sha256', $plan_lookup_key ), 0, 12 ),
+					'plan_key_len' => strlen( $plan_lookup_key ),
+					'phase'        => 'resolve_run_id_exhausted',
+				)
+			);
 			return false;
 		}
 		Named_Debug_Log::event(
@@ -133,7 +142,7 @@ final class Build_Plan_Empty_Definition_Repair_Service {
 	 * @return string|null Run internal key.
 	 */
 	private function resolve_source_run_internal_key( int $plan_post_id, string $plan_lookup_key ): ?string {
-		$from_ref = $this->run_repository->find_latest_completed_run_internal_key_for_build_plan_ref( $plan_lookup_key );
+		$from_ref = $this->run_repository->find_latest_completed_run_internal_key_for_build_plan_ref( $plan_lookup_key, 120, true );
 		if ( $from_ref !== null && $from_ref !== '' ) {
 			Named_Debug_Log::event(
 				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_FROM_REF,
@@ -141,12 +150,19 @@ final class Build_Plan_Empty_Definition_Repair_Service {
 			);
 			return $from_ref;
 		}
-		Named_Debug_Log::event(
-			Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_REF_SCAN_EMPTY,
-			'plan_post_id=' . (string) $plan_post_id . ' plan_key=' . $plan_lookup_key
-		);
+		// * Structured empty-scan line: {@see Named_Debug_Log_Event::BP_AI_RUN_BUILD_PLAN_REF_SCAN_SUMMARY} (emitted from repository).
 		$stored = trim( (string) \get_post_meta( $plan_post_id, Build_Plan_Repository::META_PLAN_SOURCE_AI_RUN_REF, true ) );
 		if ( $stored === '' ) {
+			Named_Debug_Log::event_json_payload(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_NULL_DETAIL,
+				array(
+					'plan_post_id'   => $plan_post_id,
+					'plan_key_h12'   => substr( \hash( 'sha256', $plan_lookup_key ), 0, 12 ),
+					'plan_key_len'   => strlen( $plan_lookup_key ),
+					'reason'         => 'no_stored_ai_run_ref_meta',
+					'stored_run_len' => 0,
+				)
+			);
 			return null;
 		}
 		$record = $this->run_repository->get_by_key( $stored );
@@ -155,6 +171,17 @@ final class Build_Plan_Empty_Definition_Repair_Service {
 			Named_Debug_Log::event(
 				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_META_INVALID,
 				'plan_post_id=' . (string) $plan_post_id . ' stored_run_key=' . $stored . ' status=' . $st
+			);
+			Named_Debug_Log::event_json_payload(
+				Named_Debug_Log_Event::BP_EMPTY_REPAIR_RESOLVE_NULL_DETAIL,
+				array(
+					'plan_post_id'   => $plan_post_id,
+					'plan_key_h12'   => substr( \hash( 'sha256', $plan_lookup_key ), 0, 12 ),
+					'plan_key_len'   => strlen( $plan_lookup_key ),
+					'reason'         => 'stored_run_missing_or_not_completed',
+					'stored_run_len' => strlen( $stored ),
+					'record_status'  => $st,
+				)
 			);
 			return null;
 		}

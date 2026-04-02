@@ -70,6 +70,16 @@ final class Build_Plan_Item_Statuses {
 	}
 
 	/**
+	 * Whether this status counts toward stepper "unresolved" and blocks later steps (spec 31.2–31.3).
+	 * Approved/rejected/skipped/completed recommendations do not block forward navigation; execution may lag review.
+	 */
+	public static function counts_toward_stepper_unresolved( string $status ): bool {
+		return $status === self::PENDING
+			|| $status === self::IN_PROGRESS
+			|| $status === self::FAILED;
+	}
+
+	/**
 	 * Returns whether a review-phase transition from $from to $to is allowed (plan in pending_review).
 	 */
 	public static function can_transition_review( string $from, string $to ): bool {

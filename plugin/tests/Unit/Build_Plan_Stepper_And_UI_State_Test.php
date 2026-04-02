@@ -109,6 +109,40 @@ final class Build_Plan_Stepper_And_UI_State_Test extends TestCase {
 		$this->assertSame( 2, $steps[1]['step_number'] );
 	}
 
+	/** Approved navigation (non-terminal in state machine) must not block the next stepper step. */
+	public function test_stepper_approved_items_do_not_block_successors(): void {
+		$def     = array(
+			Build_Plan_Schema::KEY_PLAN_ID => 'aio-plan-nav-gate',
+			Build_Plan_Schema::KEY_STEPS   => array(
+				array(
+					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_OVERVIEW,
+					Build_Plan_Item_Schema::KEY_ITEMS     => array(),
+				),
+				array(
+					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_NAVIGATION,
+					Build_Plan_Item_Schema::KEY_ITEMS     => array(
+						array(
+							Build_Plan_Item_Schema::KEY_ITEM_ID   => 'nav_0',
+							Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW,
+							Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::APPROVED,
+							Build_Plan_Item_Schema::KEY_PAYLOAD   => array(),
+						),
+					),
+				),
+				array(
+					Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_DESIGN_TOKENS,
+					Build_Plan_Item_Schema::KEY_ITEMS     => array(),
+				),
+			),
+		);
+		$builder = new Build_Plan_Stepper_Builder();
+		$steps   = $builder->build( $def );
+		$this->assertSame( 0, $steps[1]['unresolved_count'] );
+		$this->assertFalse( $steps[1]['is_blocked'] );
+		$this->assertFalse( $steps[2]['is_blocked'], 'Design tokens step should not be blocked after navigation reviewed (approved).' );
+		$this->assertSame( Build_Plan_Stepper_Builder::BADGE_COMPLETE, $steps[1]['status_badge'] );
+	}
+
 	public function test_ui_state_builder_returns_null_for_empty_plan_id(): void {
 		$repo    = new Build_Plan_Repository();
 		$stepper = new Build_Plan_Stepper_Builder();

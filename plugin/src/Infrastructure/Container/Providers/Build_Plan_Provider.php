@@ -48,6 +48,9 @@ use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Bulk
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_Detail_Builder;
 use AIOPageBuilder\Domain\BuildPlan\Steps\NewPageCreation\New_Page_Creation_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\Steps\SEO\SEO_Media_Step_UI_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Design_Token_Catalog_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Design_Token_Plan_Item_Editor_Service;
+use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Design_Token_Step_Minimum_Merger;
 use AIOPageBuilder\Domain\BuildPlan\Steps\Tokens\Tokens_Step_UI_Service;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Row_Action_Resolver;
 use AIOPageBuilder\Domain\BuildPlan\UI\Build_Plan_Stepper_Builder;
@@ -153,6 +156,29 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 			}
 		);
 		$container->register(
+			'design_token_catalog_service',
+			function () use ( $container ): Design_Token_Catalog_Service {
+				return new Design_Token_Catalog_Service( $container->get( 'style_token_registry' ) );
+			}
+		);
+		$container->register(
+			'design_token_step_minimum_merger',
+			function () use ( $container ): Design_Token_Step_Minimum_Merger {
+				return new Design_Token_Step_Minimum_Merger( $container->get( 'style_token_registry' ) );
+			}
+		);
+		$container->register(
+			'design_token_plan_item_editor_service',
+			function () use ( $container ): Design_Token_Plan_Item_Editor_Service {
+				return new Design_Token_Plan_Item_Editor_Service(
+					$container->get( 'build_plan_repository' ),
+					$container->get( 'design_token_catalog_service' ),
+					$container->get( 'styles_json_sanitizer' ),
+					$container->get( 'design_token_step_minimum_merger' )
+				);
+			}
+		);
+		$container->register(
 			'build_plan_generator',
 			function () use ( $container ): Build_Plan_Generator {
 				$scoring = $container->has( 'industry_subtype_build_plan_scoring_service' ) ? $container->get( 'industry_subtype_build_plan_scoring_service' ) : null;
@@ -162,7 +188,8 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 				return new Build_Plan_Generator(
 					$container->get( 'build_plan_repository' ),
 					$container->get( 'build_plan_item_generator' ),
-					$scoring instanceof Build_Plan_Scoring_Interface ? $scoring : null
+					$scoring instanceof Build_Plan_Scoring_Interface ? $scoring : null,
+					$container->get( 'design_token_step_minimum_merger' )
 				);
 			}
 		);
@@ -341,7 +368,8 @@ final class Build_Plan_Provider implements Service_Provider_Interface {
 					$container->get( 'build_plan_row_action_resolver' ),
 					$container->get( 'global_style_settings_repository' ),
 					$operational_repo,
-					$token_diff
+					$token_diff,
+					$container->get( 'design_token_catalog_service' )
 				);
 			}
 		);

@@ -732,7 +732,8 @@ final class Industry_Packs_Module implements Service_Provider_Interface {
 						new \AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Generator(
 							$container->get( 'build_plan_repository' ),
 							$container->get( 'build_plan_item_generator' ),
-							$container->has( 'industry_build_plan_scoring_service' ) ? $container->get( 'industry_build_plan_scoring_service' ) : null
+							$container->has( 'industry_build_plan_scoring_service' ) ? $container->get( 'industry_build_plan_scoring_service' ) : null,
+							$container->has( 'design_token_step_minimum_merger' ) ? $container->get( 'design_token_step_minimum_merger' ) : null
 						)
 					);
 				}

@@ -63,14 +63,14 @@ Each row is one **`new_page`** recommendation (title, slug, purpose, template, h
 
 - **Make All Updates** — Approves **all** currently **pending** items in this step.
 - **Apply to selected** — Approves only checked rows (`aio_step1_selected_ids[]`). If none selected, the UI shows an error: **Select one or more rows to apply selected updates.**
-- **Deny All Updates** — Rejects **all** pending items in this step. **No** separate confirmation checkbox (unlike step 2).
+- **Deny All Updates** — Rejects **all** pending items in this step. **No** separate confirmation checkbox.
 - **Clear selection** — Link back to the same step URL without selections.
 
 **Step index 2**:
 
 - **Build All Pages** — Bulk **approve** all eligible pending new-page items.
 - **Build Selected Pages** — Bulk approve selected (`aio_step2_selected_ids[]`). Empty selection → **Select one or more rows to build selected pages.**
-- **Deny All Eligible** — Requires the **Confirm denial** checkbox (`aio_step2_deny_all_confirm=1`). If missing, redirect shows **Please confirm bulk denial to continue.** On success, a success notice reports how many recommendations were denied.
+- **Deny All Eligible** — Rejects **all** pending new-page items in this step in one action. On success, a success notice reports how many recommendations were denied.
 - **Clear selection** — Same pattern as step 1.
 
 Bulk buttons are **disabled** when there are **no pending** items or the user cannot approve.
@@ -112,7 +112,7 @@ After submission, the screen reloads on the same `step=`; counts and badges upda
 
 **All pending (step 1):** **Deny All Updates** — confirm mentally before click; there is **no** extra checkbox.
 
-**All pending (step 2):** Check **Confirm denial** → **Deny All Eligible**.
+**All pending (step 2):** **Deny All Eligible** — same pattern as step 1; there is **no** extra checkbox.
 
 **Feedback:** Step 2 row deny may show **Denied the selected new page recommendation.** Bulk deny shows a count-based success message.
 
@@ -135,7 +135,6 @@ After submission, the screen reloads on the same `step=`; counts and badges upda
 | **Button disabled** | No **`pending`** items, missing **`aio_approve_build_plans`**, or step **blocked**—open an earlier step and finish decisions. |
 | **Approve / Deny no-op** | Item was not **`pending`** (already approved/rejected). |
 | **Mixed-status plan** | Normal: some items **`approved`**, some **`rejected`**, some may later be **`completed`** / **`failed`** after execution. |
-| **Step 2 bulk deny without checkbox** | Server rejects with **Please confirm bulk denial to continue.** |
 | **Build Selected with zero rows** | Error notices as in §4. |
 | **Existing page row has no Execute** | Expected: the resolver does not treat **`existing_page_change`** as a row-executable type; approved items are picked up when the **plan’s execution** runs. |
 | **New page row shows Execute but no link** | Approve/deny URLs are wired on this screen; **Execute** may appear in the action list without a GET URL here—use your **execution** workflow after the plan is approved. |

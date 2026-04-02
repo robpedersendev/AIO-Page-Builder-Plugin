@@ -183,6 +183,7 @@ final class Step_Item_List_Component {
 			'proposed_menu_name'       => \__( 'Proposed Menu', 'aio-page-builder' ),
 			'diff_summary'             => \__( 'Items', 'aio-page-builder' ),
 			'token_group'              => \__( 'Group', 'aio-page-builder' ),
+			'token_purpose'            => \__( 'Purpose', 'aio-page-builder' ),
 			'token_name'               => \__( 'Token', 'aio-page-builder' ),
 			'current_value'            => \__( 'Current', 'aio-page-builder' ),
 			'proposed_value'           => \__( 'Proposed', 'aio-page-builder' ),
@@ -236,7 +237,7 @@ final class Step_Item_List_Component {
 				?>
 			</td>
 			<td class="aio-col-actions">
-				<?php $this->render_row_actions( $actions, $item_id ); ?>
+				<?php $this->render_row_actions( $actions, $item_id, $is_detail_active ); ?>
 			</td>
 		</tr>
 		<?php
@@ -247,14 +248,15 @@ final class Step_Item_List_Component {
 	 *
 	 * @param array<int, array<string, mixed>> $actions Each: action_id, label, enabled, url (optional), form_post (optional), form_action, hidden_fields.
 	 * @param string                           $item_id Item id for data attributes.
+	 * @param bool                             $open_menu When true, the actions disclosure starts open (row matches detail panel).
 	 * @return void
 	 */
-	private function render_row_actions( array $actions, string $item_id ): void {
+	private function render_row_actions( array $actions, string $item_id, bool $open_menu = false ): void {
 		if ( empty( $actions ) ) {
 			echo '—';
 			return;
 		}
-		$out = array();
+		$lis = array();
 		foreach ( $actions as $action ) {
 			$action_id   = (string) ( $action['action_id'] ?? '' );
 			$label       = (string) ( $action['label'] ?? $action_id );
@@ -265,20 +267,34 @@ final class Step_Item_List_Component {
 			$hidden      = isset( $action['hidden_fields'] ) && is_array( $action['hidden_fields'] ) ? $action['hidden_fields'] : array();
 			$css_class   = 'aio-row-action aio-row-action-' . \sanitize_html_class( $action_id );
 			if ( ! $enabled ) {
-				$out[] = '<span class="' . \esc_attr( $css_class . ' aio-row-action-disabled' ) . '" aria-disabled="true">' . \esc_html( $label ) . '</span>';
+				$inner = '<span class="' . \esc_attr( $css_class . ' aio-row-action-disabled' ) . '" aria-disabled="true">' . \esc_html( $label ) . '</span>';
 			} elseif ( $form_post && $form_action !== '' ) {
 				$h = '';
 				foreach ( $hidden as $name => $value ) {
 					$h .= '<input type="hidden" name="' . \esc_attr( (string) $name ) . '" value="' . \esc_attr( (string) $value ) . '" />';
 				}
-				$out[] = '<form method="post" action="' . \esc_url( $form_action ) . '" class="aio-row-action-form" style="display:inline;">' . $h . '<button type="submit" class="button button-small ' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button></form>';
+				$inner = '<form method="post" action="' . \esc_url( $form_action ) . '" class="aio-row-action-form">' . $h . '<button type="submit" class="' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button></form>';
 			} elseif ( $url !== '' ) {
-				$out[] = '<a href="' . \esc_url( $url ) . '" class="' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</a>';
+				$inner = '<a href="' . \esc_url( $url ) . '" class="' . \esc_attr( $css_class . ' aio-row-action-link' ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</a>';
 			} else {
-				$out[] = '<button type="button" class="button button-small ' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button>';
+				$inner = '<button type="button" class="' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button>';
 			}
+			$lis[] = '<li class="aio-row-actions-li">' . $inner . '</li>';
 		}
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $out entries built with esc_url/esc_attr/esc_html above.
-		echo implode( ' ', $out );
+		?>
+		<div class="aio-row-actions-menu">
+			<details class="aio-row-actions-details"<?php echo $open_menu ? ' open' : ''; ?>>
+				<summary class="aio-row-actions-summary" aria-label="<?php echo \esc_attr( sprintf( /* translators: %s: plan item id */ \__( 'Actions for item %s', 'aio-page-builder' ), $item_id ) ); ?>">
+					<?php \esc_html_e( 'Actions', 'aio-page-builder' ); ?>
+				</summary>
+				<ul class="aio-row-actions-list" role="list">
+					<?php
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- List items built with esc_* inside loop.
+					echo implode( '', $lis );
+					?>
+				</ul>
+			</details>
+		</div>
+		<?php
 	}
 }

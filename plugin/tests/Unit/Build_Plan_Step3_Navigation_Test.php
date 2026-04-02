@@ -205,6 +205,7 @@ final class Build_Plan_Step3_Navigation_Test extends TestCase {
 		$sections = $builder->build_sections( $item );
 		$this->assertNotEmpty( $sections );
 		$headings = array_column( $sections, 'heading' );
+		$this->assertContains( 'WordPress menu name', $headings );
 		$this->assertContains( 'Navigation context', $headings );
 		$this->assertContains( 'Current vs proposed navigation', $headings );
 		$this->assertContains( 'Detected differences', $headings );
@@ -340,6 +341,106 @@ final class Build_Plan_Step3_Navigation_Test extends TestCase {
 		$workspace = $ui->build_workspace( $def, Navigation_Bulk_Action_Service::STEP_INDEX_NAVIGATION, array( 'can_approve' => true ), null, array() );
 		$this->assertFalse( $workspace['validation_summary']['valid'] );
 		$this->assertContains( 'Page /x not found.', $workspace['validation_summary']['messages'] );
+	}
+
+	/** menu_new payload: list row shows menu_name as proposed menu and items preview. */
+	public function test_menu_new_summary_columns_use_menu_name(): void {
+		$resolver  = new Build_Plan_Row_Action_Resolver();
+		$detail    = new Navigation_Detail_Builder();
+		$bulk      = new Navigation_Bulk_Action_Service( new Build_Plan_Repository() );
+		$ui        = new Navigation_Step_UI_Service( $resolver, $detail, $bulk );
+		$def       = $this->navigation_plan_menu_new_definition();
+		$workspace = $ui->build_workspace( $def, Navigation_Bulk_Action_Service::STEP_INDEX_NAVIGATION, array( 'can_approve' => true ), null, array() );
+		$cols      = $workspace['step_list_rows'][0]['summary_columns'];
+		$this->assertSame( 'Summit Header Nav', $cols['proposed_menu_name'] );
+		$this->assertStringContainsString( 'Home', $cols['diff_summary'] );
+	}
+
+	/** Detail panel: net-new menu shows explicit menu name and indented hierarchy preview. */
+	public function test_detail_builder_menu_new_shows_name_and_hierarchy(): void {
+		$item     = array(
+			Build_Plan_Item_Schema::KEY_ITEM_ID => 'plan_mcp_new',
+			Build_Plan_Item_Schema::KEY_STATUS  => Build_Plan_Item_Statuses::PENDING,
+			Build_Plan_Item_Schema::KEY_PAYLOAD => array(
+				'menu_context' => 'header',
+				'action'       => 'create',
+				'menu_name'    => 'Summit Header Nav',
+				'items'        => array(
+					array(
+						'label'    => 'Home',
+						'children' => array( array( 'label' => 'Child page' ) ),
+					),
+				),
+			),
+		);
+		$builder  = new Navigation_Detail_Builder();
+		$sections = $builder->build_sections( $item );
+		$headings = array_column( $sections, 'heading' );
+		$this->assertContains( 'WordPress menu name', $headings );
+		$this->assertContains( 'Proposed menu hierarchy (preview)', $headings );
+		$hierarchy_section = null;
+		foreach ( $sections as $s ) {
+			if ( ( $s['heading'] ?? '' ) === 'Proposed menu hierarchy (preview)' ) {
+				$hierarchy_section = $s;
+				break;
+			}
+		}
+		$this->assertNotNull( $hierarchy_section );
+		$joined = implode( ' ', $hierarchy_section['content_lines'] ?? array() );
+		$this->assertStringContainsString( 'Home', $joined );
+		$this->assertStringContainsString( 'Child page', $joined );
+	}
+
+	private function navigation_plan_menu_new_definition(): array {
+		$items = array(
+			array(
+				Build_Plan_Item_Schema::KEY_ITEM_ID   => 'plan_mcp_new',
+				Build_Plan_Item_Schema::KEY_ITEM_TYPE => Build_Plan_Item_Schema::ITEM_TYPE_MENU_NEW,
+				Build_Plan_Item_Schema::KEY_STATUS    => Build_Plan_Item_Statuses::PENDING,
+				Build_Plan_Item_Schema::KEY_PAYLOAD   => array(
+					'menu_name'      => 'Summit Header Nav',
+					'theme_location' => 'header',
+					'action'         => 'create',
+					'menu_context'   => 'header',
+					'items'          => array(
+						array(
+							'label' => 'Home',
+							'url'   => '/',
+						),
+						array(
+							'label' => 'Services',
+							'url'   => '/services',
+						),
+					),
+				),
+			),
+		);
+		$steps = array(
+			array(
+				'step_type' => 'overview',
+				'items'     => array(),
+			),
+			array(
+				'step_type' => Build_Plan_Schema::STEP_TYPE_EXISTING_PAGE_CHANGES,
+				'items'     => array(),
+			),
+			array(
+				'step_type' => Build_Plan_Schema::STEP_TYPE_NEW_PAGES,
+				'items'     => array(),
+			),
+			array(
+				'step_type' => Build_Plan_Schema::STEP_TYPE_HIERARCHY_FLOW,
+				'items'     => array(),
+			),
+			array(
+				Build_Plan_Item_Schema::KEY_STEP_TYPE => Build_Plan_Schema::STEP_TYPE_NAVIGATION,
+				Build_Plan_Item_Schema::KEY_ITEMS     => $items,
+			),
+		);
+		return array(
+			Build_Plan_Schema::KEY_PLAN_ID => 'test-plan-nav-new',
+			Build_Plan_Schema::KEY_STEPS   => $steps,
+		);
 	}
 
 	/** Column order is Step 3 (navigation) specific. */

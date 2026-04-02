@@ -102,6 +102,7 @@ final class Industry_Starter_Bundle_To_Build_Plan_Service {
 			if ( $slug === '' ) {
 				$slug = 'page-' . ( $i + 1 );
 			}
+			// * Plain comma-separated section refs (not JSON); avoids embedding raw "[{" fragments in plan payloads.
 			$section_guidance = implode( ', ', array_slice( array_map( 'strval', $section_refs ), 0, 3 ) );
 			$new_pages[]      = array(
 				'proposed_page_title' => $title,

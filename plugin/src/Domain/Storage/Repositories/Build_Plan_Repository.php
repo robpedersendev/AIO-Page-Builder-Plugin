@@ -13,6 +13,8 @@ defined( 'ABSPATH' ) || exit;
 
 use AIOPageBuilder\Domain\BuildPlan\Analytics\Build_Plan_List_Provider_Interface;
 use AIOPageBuilder\Domain\BuildPlan\Build_Plan_Template_Lab_Context;
+use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Definition_Json_Legacy_Repair;
+use AIOPageBuilder\Domain\BuildPlan\Generation\Build_Plan_Payload_Json_String_Normalizer;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Item_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Schema\Build_Plan_Schema;
 use AIOPageBuilder\Domain\BuildPlan\Statuses\Build_Plan_Item_Statuses;
@@ -93,6 +95,10 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 		$assembled = self::assemble_plan_definition_json_string_from_post_meta( $post_id );
 		$raw       = $assembled !== '' ? $assembled : \get_post_meta( $post_id, self::META_PLAN_DEFINITION, true );
 		$parsed    = self::plan_definition_from_meta_raw( $raw );
+		if ( Named_Debug_Log::build_plan_meta_trace_enabled() && is_string( $raw ) && $raw !== '' && $parsed === array() ) {
+			$load_source = ( $assembled !== '' ) ? 'chunked_assembled' : 'single_meta';
+			$this->emit_plan_definition_json_decode_fail_detail( $post_id, $raw, $load_source );
+		}
 		if ( Named_Debug_Log::build_plan_meta_trace_enabled() ) {
 			$steps_n = isset( $parsed[ Build_Plan_Schema::KEY_STEPS ] ) && is_array( $parsed[ Build_Plan_Schema::KEY_STEPS ] )
 				? count( $parsed[ Build_Plan_Schema::KEY_STEPS ] )
@@ -134,6 +140,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 		if ( $raw === '' ) {
 			return array();
 		}
+		$raw          = Build_Plan_Definition_Json_Legacy_Repair::try_repair_corrupt_section_guidance( $raw );
 		$flags        = self::json_decode_plan_flags();
 		$candidates   = array( $raw );
 		$bom_stripped = strncmp( $raw, "\xEF\xBB\xBF", 3 ) === 0 ? substr( $raw, 3 ) : null;
@@ -207,6 +214,112 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	}
 
 	/**
+	 * Coerces JSON-shaped section_guidance strings to arrays so wp_json_encode never embeds unescaped quotes (legacy bug).
+	 *
+	 * @param array<string, mixed> $definition Mutable plan root.
+	 */
+	private static function normalize_section_guidance_payloads_for_storage( array &$definition ): void {
+		$steps = $definition[ Build_Plan_Schema::KEY_STEPS ] ?? null;
+		if ( ! is_array( $steps ) ) {
+			return;
+		}
+		foreach ( $steps as $si => $step ) {
+			if ( ! is_array( $step ) ) {
+				continue;
+			}
+			$items = $step[ Build_Plan_Item_Schema::KEY_ITEMS ] ?? null;
+			if ( ! is_array( $items ) ) {
+				continue;
+			}
+			foreach ( $items as $ii => $item ) {
+				if ( ! is_array( $item ) ) {
+					continue;
+				}
+				$payload = $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ?? null;
+				if ( ! is_array( $payload ) || ! array_key_exists( 'section_guidance', $payload ) ) {
+					continue;
+				}
+				$payload['section_guidance'] = Build_Plan_Payload_Json_String_Normalizer::coerce_section_guidance_for_storage( $payload['section_guidance'] );
+				$items[ $ii ]                = array_merge( $item, array( Build_Plan_Item_Schema::KEY_PAYLOAD => $payload ) );
+			}
+			$steps[ $si ] = array_merge( $step, array( Build_Plan_Item_Schema::KEY_ITEMS => $items ) );
+		}
+		$definition[ Build_Plan_Schema::KEY_STEPS ] = $steps;
+	}
+
+	/**
+	 * Summarizes postmeta rows backing `_aio_plan_definition` (counts per key) for decode failure logs.
+	 *
+	 * @return string Comma list meta_key=count, or db_unavailable / no_rows.
+	 */
+	private function plan_definition_storage_meta_digest_for_log( int $post_id ): string {
+		global $wpdb;
+		if ( ! is_object( $wpdb ) || ! isset( $wpdb->postmeta ) || ! \is_string( $wpdb->postmeta )
+			|| ! \method_exists( $wpdb, 'prepare' ) || ! \method_exists( $wpdb, 'get_results' ) ) {
+			return 'db_unavailable';
+		}
+		$table = $wpdb->postmeta;
+		$like  = $wpdb->esc_like( self::META_PLAN_DEFINITION . '__part_' ) . '%';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- WP_DEBUG_LOG diagnostics only.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT meta_key, COUNT(*) AS c FROM {$table} WHERE post_id = %d AND (meta_key = %s OR meta_key = %s OR meta_key LIKE %s) GROUP BY meta_key ORDER BY meta_key ASC LIMIT 48",
+				$post_id,
+				self::META_PLAN_DEFINITION,
+				self::META_PLAN_DEFINITION . '__chunk_count',
+				$like
+			),
+			ARRAY_A
+		);
+		if ( ! is_array( $rows ) || $rows === array() ) {
+			return 'no_rows';
+		}
+		$parts = array();
+		foreach ( $rows as $row ) {
+			if ( ! isset( $row['meta_key'], $row['c'] ) ) {
+				continue;
+			}
+			$parts[] = (string) $row['meta_key'] . '=' . (string) (int) $row['c'];
+		}
+		return $parts !== array() ? implode( ',', $parts ) : 'no_rows';
+	}
+
+	/**
+	 * Structured decode failure fingerprint (no blob body; hashes and counts only).
+	 */
+	private function emit_plan_definition_json_decode_fail_detail( int $post_id, string $raw, string $load_source ): void {
+		\json_decode( $raw, true, 512, self::json_decode_plan_flags() );
+		$json_code = \json_last_error();
+		$json_msg  = \json_last_error_msg();
+		$trimmed   = rtrim( $raw );
+		$utf8_ok   = -1;
+		if ( \function_exists( 'mb_check_encoding' ) ) {
+			$utf8_ok = \mb_check_encoding( $raw, 'UTF-8' ) ? 1 : 0;
+		}
+		$looks_serialized = ( \function_exists( 'is_serialized' ) && \is_serialized( $raw, false ) ) ? 1 : 0;
+		$digest           = $this->plan_definition_storage_meta_digest_for_log( $post_id );
+		Named_Debug_Log::event_json_payload(
+			Named_Debug_Log_Event::BP_PLAN_DEFINITION_JSON_DECODE_FAIL_DETAIL,
+			array(
+				'post_id'              => $post_id,
+				'load_source'          => $load_source,
+				'byte_len'             => strlen( $raw ),
+				'blob_sha12'           => substr( \hash( 'sha256', $raw ), 0, 12 ),
+				'json_err_code'        => $json_code,
+				'json_err'             => $json_msg,
+				'utf8_ok'              => $utf8_ok,
+				'null_byte_count'      => substr_count( $raw, "\0" ),
+				'brace_open'           => substr_count( $raw, '{' ),
+				'brace_close'          => substr_count( $raw, '}' ),
+				'ends_rtrim_brace'     => ( $trimmed !== '' && str_ends_with( $trimmed, '}' ) ) ? 1 : 0,
+				'ends_rtrim_bracket'   => ( $trimmed !== '' && str_ends_with( $trimmed, ']' ) ) ? 1 : 0,
+				'looks_serialized_php' => $looks_serialized,
+				'meta_key_counts'      => $digest,
+			)
+		);
+	}
+
+	/**
 	 * When chunked rows exist, returns concatenated JSON; otherwise '' (caller uses single meta key).
 	 */
 	private static function assemble_plan_definition_json_string_from_post_meta( int $post_id ): string {
@@ -228,15 +341,75 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 
 	/**
 	 * Clears single-row and chunked plan definition meta before rewriting.
+	 *
+	 * * Deletes every `_aio_plan_definition__part_*` row for the post (not only `chunk_count` parts) so stale cache,
+	 * interrupted chunk writes, or duplicate keys cannot leave fragments that break the next read.
 	 */
 	private function clear_plan_definition_storage( int $post_id ): void {
-		$c = \get_post_meta( $post_id, self::META_PLAN_DEFINITION . '__chunk_count', true );
-		$n = is_numeric( $c ) ? (int) $c : 0;
-		for ( $i = 0; $i < $n; $i++ ) {
-			\delete_post_meta( $post_id, self::META_PLAN_DEFINITION . '__part_' . (string) $i );
+		$this->refresh_post_meta_runtime_cache( $post_id );
+		global $wpdb;
+		if ( is_object( $wpdb ) && isset( $wpdb->postmeta ) && \is_string( $wpdb->postmeta )
+			&& \method_exists( $wpdb, 'prepare' ) && \method_exists( $wpdb, 'query' ) ) {
+			$table = $wpdb->postmeta;
+			$like  = $wpdb->esc_like( self::META_PLAN_DEFINITION . '__part_' ) . '%';
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Full wipe of plan JSON keys; avoids orphan chunk rows.
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$table} WHERE post_id = %d AND (meta_key = %s OR meta_key = %s OR meta_key LIKE %s)",
+					$post_id,
+					self::META_PLAN_DEFINITION,
+					self::META_PLAN_DEFINITION . '__chunk_count',
+					$like
+				)
+			);
+		} else {
+			for ( $i = 0; $i < 512; $i++ ) {
+				\delete_post_meta( $post_id, self::META_PLAN_DEFINITION . '__part_' . (string) $i );
+			}
+			\delete_post_meta( $post_id, self::META_PLAN_DEFINITION . '__chunk_count' );
+			\delete_post_meta( $post_id, self::META_PLAN_DEFINITION );
 		}
-		\delete_post_meta( $post_id, self::META_PLAN_DEFINITION . '__chunk_count' );
-		\delete_post_meta( $post_id, self::META_PLAN_DEFINITION );
+		$this->refresh_post_meta_runtime_cache( $post_id );
+	}
+
+	/**
+	 * Reads the raw JSON string currently stored (DB-first, then assembled chunks, then single meta) for rollback.
+	 */
+	private function snapshot_existing_plan_definition_json_string( int $post_id ): string {
+		$blob = $this->read_plan_definition_json_string_from_db( $post_id );
+		if ( $blob !== '' ) {
+			return $blob;
+		}
+		$assembled = self::assemble_plan_definition_json_string_from_post_meta( $post_id );
+		if ( $assembled !== '' ) {
+			return $assembled;
+		}
+		$raw = \get_post_meta( $post_id, self::META_PLAN_DEFINITION, true );
+		return \is_string( $raw ) ? $raw : '';
+	}
+
+	/**
+	 * Restores plan definition meta from a snapshot after a failed persist or verify.
+	 */
+	private function restore_plan_definition_from_json_snapshot( int $post_id, string $backup_json ): void {
+		if ( $backup_json === '' ) {
+			return;
+		}
+		$this->clear_plan_definition_storage( $post_id );
+		if ( ! $this->persist_plan_definition_payload( $post_id, $backup_json ) ) {
+			Named_Debug_Log::event(
+				Named_Debug_Log_Event::BP_PLAN_DEFINITION_PERSIST_VERIFY_FAIL,
+				'post_id=' . (string) $post_id . ' phase=rollback_restore_failed json_len=' . (string) strlen( $backup_json )
+			);
+			return;
+		}
+		$this->refresh_post_meta_runtime_cache( $post_id );
+		$def = self::plan_definition_from_meta_raw( $backup_json );
+		if ( $def !== array() ) {
+			$this->sync_lineage_meta_from_definition( $post_id, $def );
+			$this->sync_source_ai_run_meta_from_definition( $post_id, $def );
+		}
+		$this->refresh_post_meta_runtime_cache( $post_id );
 	}
 
 	/**
@@ -249,6 +422,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 			return false;
 		}
 		$slashed = \function_exists( 'wp_slash' ) ? \wp_slash( $meta_value ) : addslashes( $meta_value );
+		// phpcs:disable WordPress.DB.SlowDBQuery -- postmeta column names for $wpdb->insert(); not a meta_query.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Scoped fallback when hooks block update_post_meta for this CPT.
 		$r = $wpdb->insert(
 			$wpdb->postmeta,
@@ -259,6 +433,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 			),
 			array( '%d', '%s', '%s' )
 		);
+		// phpcs:enable WordPress.DB.SlowDBQuery
 		$le_ok = ! \property_exists( $wpdb, 'last_error' ) || (string) $wpdb->last_error === '';
 		return $r !== false && $le_ok;
 	}
@@ -292,7 +467,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 				self::META_PLAN_DEFINITION . '__chunk_count'
 			)
 		);
-		$n = is_numeric( $chunk_count_raw ) ? (int) $chunk_count_raw : 0;
+		$n               = is_numeric( $chunk_count_raw ) ? (int) $chunk_count_raw : 0;
 		if ( $n > 0 ) {
 			$pieces = array();
 			for ( $i = 0; $i < $n; $i++ ) {
@@ -326,49 +501,13 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	}
 
 	/**
-	 * CHAR_LENGTH(meta_value) for the newest postmeta row (DB stores slash-escaped values).
-	 */
-	private function postmeta_db_char_length( int $post_id, string $meta_key ): int {
-		global $wpdb;
-		if ( ! $wpdb instanceof \wpdb || ! isset( $wpdb->postmeta ) ) {
-			return 0;
-		}
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Length probe for persistence integrity.
-		$len = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT CHAR_LENGTH(meta_value) FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1",
-				$post_id,
-				$meta_key
-			)
-		);
-		return is_numeric( $len ) ? (int) $len : 0;
-	}
-
-	/**
-	 * Expected DB CHAR_LENGTH for a meta value WordPress will slash before insert.
-	 */
-	private static function expected_slashed_meta_char_length( string $value ): int {
-		$slashed = \function_exists( 'wp_slash' ) ? \wp_slash( $value ) : $value;
-		return strlen( $slashed );
-	}
-
-	/**
-	 * True when the newest _aio_plan_definition row’s stored length matches wp_slash( $json ).
-	 */
-	private function plan_definition_single_row_db_length_matches( int $post_id, string $json ): bool {
-		$exp = self::expected_slashed_meta_char_length( $json );
-		$act = $this->postmeta_db_char_length( $post_id, self::META_PLAN_DEFINITION );
-		return $exp > 0 && $act === $exp;
-	}
-
-	/**
 	 * @param mixed $updated_return Value from update_post_meta.
 	 */
 	private function log_update_meta_failed_diag( int $post_id, int $value_len, mixed $updated_return ): void {
 		global $wpdb;
 		$ur_str = is_bool( $updated_return ) ? ( $updated_return ? 'bool_true' : 'bool_false' ) : get_debug_type( $updated_return );
 		$extra  = '';
-		if ( $wpdb instanceof \wpdb && isset( $wpdb->last_error ) && (string) $wpdb->last_error !== '' ) {
+		if ( is_object( $wpdb ) && \property_exists( $wpdb, 'last_error' ) && (string) $wpdb->last_error !== '' ) {
 			$extra = ' wpdb_err=' . substr( preg_replace( '/\s+/', ' ', (string) $wpdb->last_error ), 0, 120 );
 		}
 		Named_Debug_Log::event(
@@ -392,31 +531,12 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 				$ok        = \is_string( $roundtrip ) && $roundtrip === $json;
 			}
 		}
-		if ( $ok && ! $this->plan_definition_single_row_db_length_matches( $post_id, $json ) ) {
-			$exp = self::expected_slashed_meta_char_length( $json );
-			$act = $this->postmeta_db_char_length( $post_id, self::META_PLAN_DEFINITION );
-			Named_Debug_Log::event(
-				Named_Debug_Log_Event::BP_PLAN_DEFINITION_PERSIST_VERIFY_FAIL,
-				'post_id=' . (string) $post_id . ' phase=post_update_meta_length expected_db_char_len=' . (string) $exp . ' actual_db_char_len=' . (string) $act
-					. ' intended_sha1=' . substr( \hash( 'sha1', $json ), 0, 12 )
-			);
-			\delete_post_meta( $post_id, self::META_PLAN_DEFINITION );
-			$ok = false;
-		}
 		if ( $ok ) {
 			return true;
 		}
 		$this->log_update_meta_failed_diag( $post_id, strlen( $json ), $updated );
 		if ( $this->is_build_plan_post_for_meta_persist( $post_id ) && $this->insert_postmeta_row_direct_for_plan( $post_id, self::META_PLAN_DEFINITION, $json ) ) {
 			$this->refresh_post_meta_runtime_cache( $post_id );
-			if ( ! $this->plan_definition_single_row_db_length_matches( $post_id, $json ) ) {
-				Named_Debug_Log::event(
-					Named_Debug_Log_Event::BP_PLAN_DEFINITION_PERSIST_VERIFY_FAIL,
-					'post_id=' . (string) $post_id . ' phase=direct_insert_length expected_db_char_len=' . (string) self::expected_slashed_meta_char_length( $json )
-						. ' actual_db_char_len=' . (string) $this->postmeta_db_char_length( $post_id, self::META_PLAN_DEFINITION )
-				);
-				return false;
-			}
 			Named_Debug_Log::event(
 				Named_Debug_Log_Event::BP_PLAN_DEFINITION_DB_INSERT_FALLBACK_OK,
 				'post_id=' . (string) $post_id . ' json_len=' . (string) strlen( $json ) . ' mode=single'
@@ -476,14 +596,6 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 			$this->refresh_post_meta_runtime_cache( $post_id );
 		}
 		$this->refresh_post_meta_runtime_cache( $post_id );
-		$round = $this->read_plan_definition_json_string_from_db( $post_id );
-		if ( $round !== $json ) {
-			Named_Debug_Log::event(
-				Named_Debug_Log_Event::BP_PLAN_DEFINITION_PERSIST_VERIFY_FAIL,
-				'post_id=' . (string) $post_id . ' phase=chunked_roundtrip read_len=' . (string) strlen( $round ) . ' json_len=' . (string) strlen( $json )
-			);
-			return false;
-		}
 		return true;
 	}
 
@@ -504,25 +616,6 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	}
 
 	/**
-	 * Reloads plan definition from DB (newest meta row) bypassing stale object cache, then falls back to get_post_meta.
-	 *
-	 * @param int $post_id Plan post ID.
-	 * @return array<string, mixed>
-	 */
-	private function load_plan_definition_after_persist_for_verify( int $post_id ): array {
-		$blob = $this->read_plan_definition_json_string_from_db( $post_id );
-		if ( $blob !== '' ) {
-			return self::plan_definition_from_meta_raw( $blob );
-		}
-		$assembled = self::assemble_plan_definition_json_string_from_post_meta( $post_id );
-		if ( $assembled !== '' ) {
-			return self::plan_definition_from_meta_raw( $assembled );
-		}
-		$raw = \get_post_meta( $post_id, self::META_PLAN_DEFINITION, true );
-		return self::plan_definition_from_meta_raw( $raw );
-	}
-
-	/**
 	 * Safe diagnostic string when persisted definition cannot be read back with steps.
 	 *
 	 * @param int $post_id Plan post ID.
@@ -530,7 +623,8 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 	private function plan_definition_persist_failure_diag( int $post_id ): string {
 		global $wpdb;
 		$parts = array( 'post_id=' . (string) $post_id );
-		if ( $wpdb instanceof \wpdb && isset( $wpdb->postmeta ) ) {
+		if ( is_object( $wpdb ) && isset( $wpdb->postmeta ) && \is_string( $wpdb->postmeta )
+			&& \method_exists( $wpdb, 'get_var' ) && \method_exists( $wpdb, 'prepare' ) ) {
 			$table = $wpdb->postmeta;
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Diagnostics only under WP_DEBUG.
 			$cnt     = (int) $wpdb->get_var(
@@ -600,6 +694,7 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 				is_array( $tl ) ? $tl : null
 			);
 		}
+		self::normalize_section_guidance_payloads_for_storage( $definition );
 		$encode_opts = 0;
 		if ( \defined( 'JSON_INVALID_UTF8_SUBSTITUTE' ) ) {
 			$encode_opts |= JSON_INVALID_UTF8_SUBSTITUTE;
@@ -621,23 +716,25 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 				return false;
 			}
 		}
+		$backup_json = $this->snapshot_existing_plan_definition_json_string( $post_id );
 		// * Remove single-row and chunked rows so duplicate postmeta cannot mask the new blob.
 		$this->clear_plan_definition_storage( $post_id );
 		if ( ! $this->persist_plan_definition_payload( $post_id, $json ) ) {
+			$this->restore_plan_definition_from_json_snapshot( $post_id, $backup_json );
 			return false;
 		}
-		$this->sync_lineage_meta_from_definition( $post_id, $definition );
-		$this->sync_source_ai_run_meta_from_definition( $post_id, $definition );
 		$this->refresh_post_meta_runtime_cache( $post_id );
 
 		$expect_steps = self::plan_definition_has_non_empty_steps( $definition );
 		if ( $expect_steps ) {
-			$verified = $this->load_plan_definition_after_persist_for_verify( $post_id );
+			// * Same load path as admin/executor after cache refresh (avoids verify vs UI divergence).
+			$verified = $this->get_plan_definition( $post_id );
 			if ( ! self::plan_definition_has_non_empty_steps( $verified ) ) {
 				Named_Debug_Log::event(
 					Named_Debug_Log_Event::BP_PLAN_DEFINITION_PERSIST_VERIFY_FAIL,
 					$this->plan_definition_persist_failure_diag( $post_id )
 				);
+				$this->restore_plan_definition_from_json_snapshot( $post_id, $backup_json );
 				return false;
 			}
 			if ( Named_Debug_Log::build_plan_meta_trace_enabled() ) {
@@ -648,6 +745,10 @@ final class Build_Plan_Repository extends Abstract_CPT_Repository implements Bui
 				);
 			}
 		}
+
+		$this->sync_lineage_meta_from_definition( $post_id, $definition );
+		$this->sync_source_ai_run_meta_from_definition( $post_id, $definition );
+		$this->refresh_post_meta_runtime_cache( $post_id );
 		return true;
 	}
 

@@ -10,6 +10,8 @@ declare( strict_types=1 );
 namespace AIOPageBuilder\Admin;
 
 use AIOPageBuilder\Admin\Admin_Ux_Trace_Ajax;
+use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plan_Analytics_Screen;
+use AIOPageBuilder\Admin\Screens\BuildPlan\Build_Plans_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Page_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Section_Template_Detail_Screen;
 use AIOPageBuilder\Admin\Screens\Templates\Template_Compare_Screen;
@@ -32,6 +34,10 @@ final class Admin_Assets {
 	public const STYLE_TEMPLATE_LIVE_PREVIEW = 'aio-template-live-preview';
 
 	public const SCRIPT_ADMIN_UX_TRACE = 'aio-admin-ux-trace';
+
+	public const SCRIPT_BUILD_PLAN_WORKSPACE_LIST = 'aio-build-plan-workspace-list';
+
+	public const SCRIPT_BUILD_PLAN_DESIGN_TOKENS = 'aio-build-plan-design-tokens';
 
 	/**
 	 * Hooks admin_enqueue_scripts.
@@ -97,11 +103,25 @@ final class Admin_Assets {
 			array(),
 			Constants::plugin_version()
 		);
+		$style_deps             = array( 'aio-page-builder-admin-fonts' );
+		$build_plan_suite_pages = array(
+			Build_Plans_Screen::SLUG,
+			Build_Plan_Analytics_Screen::SLUG,
+		);
+		if ( \in_array( $page, $build_plan_suite_pages, true ) ) {
+			\wp_enqueue_style(
+				'aio-pb-font-build-plan-display',
+				'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap',
+				array(),
+				Constants::plugin_version()
+			);
+			$style_deps[] = 'aio-pb-font-build-plan-display';
+		}
 		$url = \trailingslashit( Constants::plugin_url() ) . 'assets/css/aio-page-builder-admin.css';
 		\wp_enqueue_style(
 			self::STYLE_HANDLE,
 			$url,
-			array( 'aio-page-builder-admin-fonts' ),
+			$style_deps,
 			Constants::plugin_version()
 		);
 
@@ -149,6 +169,30 @@ final class Admin_Assets {
 					'tab'     => $tab,
 				)
 			);
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only routing for script load.
+		$plan_id_for_workspace = isset( $_GET['plan_id'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['plan_id'] ) ) : '';
+		$bp_workspace_step     = isset( $_GET['step'] ) ? \sanitize_text_field( \wp_unslash( (string) $_GET['step'] ) ) : '';
+		if ( $page === Build_Plans_Screen::SLUG && $plan_id_for_workspace !== '' ) {
+			$bp_list_js = \trailingslashit( Constants::plugin_url() ) . 'assets/js/build-plan-workspace-list.js';
+			\wp_enqueue_script(
+				self::SCRIPT_BUILD_PLAN_WORKSPACE_LIST,
+				$bp_list_js,
+				array(),
+				Constants::plugin_version(),
+				true
+			);
+			if ( $bp_workspace_step === '5' ) {
+				$bp_dt_js = \trailingslashit( Constants::plugin_url() ) . 'assets/js/build-plan-design-tokens.js';
+				\wp_enqueue_script(
+					self::SCRIPT_BUILD_PLAN_DESIGN_TOKENS,
+					$bp_dt_js,
+					array(),
+					Constants::plugin_version(),
+					true
+				);
+			}
 		}
 
 		if ( $page === Page_Template_Detail_Screen::SLUG || $page === Section_Template_Detail_Screen::SLUG ) {

@@ -146,15 +146,16 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 	 *
 	 * @param string $plan_id Stable build plan internal key.
 	 * @param int    $scan_limit Max recent runs to inspect (bounded for admin repair paths).
+	 * @param bool   $emit_empty_scan_log When true and no match, logs {@see Named_Debug_Log_Event::BP_AI_RUN_BUILD_PLAN_REF_SCAN_SUMMARY} (WP_DEBUG_LOG).
 	 * @return string|null Run internal key (run_id) or null.
 	 */
-	public function find_latest_completed_run_internal_key_for_build_plan_ref( string $plan_id, int $scan_limit = 120 ): ?string {
+	public function find_latest_completed_run_internal_key_for_build_plan_ref( string $plan_id, int $scan_limit = 120, bool $emit_empty_scan_log = false ): ?string {
 		$plan_id = \sanitize_text_field( $plan_id );
 		if ( $plan_id === '' ) {
 			return null;
 		}
-		$scan_limit = max( 1, min( 300, $scan_limit ) );
-		$query      = new \WP_Query(
+		$scan_limit               = max( 1, min( 300, $scan_limit ) );
+		$query                    = new \WP_Query(
 			array(
 				'post_type'              => $this->get_post_type(),
 				'post_status'            => 'publish',
@@ -166,7 +167,12 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 				'update_post_meta_cache' => true,
 			)
 		);
+		$posts_scanned            = 0;
+		$refs_equal               = 0;
+		$refs_equal_record_null   = 0;
+		$refs_equal_not_completed = 0;
 		foreach ( $query->get_posts() as $pid_raw ) {
+			++$posts_scanned;
 			$pid = (int) $pid_raw;
 			if ( $pid <= 0 ) {
 				continue;
@@ -176,15 +182,35 @@ final class AI_Run_Repository extends Abstract_CPT_Repository implements AI_Arti
 			if ( $ref !== $plan_id ) {
 				continue;
 			}
+			++$refs_equal;
 			$record = $this->get_by_id( $pid );
 			if ( $record === null ) {
+				++$refs_equal_record_null;
 				continue;
 			}
 			if ( (string) ( $record['status'] ?? '' ) !== 'completed' ) {
+				++$refs_equal_not_completed;
 				continue;
 			}
 			$key = (string) ( $record['internal_key'] ?? '' );
-			return $key !== '' ? $key : null;
+			$out = $key !== '' ? $key : null;
+			if ( $out !== null ) {
+				return $out;
+			}
+		}
+		if ( $emit_empty_scan_log ) {
+			Named_Debug_Log::event_json_payload(
+				Named_Debug_Log_Event::BP_AI_RUN_BUILD_PLAN_REF_SCAN_SUMMARY,
+				array(
+					'plan_id_len'              => strlen( $plan_id ),
+					'plan_id_h12'              => substr( \hash( 'sha256', $plan_id ), 0, 12 ),
+					'scan_limit'               => $scan_limit,
+					'posts_scanned'            => $posts_scanned,
+					'refs_equal'               => $refs_equal,
+					'refs_equal_record_null'   => $refs_equal_record_null,
+					'refs_equal_not_completed' => $refs_equal_not_completed,
+				)
+			);
 		}
 		return null;
 	}

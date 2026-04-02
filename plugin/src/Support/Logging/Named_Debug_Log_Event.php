@@ -134,6 +134,8 @@ final class Named_Debug_Log_Event {
 	public const BUILD_PLAN_WORKSPACE_FINALIZE             = 'AIO_BUILD_PLAN_WORKSPACE_FINALIZE';
 	public const BUILD_PLAN_SEO_BULK_ACTION_DEBUG          = 'AIO_BUILD_PLAN_SEO_BULK_ACTION_DEBUG';
 	public const BUILD_PLAN_DESIGN_TOKEN_BULK_DEBUG        = 'AIO_BUILD_PLAN_DESIGN_TOKEN_BULK_DEBUG';
+	/** Workspace step Back/Next bar + required counts (WP_DEBUG + WP_DEBUG_LOG only). */
+	public const BP_WORKSPACE_STEP_NAV_SNAPSHOT = 'AIO_BP_WORKSPACE_STEP_NAV_SNAPSHOT';
 
 	// Build plan — admin-post: create from completed AI run
 	public const ADMIN_CREATE_BP_FROM_AI_RUN_ENTER                 = 'AIO_ADMIN_CREATE_BP_FROM_AI_RUN_ENTER';
@@ -168,6 +170,7 @@ final class Named_Debug_Log_Event {
 	public const BP_EMPTY_REPAIR_SKIP_ALREADY_HAS_STEPS = 'AIO_BP_EMPTY_REPAIR_SKIP_ALREADY_HAS_STEPS';
 	public const BP_EMPTY_REPAIR_SKIP_BACKOFF_TRANSIENT = 'AIO_BP_EMPTY_REPAIR_SKIP_BACKOFF_TRANSIENT';
 	public const BP_EMPTY_REPAIR_RESOLVE_FROM_REF       = 'AIO_BP_EMPTY_REPAIR_RESOLVE_FROM_REF';
+	/** @deprecated Log line superseded by {@see BP_AI_RUN_BUILD_PLAN_REF_SCAN_SUMMARY} when repair passes emit flag; const retained for grep/docs. */
 	public const BP_EMPTY_REPAIR_RESOLVE_REF_SCAN_EMPTY = 'AIO_BP_EMPTY_REPAIR_RESOLVE_REF_SCAN_EMPTY';
 	public const BP_EMPTY_REPAIR_RESOLVE_FAILED         = 'AIO_BP_EMPTY_REPAIR_RESOLVE_FAILED';
 	public const BP_EMPTY_REPAIR_RESOLVE_FROM_POST_META = 'AIO_BP_EMPTY_REPAIR_RESOLVE_FROM_POST_META';
@@ -207,6 +210,16 @@ final class Named_Debug_Log_Event {
 	public const BP_PLAN_DEFINITION_DB_INSERT_FALLBACK_OK = 'AIO_BP_PLAN_DEFINITION_DB_INSERT_FALLBACK_OK';
 	/** Definition JSON exceeded chunk threshold; stored as _aio_plan_definition__part_* rows. */
 	public const BP_PLAN_DEFINITION_CHUNKED_WRITE = 'AIO_BP_PLAN_DEFINITION_CHUNKED_WRITE';
+	/** Non-empty meta string failed JSON + unserialize decode; payload has storage shape, utf8, json_last_error, brace counts. */
+	public const BP_PLAN_DEFINITION_JSON_DECODE_FAIL_DETAIL = 'AIO_BP_PLAN_DEFINITION_JSON_DECODE_FAIL_DETAIL';
+
+	// Build plan — AI run lookup for repair (bounded scan of recent runs)
+	/** No completed run matched plan ref; payload has scan counts (posts_scanned, refs_equal, etc.). */
+	public const BP_AI_RUN_BUILD_PLAN_REF_SCAN_SUMMARY = 'AIO_BP_AI_RUN_BUILD_PLAN_REF_SCAN_SUMMARY';
+
+	// Build plan — empty-definition repair (structured outcome)
+	/** resolve_source_run_internal_key could not produce a run id; payload reason + stored_run_ref state. */
+	public const BP_EMPTY_REPAIR_RESOLVE_NULL_DETAIL = 'AIO_BP_EMPTY_REPAIR_RESOLVE_NULL_DETAIL';
 
 	// -------------------------------------------------------------------------
 	// Admin — menu / template seeding / industry bundle

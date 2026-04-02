@@ -57,7 +57,7 @@ final class Admin_Ux_Trace_Ajax {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
-			$partial             = self::sanitize_client_partial( $item );
+			$partial           = self::sanitize_client_partial( $item );
 			$partial['source'] = 'browser';
 			Admin_Ux_Trace::emit( $partial );
 			++$n;

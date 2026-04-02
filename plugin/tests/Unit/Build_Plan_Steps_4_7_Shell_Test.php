@@ -323,6 +323,11 @@ final class Build_Plan_Steps_4_7_Shell_Test extends TestCase {
 		$this->assertArrayHasKey( 'detail_panel', $workspace );
 		$this->assertArrayHasKey( 'step_messages', $workspace );
 		$this->assertArrayHasKey( 'token_set_summary', $workspace );
+		$this->assertArrayHasKey( 'design_token_catalog', $workspace );
+		$this->assertArrayHasKey( 'design_token_required', $workspace );
+		$this->assertArrayHasKey( 'design_token_edit_form', $workspace );
+		$this->assertArrayHasKey( 'design_token_can_mutate', $workspace );
+		$this->assertTrue( $workspace['design_token_can_mutate'] );
 		$this->assertSame( Tokens_Step_UI_Service::COLUMN_ORDER, $workspace['column_order'] );
 		$this->assertCount( 1, $workspace['step_list_rows'] );
 		$this->assertSame( array( 'colors' => 1 ), $workspace['token_set_summary']['groups'] );

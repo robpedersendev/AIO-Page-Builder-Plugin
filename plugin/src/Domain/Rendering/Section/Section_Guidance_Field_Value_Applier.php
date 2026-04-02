@@ -70,6 +70,20 @@ final class Section_Guidance_Field_Value_Applier {
 	private static function normalize_guidance_list( array $raw ): array {
 		$out = array();
 		foreach ( $raw as $row ) {
+			if ( is_string( $row ) ) {
+				$s = trim( $row );
+				if ( $s === '' ) {
+					continue;
+				}
+				$out[] = array(
+					'section_key'       => '',
+					'intent'            => '',
+					'content_direction' => $s,
+					'must_include'      => '',
+					'must_avoid'        => '',
+				);
+				continue;
+			}
 			if ( ! is_array( $row ) ) {
 				continue;
 			}

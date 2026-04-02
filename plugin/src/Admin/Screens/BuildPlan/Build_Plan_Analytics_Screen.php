@@ -70,6 +70,8 @@ final class Build_Plan_Analytics_Screen {
 		<?php if ( ! $embed_in_hub ) : ?>
 		<div class="wrap aio-page-builder-screen aio-build-plan-analytics" role="main" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 			<h1><?php echo \esc_html( $this->get_title() ); ?></h1>
+		<?php else : ?>
+		<div class="aio-build-plan-analytics aio-build-plan-analytics--embedded" role="region" aria-label="<?php echo \esc_attr( $this->get_title() ); ?>">
 		<?php endif; ?>
 			<p class="aio-analytics-intro"><?php \esc_html_e( 'Observational trends from Build Plan history. No changes to plans or execution.', 'aio-page-builder' ); ?></p>
 			<?php if ( Capabilities::current_user_can_for_route( Capabilities::VIEW_AI_RUNS ) ) : ?>
@@ -101,6 +103,8 @@ final class Build_Plan_Analytics_Screen {
 			<h2><?php \esc_html_e( 'Rollback frequency', 'aio-page-builder' ); ?></h2>
 			<?php $this->render_rollback_summary( $summary['rollback_frequency_summary'] ); ?>
 		<?php if ( ! $embed_in_hub ) : ?>
+		</div>
+		<?php else : ?>
 		</div>
 		<?php endif; ?>
 		<?php

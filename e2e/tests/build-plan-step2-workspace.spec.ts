@@ -17,6 +17,7 @@ test.describe( 'Build Plan Step 2 workspace (opt-in)', () => {
 		await page.goto( url, { waitUntil: 'domcontentloaded' } );
 		await waitForWpAdminReady( page );
 		await expect( page.locator( AIO_TEST_IDS.buildPlanWorkspaceScreen ) ).toBeVisible( { timeout: 30_000 } );
+		await expect( page.locator( '.aio-stepper-list .aio-stepper-item' ).first() ).toBeVisible( { timeout: 15_000 } );
 		await expectNoAxeViolations( page, 'Build Plan Step 2 workspace', {
 			exclude: [ '#wpadminbar', '#adminmenumain', '#screen-meta', '#screen-meta-links' ],
 		} );

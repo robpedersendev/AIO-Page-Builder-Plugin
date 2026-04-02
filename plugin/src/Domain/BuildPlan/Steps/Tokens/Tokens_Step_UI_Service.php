@@ -36,9 +36,10 @@ final class Tokens_Step_UI_Service {
 	/** Bulk execute-selected control key for token execution. */
 	public const BULK_CONTROL_EXECUTE_SELECTED = 'execute_to_selected';
 
-	/** Column order per spec §35. */
+	/** Column order per spec §35 (purpose groups rows with the style-spec catalog). */
 	public const COLUMN_ORDER = array(
 		'token_group',
+		'token_purpose',
 		'token_name',
 		'current_value',
 		'proposed_value',
@@ -57,22 +58,33 @@ final class Tokens_Step_UI_Service {
 	/** @var Token_Diff_Summarizer|null */
 	private ?Token_Diff_Summarizer $token_diff_summarizer;
 
+	/** @var Design_Token_Catalog_Service|null */
+	private ?Design_Token_Catalog_Service $token_catalog;
+
 	/** @var string|null Internal build-plan key for lookup of rollback/diff state. */
 	private ?string $current_plan_id = null;
 
 	/** @var array<string, array<string, string>>|null */
 	private ?array $current_tokens_cache = null;
 
+	/** @var array<string, string>|null token_group|token_name => purpose_sort */
+	private ?array $catalog_sort_by_pair = null;
+
+	/** @var array<string, string>|null token_group|token_name => purpose label */
+	private ?array $catalog_purpose_label_by_pair = null;
+
 	public function __construct(
 		Build_Plan_Row_Action_Resolver $row_action_resolver,
 		Global_Style_Settings_Repository $global_style_settings_repository,
 		?Operational_Snapshot_Repository_Interface $operational_snapshot_repository = null,
-		?Token_Diff_Summarizer $token_diff_summarizer = null
+		?Token_Diff_Summarizer $token_diff_summarizer = null,
+		?Design_Token_Catalog_Service $token_catalog = null
 	) {
 		$this->row_action_resolver              = $row_action_resolver;
 		$this->global_style_settings_repository = $global_style_settings_repository;
 		$this->operational_snapshot_repository  = $operational_snapshot_repository;
 		$this->token_diff_summarizer            = $token_diff_summarizer;
+		$this->token_catalog                    = $token_catalog;
 	}
 
 	/**
@@ -95,6 +107,22 @@ final class Tokens_Step_UI_Service {
 		if ( $step_index !== self::STEP_INDEX_DESIGN_TOKENS ) {
 			return $this->empty_workspace();
 		}
+		$this->catalog_sort_by_pair          = null;
+		$this->catalog_purpose_label_by_pair = null;
+		if ( $this->token_catalog !== null ) {
+			$this->catalog_sort_by_pair          = array();
+			$this->catalog_purpose_label_by_pair = array();
+			foreach ( $this->token_catalog->get_sorted_entries() as $entry ) {
+				$g = (string) ( $entry['group'] ?? '' );
+				$n = (string) ( $entry['name'] ?? '' );
+				if ( $g === '' || $n === '' ) {
+					continue;
+				}
+				$pk                                = $g . '|' . $n;
+				$this->catalog_sort_by_pair[ $pk ] = (string) ( $entry['purpose_sort'] ?? '' );
+				$this->catalog_purpose_label_by_pair[ $pk ] = (string) ( $entry['purpose'] ?? '' );
+			}
+		}
 		$this->current_plan_id = isset( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] ) && is_string( $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ] )
 			? $plan_definition[ Build_Plan_Schema::KEY_PLAN_ID ]
 			: null;
@@ -111,7 +139,9 @@ final class Tokens_Step_UI_Service {
 		}
 
 		$items                   = $this->eligible_items_from_step( $step );
+		$req_stats               = $this->required_token_stats( $items );
 		$rows                    = array();
+		$row_sort                = array();
 		$pending_count           = 0;
 		$approved_count          = 0;
 		$selected_pending_count  = 0;
@@ -139,8 +169,8 @@ final class Tokens_Step_UI_Service {
 			} elseif ( $is_selected ) {
 				++$selected_any_count;
 			}
-			$row_actions = $this->row_action_resolver->resolve( $item, $capabilities );
-			$rows[]      = array(
+			$row_actions          = $this->row_action_resolver->resolve( $item, $capabilities );
+			$rows[]               = array(
 				Step_Item_List_Component::ROW_KEY_ITEM_ID => $item_id,
 				Step_Item_List_Component::ROW_KEY_STATUS  => $status,
 				Step_Item_List_Component::ROW_KEY_STATUS_BADGE => $this->status_to_badge( $status ),
@@ -148,20 +178,50 @@ final class Tokens_Step_UI_Service {
 				Step_Item_List_Component::ROW_KEY_ROW_ACTIONS => $row_actions,
 				Step_Item_List_Component::ROW_KEY_IS_SELECTED => $is_selected,
 			);
+			$row_sort[ $item_id ] = $this->sort_tuple_for_item( $item );
 		}
+
+		usort(
+			$rows,
+			static function ( array $a, array $b ) use ( $row_sort ): int {
+				$ida = (string) $a[ Step_Item_List_Component::ROW_KEY_ITEM_ID ];
+				$idb = (string) $b[ Step_Item_List_Component::ROW_KEY_ITEM_ID ];
+				$sa  = $row_sort[ $ida ] ?? array( '~', '', '' );
+				$sb  = $row_sort[ $idb ] ?? array( '~', '', '' );
+				$c   = strcmp( (string) $sa[0], (string) $sb[0] );
+				if ( $c !== 0 ) {
+					return $c;
+				}
+				$c = strcmp( (string) $sa[1], (string) $sb[1] );
+				if ( $c !== 0 ) {
+					return $c;
+				}
+				return strcmp( (string) $sa[2], (string) $sb[2] );
+			}
+		);
 
 		$bulk_states       = $this->bulk_states( $pending_count, $approved_count, $selected_pending_count, $selected_approved_count, $selected_any_count, $capabilities );
 		$detail_panel      = $this->build_detail_panel( $items, $selected_item_id, $capabilities );
-		$step_messages     = $this->step_messages( count( $rows ), $pending_count );
+		$step_messages     = $this->step_messages( count( $rows ), $pending_count, $req_stats );
 		$token_set_summary = $this->build_token_set_summary( $items );
+		$catalog_json      = $this->token_catalog !== null ? $this->token_catalog->get_entries_for_json() : array();
+		$can_edit_tokens   = ! empty( $capabilities['can_approve'] );
+		$edit_form         = $this->build_design_token_edit_form( $items, $selected_item_id, $can_edit_tokens );
+
+		$this->catalog_sort_by_pair          = null;
+		$this->catalog_purpose_label_by_pair = null;
 
 		return array(
-			'step_list_rows'     => $rows,
-			'column_order'       => self::COLUMN_ORDER,
-			'bulk_action_states' => $bulk_states,
-			'detail_panel'       => $detail_panel,
-			'step_messages'      => $step_messages,
-			'token_set_summary'  => $token_set_summary,
+			'step_list_rows'          => $rows,
+			'column_order'            => self::COLUMN_ORDER,
+			'bulk_action_states'      => $bulk_states,
+			'detail_panel'            => $detail_panel,
+			'step_messages'           => $step_messages,
+			'token_set_summary'       => $token_set_summary,
+			'design_token_catalog'    => $catalog_json,
+			'design_token_required'   => $req_stats,
+			'design_token_edit_form'  => $edit_form,
+			'design_token_can_mutate' => $can_edit_tokens,
 		);
 	}
 
@@ -191,6 +251,13 @@ final class Tokens_Step_UI_Service {
 		$curr    = $this->current_value_for_token( $group, $name );
 		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
+			if ( $key === 'token_purpose' ) {
+				$pk           = ( $group !== '' && $name !== '' ) ? $group . '|' . $name : '';
+				$cols[ $key ] = ( $pk !== '' && $this->catalog_purpose_label_by_pair !== null && isset( $this->catalog_purpose_label_by_pair[ $pk ] ) )
+					? $this->catalog_purpose_label_by_pair[ $pk ]
+					: '—';
+				continue;
+			}
 			if ( $key === 'current_value' ) {
 				$cols[ $key ] = $curr !== '' ? $curr : '—';
 				continue;
@@ -456,39 +523,58 @@ final class Tokens_Step_UI_Service {
 		return $map[ $status ] ?? $status;
 	}
 
-	private function step_messages( int $total, int $eligible ): array {
-		if ( $total === 0 ) {
-			return array(
-				array(
-					'severity' => 'info',
-					'message'  => \__( 'No design token recommendations for this plan.', 'aio-page-builder' ),
-					'level'    => 'step',
+	/**
+	 * @param array{total: int, present: int, missing: int} $req_stats
+	 * @return array<int, array<string, string>>
+	 */
+	private function step_messages( int $total, int $eligible, array $req_stats ): array {
+		$messages = array();
+		if ( (int) ( $req_stats['missing'] ?? 0 ) > 0 ) {
+			$missing    = (int) $req_stats['missing'];
+			$messages[] = array(
+				'severity' => 'warning',
+				'message'  => sprintf(
+					/* translators: %d: count of missing required tokens */
+					\_n(
+						'%d required core design token is missing from this plan. Add required tokens or pick tokens from the catalog.',
+						'%d required core design tokens are missing from this plan. Add required tokens or pick tokens from the catalog.',
+						$missing,
+						'aio-page-builder'
+					),
+					$missing
 				),
+				'level'    => 'step',
 			);
+		}
+		if ( $total === 0 ) {
+			$messages[] = array(
+				'severity' => 'info',
+				'message'  => \__( 'No design token recommendations for this plan.', 'aio-page-builder' ),
+				'level'    => 'step',
+			);
+			return $messages;
 		}
 		if ( $eligible === 0 ) {
-			return array(
-				array(
-					'severity' => 'success',
-					'message'  => \__( 'All token recommendations have been reviewed.', 'aio-page-builder' ),
-					'level'    => 'step',
-				),
-			);
-		}
-		return array(
-			array(
-				'severity' => 'info',
-				'message'  => sprintf( /* translators: %d: number of tokens */ \_n( '%d token pending review.', '%d tokens pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+			$messages[] = array(
+				'severity' => 'success',
+				'message'  => \__( 'All token recommendations have been reviewed.', 'aio-page-builder' ),
 				'level'    => 'step',
-			),
+			);
+			return $messages;
+		}
+		$messages[] = array(
+			'severity' => 'info',
+			'message'  => sprintf( /* translators: %d: number of tokens */ \_n( '%d token pending review.', '%d tokens pending review.', $eligible, 'aio-page-builder' ), $eligible ),
+			'level'    => 'step',
 		);
+		return $messages;
 	}
 
 	private function empty_workspace(): array {
 		return array(
-			'step_list_rows'     => array(),
-			'column_order'       => self::COLUMN_ORDER,
-			'bulk_action_states' => array(
+			'step_list_rows'          => array(),
+			'column_order'            => self::COLUMN_ORDER,
+			'bulk_action_states'      => array(
 				Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 					'enabled'        => false,
 					'label'          => \__( 'Apply all tokens', 'aio-page-builder' ),
@@ -519,16 +605,135 @@ final class Tokens_Step_UI_Service {
 					'count_selected' => 0,
 				),
 			),
-			'detail_panel'       => array(
+			'detail_panel'            => array(
 				'item_id'     => '',
 				'sections'    => array(),
 				'row_actions' => array(),
 			),
-			'step_messages'      => array(),
-			'token_set_summary'  => array(
+			'step_messages'           => array(),
+			'token_set_summary'       => array(
 				'groups' => array(),
 				'total'  => 0,
 			),
+			'design_token_catalog'    => array(),
+			'design_token_required'   => array(
+				'total'   => 0,
+				'present' => 0,
+				'missing' => 0,
+			),
+			'design_token_edit_form'  => null,
+			'design_token_can_mutate' => false,
 		);
+	}
+
+	/**
+	 * @return array{total: int, present: int, missing: int}
+	 */
+	private function required_token_stats( array $items ): array {
+		if ( $this->token_catalog === null ) {
+			return array(
+				'total'   => 0,
+				'present' => 0,
+				'missing' => 0,
+			);
+		}
+		$present_keys = $this->present_token_pair_keys( $items );
+		$total        = 0;
+		$present      = 0;
+		foreach ( Design_Token_Required_Set::REQUIRED_PAIRS as $pair ) {
+			$g = $pair[0];
+			$n = $pair[1];
+			if ( ! $this->token_catalog->is_allowed_pair( $g, $n ) ) {
+				continue;
+			}
+			++$total;
+			if ( isset( $present_keys[ $g . "\0" . $n ] ) ) {
+				++$present;
+			}
+		}
+		return array(
+			'total'   => $total,
+			'present' => $present,
+			'missing' => max( 0, $total - $present ),
+		);
+	}
+
+	/**
+	 * @param array<int, array<string, mixed>> $items
+	 * @return array<string, bool>
+	 */
+	private function present_token_pair_keys( array $items ): array {
+		$out = array();
+		foreach ( $items as $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN ) {
+				continue;
+			}
+			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
+				: array();
+			$group   = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? trim( $payload['token_group'] ) : '';
+			$name    = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? trim( $payload['token_name'] ) : '';
+			if ( $group === '' || $name === '' ) {
+				continue;
+			}
+			$out[ $group . "\0" . $name ] = true;
+		}
+		return $out;
+	}
+
+	/**
+	 * @return array{0: string, 1: string, 2: string} purpose_sort, group, name
+	 */
+	private function sort_tuple_for_item( array $item ): array {
+		$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+			? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
+			: array();
+		$group   = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? trim( $payload['token_group'] ) : '';
+		$name    = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? trim( $payload['token_name'] ) : '';
+		$pk      = ( $group !== '' && $name !== '' ) ? $group . '|' . $name : '';
+		$ps      = ( $pk !== '' && $this->catalog_sort_by_pair !== null && isset( $this->catalog_sort_by_pair[ $pk ] ) )
+			? $this->catalog_sort_by_pair[ $pk ]
+			: ( '99_' . $group );
+		return array( $ps, $group, $name );
+	}
+
+	/**
+	 * @param array<int, array<string, mixed>> $items
+	 * @return array<string, mixed>|null
+	 */
+	private function build_design_token_edit_form( array $items, ?string $selected_item_id, bool $can_edit ): ?array {
+		if ( ! $can_edit || $selected_item_id === null || $selected_item_id === '' ) {
+			return null;
+		}
+		foreach ( $items as $item ) {
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_ID ] ?? '' ) !== $selected_item_id ) {
+				continue;
+			}
+			if ( (string) ( $item[ Build_Plan_Item_Schema::KEY_ITEM_TYPE ] ?? '' ) !== Build_Plan_Item_Schema::ITEM_TYPE_DESIGN_TOKEN ) {
+				return null;
+			}
+			$payload = isset( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] ) && is_array( $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ] )
+				? $item[ Build_Plan_Item_Schema::KEY_PAYLOAD ]
+				: array();
+			$group   = isset( $payload['token_group'] ) && is_string( $payload['token_group'] ) ? trim( $payload['token_group'] ) : '';
+			$name    = isset( $payload['token_name'] ) && is_string( $payload['token_name'] ) ? trim( $payload['token_name'] ) : '';
+			$prop    = $payload['proposed_value'] ?? '';
+			$prop_s  = is_scalar( $prop ) ? (string) $prop : (string) \wp_json_encode( $prop );
+			$rat     = isset( $payload['rationale'] ) && is_string( $payload['rationale'] ) ? $payload['rationale'] : '';
+			$cid     = ( $group !== '' && $name !== '' ) ? $group . '|' . $name : '';
+			return array(
+				'item_id'        => $selected_item_id,
+				'catalog_id'     => $cid,
+				'proposed_value' => $prop_s,
+				'rationale'      => $rat,
+			);
+		}
+		return null;
 	}
 }

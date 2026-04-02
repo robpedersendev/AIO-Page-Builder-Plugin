@@ -203,12 +203,61 @@ final class Navigation_Step_UI_Service {
 		$cols    = array();
 		foreach ( self::COLUMN_ORDER as $key ) {
 			$val = $payload[ $key ] ?? $item[ $key ] ?? '';
-			if ( $key === 'diff_summary' && is_array( $val ) ) {
+			if ( $key === 'proposed_menu_name' && $val === '' ) {
+				$val = $payload['menu_name'] ?? '';
+			}
+			if ( $key === 'current_menu_name' && $val === ''
+				&& \strtolower( (string) ( $payload['action'] ?? '' ) ) === 'create' ) {
+				$val = \__( '(none — new menu)', 'aio-page-builder' );
+			}
+			if ( $key === 'diff_summary' ) {
+				if ( $val === '' || ( is_array( $val ) && $val === array() ) ) {
+					$val = $this->format_items_column_preview( $payload['items'] ?? array() );
+				} elseif ( is_array( $val ) ) {
+					$val = implode( '; ', array_slice( array_map( 'strval', $val ), 0, 3 ) );
+				}
+			} elseif ( is_array( $val ) ) {
 				$val = implode( '; ', array_slice( array_map( 'strval', $val ), 0, 3 ) );
 			}
 			$cols[ $key ] = is_string( $val ) ? $val : (string) \wp_json_encode( $val );
 		}
 		return $cols;
+	}
+
+	/**
+	 * Short preview for the Items column when diff_summary is empty (e.g. net-new menu with structured items).
+	 *
+	 * @param mixed $items Payload items list.
+	 */
+	private function format_items_column_preview( $items ): string {
+		if ( ! is_array( $items ) || $items === array() ) {
+			return '';
+		}
+		$n       = count( $items );
+		$preview = array();
+		foreach ( array_slice( $items, 0, 3 ) as $entry ) {
+			if ( is_string( $entry ) ) {
+				$label = $entry;
+			} elseif ( is_array( $entry ) ) {
+				$label = (string) ( $entry['label'] ?? $entry['title'] ?? $entry['page_ref'] ?? '' );
+			} else {
+				$label = (string) $entry;
+			}
+			if ( $label !== '' ) {
+				$preview[] = $label;
+			}
+		}
+		if ( $preview === array() ) {
+			return sprintf( /* translators: %d: menu item count */ \__( '%d item(s)', 'aio-page-builder' ), $n );
+		}
+		$more = $n > count( $preview ) ? '…' : '';
+		return sprintf(
+			/* translators: 1: item count, 2: comma-separated labels, 3: ellipsis if truncated */
+			\__( '%1$d: %2$s%3$s', 'aio-page-builder' ),
+			$n,
+			implode( ', ', $preview ),
+			$more
+		);
 	}
 
 	/**
@@ -225,7 +274,7 @@ final class Navigation_Step_UI_Service {
 				: array();
 			$context  = (string) ( $payload['menu_context'] ?? 'default' );
 			$current  = $payload['current_menu_name'] ?? $payload['current_structure'] ?? '';
-			$proposed = (string) ( $payload['proposed_menu_name'] ?? '' );
+			$proposed = (string) ( $payload['proposed_menu_name'] ?? $payload['menu_name'] ?? '' );
 			$diff     = $payload['diff_summary'] ?? $payload['differences'] ?? array();
 			if ( ! is_array( $diff ) ) {
 				$diff = array();

@@ -40,6 +40,18 @@ final class New_Page_Creation_UI_Service {
 		'page_type',
 	);
 
+	/** Bulk bar keys: execute approved new pages (mirrors row Execute). */
+	public const BULK_CONTROL_EXECUTE_ALL_APPROVED = 'execute_all_approved_new_pages';
+
+	/** Bulk bar: execute selected rows that are approved. */
+	public const BULK_CONTROL_EXECUTE_SELECTED = 'execute_selected_new_pages';
+
+	/** Bulk bar: retry all failed new pages. */
+	public const BULK_CONTROL_RETRY_ALL_FAILED = 'retry_all_failed_new_pages';
+
+	/** Bulk bar: retry selected failed rows. */
+	public const BULK_CONTROL_RETRY_SELECTED_FAILED = 'retry_selected_failed_new_pages';
+
 	/** Minimum confidence for item to appear (spec §33.2: exclude low). */
 	private const MIN_CONFIDENCE_EXCLUDE = 'low';
 
@@ -160,6 +172,32 @@ final class New_Page_Creation_UI_Service {
 		$pending_count  = $eligibility['build_all_eligible'];
 		$selected_count = count( array_intersect( $selected_item_ids, array_column( $rows, 'item_id' ) ) );
 
+		$selected_id_set = array_fill_keys( array_map( 'strval', $selected_item_ids ), true );
+		$approved_count  = 0;
+		$failed_count    = 0;
+		$sel_approved    = 0;
+		$sel_failed      = 0;
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$st  = (string) ( $row[ Step_Item_List_Component::ROW_KEY_STATUS ] ?? '' );
+			$iid = (string) ( $row[ Step_Item_List_Component::ROW_KEY_ITEM_ID ] ?? '' );
+			if ( $st === Build_Plan_Item_Statuses::APPROVED ) {
+				++$approved_count;
+				if ( $iid !== '' && isset( $selected_id_set[ $iid ] ) ) {
+					++$sel_approved;
+				}
+			}
+			if ( $st === Build_Plan_Item_Statuses::FAILED ) {
+				++$failed_count;
+				if ( $iid !== '' && isset( $selected_id_set[ $iid ] ) ) {
+					++$sel_failed;
+				}
+			}
+		}
+		$can_execute = ! empty( $capabilities['can_execute'] );
+
 		$bulk_states = array(
 			Bulk_Action_Bar_Component::CONTROL_APPLY_TO_ALL => array(
 				'enabled'        => $pending_count > 0 && ! empty( $capabilities['can_approve'] ),
@@ -184,6 +222,26 @@ final class New_Page_Creation_UI_Service {
 			Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
 				'enabled' => $pending_count > 0,
 				'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+			),
+			self::BULK_CONTROL_EXECUTE_ALL_APPROVED     => array(
+				'enabled'        => $can_execute && $approved_count > 0,
+				'label'          => \__( 'Execute all approved pages', 'aio-page-builder' ),
+				'count_eligible' => $approved_count,
+			),
+			self::BULK_CONTROL_EXECUTE_SELECTED         => array(
+				'enabled'        => $can_execute && $sel_approved > 0,
+				'label'          => \__( 'Execute selected pages', 'aio-page-builder' ),
+				'count_selected' => $sel_approved,
+			),
+			self::BULK_CONTROL_RETRY_ALL_FAILED         => array(
+				'enabled'        => $can_execute && $failed_count > 0,
+				'label'          => \__( 'Retry all failed pages', 'aio-page-builder' ),
+				'count_eligible' => $failed_count,
+			),
+			self::BULK_CONTROL_RETRY_SELECTED_FAILED    => array(
+				'enabled'        => $can_execute && $sel_failed > 0,
+				'label'          => \__( 'Retry selected failed pages', 'aio-page-builder' ),
+				'count_selected' => $sel_failed,
 			),
 		);
 
@@ -399,7 +457,7 @@ final class New_Page_Creation_UI_Service {
 					'label'          => \__( 'Build Selected Pages', 'aio-page-builder' ),
 					'count_selected' => 0,
 				),
-				'deny_selected' => array(
+				'deny_selected'                          => array(
 					'enabled'        => false,
 					'label'          => \__( 'Deny Selected Pages', 'aio-page-builder' ),
 					'count_selected' => 0,
@@ -412,6 +470,26 @@ final class New_Page_Creation_UI_Service {
 				Bulk_Action_Bar_Component::CONTROL_CLEAR_SELECTION => array(
 					'enabled' => false,
 					'label'   => \__( 'Clear selection', 'aio-page-builder' ),
+				),
+				self::BULK_CONTROL_EXECUTE_ALL_APPROVED  => array(
+					'enabled'        => false,
+					'label'          => \__( 'Execute all approved pages', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				self::BULK_CONTROL_EXECUTE_SELECTED      => array(
+					'enabled'        => false,
+					'label'          => \__( 'Execute selected pages', 'aio-page-builder' ),
+					'count_selected' => 0,
+				),
+				self::BULK_CONTROL_RETRY_ALL_FAILED      => array(
+					'enabled'        => false,
+					'label'          => \__( 'Retry all failed pages', 'aio-page-builder' ),
+					'count_eligible' => 0,
+				),
+				self::BULK_CONTROL_RETRY_SELECTED_FAILED => array(
+					'enabled'        => false,
+					'label'          => \__( 'Retry selected failed pages', 'aio-page-builder' ),
+					'count_selected' => 0,
 				),
 			),
 			'detail_panel'       => array(

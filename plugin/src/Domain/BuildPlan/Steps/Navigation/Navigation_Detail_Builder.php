@@ -37,9 +37,11 @@ final class Navigation_Detail_Builder {
 		$sections = array();
 
 		$sections[] = $this->section_navigation_context( $payload );
+		$sections[] = $this->section_named_menu_summary( $payload );
 		$sections[] = $this->section_current_vs_proposed( $payload );
 		$sections[] = $this->section_diff_summary( $payload );
 		$sections[] = $this->section_menu_action( $payload );
+		$sections[] = $this->section_menu_hierarchy( $payload );
 		$sections[] = $this->section_item_assignment( $payload );
 		$sections[] = $this->section_location_assignment( $payload );
 		$sections[] = $this->section_validation( $payload );
@@ -47,7 +49,7 @@ final class Navigation_Detail_Builder {
 		return array_filter(
 			$sections,
 			static function ( $s ) {
-				return $s !== null && is_array( $s );
+				return $s !== null;
 			}
 		);
 	}
@@ -62,9 +64,28 @@ final class Navigation_Detail_Builder {
 		);
 	}
 
+	private function section_named_menu_summary( array $payload ): array {
+		$name = (string) ( $payload['proposed_menu_name'] ?? '' );
+		if ( $name === '' ) {
+			$name = (string) ( $payload['menu_name'] ?? '' );
+		}
+		if ( $name === '' ) {
+			return array(
+				Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'WordPress menu name', 'aio-page-builder' ),
+				Detail_Panel_Component::SECTION_KEY_KEY => 'menu_name_summary',
+				Detail_Panel_Component::SECTION_KEY_CONTENT_LINES => array( \__( 'Not specified in plan data.', 'aio-page-builder' ) ),
+			);
+		}
+		return array(
+			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'WordPress menu name', 'aio-page-builder' ),
+			Detail_Panel_Component::SECTION_KEY_KEY     => 'menu_name_summary',
+			Detail_Panel_Component::SECTION_KEY_CONTENT_LINES => array( \esc_html( $name ) ),
+		);
+	}
+
 	private function section_current_vs_proposed( array $payload ): array {
 		$current  = $payload['current_structure'] ?? $payload['current_menu_name'] ?? '';
-		$proposed = $payload['proposed_structure'] ?? $payload['proposed_menu_name'] ?? '';
+		$proposed = $payload['proposed_structure'] ?? $payload['proposed_menu_name'] ?? $payload['menu_name'] ?? '';
 		$lines    = array();
 		$lines[]  = \__( 'Current:', 'aio-page-builder' ) . ' ' . ( is_string( $current ) ? \esc_html( $current ) : \esc_html( (string) \wp_json_encode( $current ) ) );
 		$lines[]  = \__( 'Proposed:', 'aio-page-builder' ) . ' ' . ( is_string( $proposed ) ? \esc_html( $proposed ) : \esc_html( (string) \wp_json_encode( $proposed ) ) );
@@ -109,6 +130,52 @@ final class Navigation_Detail_Builder {
 			Detail_Panel_Component::SECTION_KEY_KEY     => 'menu_action',
 			Detail_Panel_Component::SECTION_KEY_CONTENT_LINES => $lines,
 		);
+	}
+
+	private function section_menu_hierarchy( array $payload ): ?array {
+		$items = $payload['items'] ?? array();
+		if ( ! is_array( $items ) || $items === array() ) {
+			return null;
+		}
+		$lines = $this->flatten_menu_tree_lines( $items, 0 );
+		if ( $lines === array() ) {
+			return null;
+		}
+		return array(
+			Detail_Panel_Component::SECTION_KEY_HEADING => \__( 'Proposed menu hierarchy (preview)', 'aio-page-builder' ),
+			Detail_Panel_Component::SECTION_KEY_KEY     => 'menu_hierarchy_preview',
+			Detail_Panel_Component::SECTION_KEY_CONTENT_LINES => $lines,
+		);
+	}
+
+	/**
+	 * @param array<int, mixed> $nodes
+	 * @return array<int, string> Escaped HTML lines.
+	 */
+	private function flatten_menu_tree_lines( array $nodes, int $depth ): array {
+		$lines = array();
+		foreach ( $nodes as $node ) {
+			if ( is_string( $node ) ) {
+				$lines[] = \esc_html( str_repeat( '  ', $depth ) . '- ' . $node );
+				continue;
+			}
+			if ( ! is_array( $node ) ) {
+				continue;
+			}
+			$label = (string) ( $node['label'] ?? $node['title'] ?? '' );
+			if ( $label === '' ) {
+				$label = (string) ( $node['page_ref'] ?? $node['slug'] ?? '' );
+			}
+			if ( $label === '' ) {
+				$label = (string) \wp_json_encode( $node );
+			}
+			$lines[] = \esc_html( str_repeat( '  ', $depth ) . '- ' . $label );
+			$nested  = $node['children'] ?? $node['subitems'] ?? $node['child_items'] ?? null;
+			if ( is_array( $nested ) && $nested !== array() ) {
+				$lines = array_merge( $lines, $this->flatten_menu_tree_lines( $nested, $depth + 1 ) );
+			}
+		}
+		return $lines;
 	}
 
 	private function section_item_assignment( array $payload ): array {

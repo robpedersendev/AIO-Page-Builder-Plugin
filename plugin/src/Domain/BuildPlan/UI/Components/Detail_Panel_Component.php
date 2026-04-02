@@ -70,7 +70,6 @@ final class Detail_Panel_Component {
 					<?php $this->render_sections( $sections ); ?>
 					<?php if ( ! empty( $row_actions ) ) : ?>
 						<div class="aio-detail-panel-actions">
-							<h4><?php \esc_html_e( 'Actions', 'aio-page-builder' ); ?></h4>
 							<?php $this->render_detail_actions( $row_actions, $item_id ); ?>
 						</div>
 					<?php endif; ?>
@@ -126,6 +125,7 @@ final class Detail_Panel_Component {
 	 * @return void
 	 */
 	private function render_detail_actions( array $actions, string $item_id ): void {
+		$lis = array();
 		foreach ( $actions as $action ) {
 			$action_id = (string) ( $action['action_id'] ?? '' );
 			$label     = (string) ( $action['label'] ?? $action_id );
@@ -133,12 +133,26 @@ final class Detail_Panel_Component {
 			$url       = isset( $action['url'] ) ? (string) $action['url'] : '';
 			$css_class = 'aio-detail-action aio-detail-action-' . \sanitize_html_class( $action_id );
 			if ( ! $enabled ) {
-				echo '<span class="button button-small ' . \esc_attr( $css_class . ' aio-detail-action-disabled' ) . '" aria-disabled="true">' . \esc_html( $label ) . '</span> ';
+				$inner = '<span class="' . \esc_attr( $css_class . ' aio-detail-action-disabled' ) . '" aria-disabled="true">' . \esc_html( $label ) . '</span>';
 			} elseif ( $url !== '' ) {
-				echo '<a href="' . \esc_url( $url ) . '" class="button button-small ' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</a> ';
+				$inner = '<a href="' . \esc_url( $url ) . '" class="' . \esc_attr( $css_class . ' aio-detail-action-link' ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</a>';
 			} else {
-				echo '<button type="button" class="button button-small ' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button> ';
+				$inner = '<button type="button" class="' . \esc_attr( $css_class ) . '" data-item-id="' . \esc_attr( $item_id ) . '" data-action="' . \esc_attr( $action_id ) . '">' . \esc_html( $label ) . '</button>';
 			}
+			$lis[] = '<li class="aio-detail-actions-li">' . $inner . '</li>';
 		}
+		?>
+		<div class="aio-detail-actions-menu">
+			<details class="aio-detail-actions-details" open>
+				<summary class="aio-detail-actions-summary"><?php \esc_html_e( 'Actions', 'aio-page-builder' ); ?></summary>
+				<ul class="aio-detail-actions-list" role="list">
+					<?php
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- List items built with esc_* above.
+					echo implode( '', $lis );
+					?>
+				</ul>
+			</details>
+		</div>
+		<?php
 	}
 }

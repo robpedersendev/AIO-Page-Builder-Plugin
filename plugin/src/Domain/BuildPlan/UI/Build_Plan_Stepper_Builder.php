@@ -67,7 +67,7 @@ final class Build_Plan_Stepper_Builder {
 	}
 
 	/**
-	 * Computes unresolved (non-terminal) item count per step index.
+	 * Computes per-step counts for stepper badges and forward-blocking (pending, in_progress, failed).
 	 *
 	 * @param array<int, array<string, mixed>> $steps_raw
 	 * @return array<int, int>
@@ -91,7 +91,7 @@ final class Build_Plan_Stepper_Builder {
 					continue;
 				}
 				$status = (string) ( $item[ Build_Plan_Item_Schema::KEY_STATUS ] ?? Build_Plan_Item_Statuses::PENDING );
-				if ( ! Build_Plan_Item_Statuses::is_terminal( $status ) ) {
+				if ( Build_Plan_Item_Statuses::counts_toward_stepper_unresolved( $status ) ) {
 					++$counts[ $idx ];
 				}
 			}
